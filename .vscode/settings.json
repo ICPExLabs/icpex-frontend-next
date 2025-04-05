@@ -1,0 +1,17 @@
+{
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "npm.packageManager": "pnpm",
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "files.eol": "\n",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "cSpell.words": [
+        "Avenir",
+        "heroui",
+        "ianvs",
+        "icpex",
+        "usehooks"
+    ],
+}
