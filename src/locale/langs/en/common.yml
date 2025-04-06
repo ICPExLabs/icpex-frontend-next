@@ -1,0 +1,9 @@
+nav:
+    swap: Swap
+    pools: Pools
+    explore: Explore
+    tools: Tools
+    ai: AI
+
+search:
+    placeholder: Search by symbol or canister id

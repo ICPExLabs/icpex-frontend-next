@@ -1,19 +1,31 @@
 import { HeroUIProvider } from '@heroui/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { I18nextProvider } from 'react-i18next';
 import { BrowserRouter } from 'react-router';
 
-import './index.css';
-
 import App from './App';
+import i18n from './locale/index.ts';
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+import 'animate.css';
+import './assets/css/tailwind.css';
+import './assets/css/fonts.scss';
+import './assets/css/main.scss';
+import './assets/iconfont/iconfont.js';
+
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <HeroUIProvider>
-                <App />
-            </HeroUIProvider>
+            <QueryClientProvider client={queryClient}>
+                <HeroUIProvider>
+                    <I18nextProvider i18n={i18n}>
+                        <App />
+                    </I18nextProvider>
+                </HeroUIProvider>
+            </QueryClientProvider>
         </BrowserRouter>
     </StrictMode>,
 );
