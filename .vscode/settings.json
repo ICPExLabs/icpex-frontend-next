@@ -9,10 +9,15 @@
     },
     "cSpell.words": [
         "Avenir",
+        "douyinfe",
         "heroui",
         "ianvs",
         "icpex",
         "modyfi",
         "usehooks"
+    ],
+    "i18n-ally.localesPaths": [
+        "src/locale",
+        "src/locale/langs"
     ],
 }

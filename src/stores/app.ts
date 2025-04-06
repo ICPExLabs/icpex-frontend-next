@@ -1,3 +1,6 @@
+import { Locale } from '@douyinfe/semi-ui/lib/es/locale/interface';
+import en_US from '@douyinfe/semi-ui/lib/es/locale/source/en_US';
+import zh_CN from '@douyinfe/semi-ui/lib/es/locale/source/zh_CN';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -10,6 +13,7 @@ type ThemeMode = 'light' | 'dark';
 
 interface AppState {
     language: SupportedLanguage;
+    designLang: Locale;
     theme: ThemeMode;
     setLanguage: (language: SupportedLanguage) => void;
     setTheme: (theme: ThemeMode) => void;
@@ -50,11 +54,12 @@ export const useAppStore = create<AppState>()(
         persist(
             (set, get) => ({
                 language: 'en',
+                designLang: en_US,
                 theme: getSystemTheme(),
 
                 setLanguage: (language) => {
                     setLanguage(language);
-                    set({ language });
+                    set({ language, designLang: language === 'zh-CN' ? zh_CN : en_US });
                 },
 
                 setTheme: (theme) => {

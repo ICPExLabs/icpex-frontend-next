@@ -1,9 +1,8 @@
-import { HeroUIProvider } from '@heroui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import App from './App';
 import i18n from './locale/index.ts';
@@ -20,11 +19,9 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
-                <HeroUIProvider>
-                    <I18nextProvider i18n={i18n}>
-                        <App />
-                    </I18nextProvider>
-                </HeroUIProvider>
+                <I18nextProvider i18n={i18n}>
+                    <App />
+                </I18nextProvider>
             </QueryClientProvider>
         </BrowserRouter>
     </StrictMode>,

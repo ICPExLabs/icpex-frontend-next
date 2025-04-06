@@ -1,20 +1,22 @@
+import { LocaleProvider } from '@douyinfe/semi-ui';
 import { useEffect } from 'react';
-import { useRoutes } from 'react-router';
+// import { useRoutes } from 'react-router';
+import { useRoutes } from 'react-router-dom';
 
 import { setLanguage } from './locale';
-import { routes } from './routes/routes';
+import routes from './routes/routes';
 import { useAppStore } from './stores/app';
 
 function App() {
     const views = useRoutes(routes);
 
-    const { language, initThemeListener } = useAppStore();
+    const { language, designLang, initThemeListener } = useAppStore();
     useEffect(() => setLanguage(language), [language]);
     useEffect(() => {
         initThemeListener();
     }, [initThemeListener]);
 
-    return <>{views}</>;
+    return <LocaleProvider locale={designLang}>{views}</LocaleProvider>;
 }
 
 export default App;
