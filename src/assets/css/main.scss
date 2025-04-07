@@ -11,3 +11,17 @@ body {
         display: none;
     }
 }
+
+.login-modal {
+    .semi-sidesheet-inner {
+        background-color: transparent;
+    }
+
+    .semi-sidesheet-header {
+        display: none;
+    }
+
+    .semi-sidesheet-mask {
+        background-color: transparent;
+    }
+}

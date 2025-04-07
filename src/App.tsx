@@ -1,6 +1,5 @@
 import { LocaleProvider } from '@douyinfe/semi-ui';
 import { useEffect } from 'react';
-// import { useRoutes } from 'react-router';
 import { useRoutes } from 'react-router-dom';
 
 import { setLanguage } from './locale';

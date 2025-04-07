@@ -1,11 +1,11 @@
 @font-face {
   font-family: "iconfont";
-  src: url('iconfont.eot?t=4ffeb51f8830e75f865da12c277fe298'); /* IE9 */
-  src: url('iconfont.eot?t=4ffeb51f8830e75f865da12c277fe298#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=4ffeb51f8830e75f865da12c277fe298') format('woff2'),
-  url('iconfont.woff?t=4ffeb51f8830e75f865da12c277fe298') format('woff'), /* chrome、firefox */
-  url('iconfont.ttf?t=4ffeb51f8830e75f865da12c277fe298') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=4ffeb51f8830e75f865da12c277fe298#iconfont') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=59c3668dc3c3e471426a85395f166098'); /* IE9 */
+  src: url('iconfont.eot?t=59c3668dc3c3e471426a85395f166098#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=59c3668dc3c3e471426a85395f166098') format('woff2'),
+  url('iconfont.woff?t=59c3668dc3c3e471426a85395f166098') format('woff'), /* chrome、firefox */
+  url('iconfont.ttf?t=59c3668dc3c3e471426a85395f166098') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=59c3668dc3c3e471426a85395f166098#iconfont') format('svg'); /* iOS 4.1- */
 }
 
 .iconfont {
@@ -147,4 +147,19 @@
 }
 .icon-x:before {
   content: "\e031";
+}
+.icon-bitfinity:before {
+  content: "\e032";
+}
+.icon-ii:before {
+  content: "\e033";
+}
+.icon-me:before {
+  content: "\e034";
+}
+.icon-plug:before {
+  content: "\e035";
+}
+.icon-checkbox:before {
+  content: "\e036";
 }
