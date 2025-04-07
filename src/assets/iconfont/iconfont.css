@@ -1,11 +1,11 @@
 @font-face {
   font-family: "iconfont";
-  src: url('iconfont.eot?t=ff33385aa183199b9f93ccbecd06b12a'); /* IE9 */
-  src: url('iconfont.eot?t=ff33385aa183199b9f93ccbecd06b12a#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=ff33385aa183199b9f93ccbecd06b12a') format('woff2'),
-  url('iconfont.woff?t=ff33385aa183199b9f93ccbecd06b12a') format('woff'), /* chrome、firefox */
-  url('iconfont.ttf?t=ff33385aa183199b9f93ccbecd06b12a') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=ff33385aa183199b9f93ccbecd06b12a#iconfont') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=4ffeb51f8830e75f865da12c277fe298'); /* IE9 */
+  src: url('iconfont.eot?t=4ffeb51f8830e75f865da12c277fe298#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=4ffeb51f8830e75f865da12c277fe298') format('woff2'),
+  url('iconfont.woff?t=4ffeb51f8830e75f865da12c277fe298') format('woff'), /* chrome、firefox */
+  url('iconfont.ttf?t=4ffeb51f8830e75f865da12c277fe298') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=4ffeb51f8830e75f865da12c277fe298#iconfont') format('svg'); /* iOS 4.1- */
 }
 
 .iconfont {
@@ -87,4 +87,64 @@
 }
 .icon-logo:before {
   content: "\e01c";
+}
+.icon-favicon:before {
+  content: "\e01d";
+}
+.icon-menu:before {
+  content: "\e01f";
+}
+.icon-menu-hover:before {
+  content: "\e020";
+}
+.icon-moon:before {
+  content: "\e021";
+}
+.icon-sun:before {
+  content: "\e022";
+}
+.icon-exchange:before {
+  content: "\e023";
+}
+.icon-exchange-hover:before {
+  content: "\e024";
+}
+.icon-setting-hover:before {
+  content: "\e025";
+}
+.icon-setting:before {
+  content: "\e026";
+}
+.icon-del:before {
+  content: "\e027";
+}
+.icon-in:before {
+  content: "\e028";
+}
+.icon-off:before {
+  content: "\e029";
+}
+.icon-lock:before {
+  content: "\e02a";
+}
+.icon-out:before {
+  content: "\e02b";
+}
+.icon-image:before {
+  content: "\e02c";
+}
+.icon-image-hover:before {
+  content: "\e02d";
+}
+.icon-document:before {
+  content: "\e02e";
+}
+.icon-github:before {
+  content: "\e02f";
+}
+.icon-telegram:before {
+  content: "\e030";
+}
+.icon-x:before {
+  content: "\e031";
 }

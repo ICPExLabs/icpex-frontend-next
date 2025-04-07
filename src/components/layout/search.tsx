@@ -198,7 +198,7 @@ const SearchComponents = () => {
             <div className="relative ml-[72px] h-10 w-[440px]">
                 <div
                     className={cn(
-                        'absolute z-10 flex w-full flex-col items-center rounded-[40px] bg-[#f2f4ff] duration-500',
+                        'absolute z-10 flex w-full flex-col items-center rounded-[40px] bg-[#f2f4ff]',
                         isOpenSearch && 'rounded-[20px] bg-white',
                     )}
                 >
@@ -215,13 +215,12 @@ const SearchComponents = () => {
                         />
                     </div>
 
-                    <AnimatePresence>
-                        {isOpenSearch && (
-                            <>
-                                <div className="no-scrollbar flex max-h-[504px] min-h-[170px] w-full flex-col overflow-y-scroll pb-[15px]">
-                                    {!keyword && (
-                                        <>
-                                            {/* <div className="mt-[10px] mb-[8px] flex w-full items-center px-4">
+                    {isOpenSearch && (
+                        <>
+                            <div className="no-scrollbar flex max-h-[504px] min-h-[170px] w-full flex-col overflow-y-scroll pb-[15px]">
+                                {!keyword && (
+                                    <>
+                                        {/* <div className="mt-[10px] mb-[8px] flex w-full items-center px-4">
                                                 <Icon name="history" className="h-4 w-3.5 text-[#97a0c9]"></Icon>
                                                 <p className="ml-2 text-sm font-medium text-[#272e4d]">
                                                     {t('common.search.recent')}
@@ -233,52 +232,48 @@ const SearchComponents = () => {
                                                 ))}
                                             </div> */}
 
-                                            {popularList && popularList.length ? (
-                                                <>
-                                                    <div className="mt-[10px] flex w-full items-center px-4">
-                                                        <Icon
-                                                            name="popular"
-                                                            className="h-4 w-3.5 text-[#97a0c9]"
-                                                        ></Icon>
-                                                        <p className="ml-2 text-sm font-medium text-[#272e4d]">
-                                                            {t('common.search.popular')}
-                                                        </p>
-                                                    </div>
-                                                    <div className="mt-2 flex w-full flex-col">
-                                                        {popularList.map((item, index) => (
-                                                            <SearchResultItem key={index} data={item} />
-                                                        ))}
-                                                    </div>
-                                                </>
-                                            ) : null}
-                                        </>
-                                    )}
-
-                                    {keyword && (
-                                        <>
-                                            {!searchResult?.length ? (
-                                                <div className="mt-[40px] mb-[70px] flex w-full flex-col items-center justify-center">
-                                                    <Icon
-                                                        name="no"
-                                                        className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]"
-                                                    />
-                                                    <p className="mt-[13px] text-sm font-medium text-[#97a0c9]">
-                                                        {t('common.search.noResults')}
+                                        {popularList && popularList.length ? (
+                                            <>
+                                                <div className="mt-[10px] flex w-full items-center px-4">
+                                                    <Icon name="popular" className="h-4 w-3.5 text-[#97a0c9]"></Icon>
+                                                    <p className="ml-2 text-sm font-medium text-[#272e4d]">
+                                                        {t('common.search.popular')}
                                                     </p>
                                                 </div>
-                                            ) : (
-                                                <div className="flex w-full flex-col">
-                                                    {searchResult.map((item, index) => (
+                                                <div className="mt-2 flex w-full flex-col">
+                                                    {popularList.map((item, index) => (
                                                         <SearchResultItem key={index} data={item} />
                                                     ))}
                                                 </div>
-                                            )}
-                                        </>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </AnimatePresence>
+                                            </>
+                                        ) : null}
+                                    </>
+                                )}
+
+                                {keyword && (
+                                    <>
+                                        {!searchResult?.length ? (
+                                            <div className="mt-[40px] mb-[70px] flex w-full flex-col items-center justify-center">
+                                                <Icon
+                                                    name="no"
+                                                    className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]"
+                                                />
+                                                <p className="mt-[13px] text-sm font-medium text-[#97a0c9]">
+                                                    {t('common.search.noResults')}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex w-full flex-col">
+                                                {searchResult.map((item, index) => (
+                                                    <SearchResultItem key={index} data={item} />
+                                                ))}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </>
