@@ -28,8 +28,8 @@ export const createClient = () => {
     const globalProviderConfig = {
         appName: 'ICPEx',
         dev: true,
-        // host: 'https://icp0.io', // 'https://boundary.ic0.app'
-        host: window.location.origin,
+        host: 'https://icp0.io', // 'https://boundary.ic0.app'
+        // host: window.location.origin,
         // host: import.meta.env.CONNECT_HOST,
         customDomain: derivationOrigin,
         whitelist,
