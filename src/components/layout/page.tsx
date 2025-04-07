@@ -18,7 +18,7 @@ function PageLayout({ children }: { children: React.ReactNode }) {
 
                 <Header />
 
-                <div className="relative flex w-full xl:min-h-[1015px]" ref={childRef}>
+                <div className="relative flex w-full" ref={childRef}>
                     {children}
                 </div>
 
