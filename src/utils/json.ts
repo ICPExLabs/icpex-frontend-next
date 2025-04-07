@@ -1,4 +1,4 @@
-import { isPrincipalText } from '../../principals';
+import { isPrincipalText } from './principals';
 
 // Custom JSON stringifier
 // ! Note: Some types cannot be restored

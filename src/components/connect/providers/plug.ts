@@ -11,7 +11,7 @@ import { IDL } from '@dfinity/candid';
 import { Principal } from '@dfinity/principal';
 import { err, ok } from 'neverthrow';
 
-import { readLastConnectType, writeLastConnectType } from '../../storage';
+import { readLastConnectType, writeLastConnectType } from '../../../utils/storage';
 import plugLogoDark from './svg/plug-dark.min.svg';
 import plugLogoLight from './svg/plug-light.min.svg';
 
@@ -80,24 +80,8 @@ export class CustomPlugWallet {
 
     // Update callback after plug login
     onUpdate = () => {
-        // const { agent, principal, accountId } = window.ic.plug.sessionManager.sessionData;
-        // // agent.getPrincipal().then((principal: Principal) => {
-        // //     console.debug(
-        // //         `🚀 ~ file: plug.ts:85 ~ CustomPlugWallet ~ agent.getPrincipal ~ principal:`,
-        // //         principal.toText(),
-        // //     );
-        // // });
-        // console.debug(`🚀 ~ file: plug.ts:87 ~ CustomPlugWallet ~ accountId:`, accountId);
-        // console.debug(`🚀 ~ file: plug.ts:87 ~ CustomPlugWallet ~ principal:`, principal);
-        // console.debug(`🚀 ~ file: plug.ts:87 ~ CustomPlugWallet ~ agent:`, agent);
         if (readLastConnectType() === 'plug') {
             writeLastConnectType('');
-            // If previously logged in with plug
-            // message.success({
-            //     content: `The connected identity has changed, the wallet will log out.`,
-            //     duration: 2,
-            //     onClose: () => window.location.reload(),
-            // });
         }
     };
 

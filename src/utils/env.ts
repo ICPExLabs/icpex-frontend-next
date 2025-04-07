@@ -54,11 +54,3 @@ export const getConnectDerivationOrigin = (): string | undefined => {
             return undefined;
     }
 };
-
-if (import.meta.env.DEV) {
-    console.debug('Environment config:', {
-        command: getCommand(),
-        buildMode: getBuildMode(),
-        connectHost: getConnectHost(),
-    });
-}

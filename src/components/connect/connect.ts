@@ -2,9 +2,9 @@ import { createClient as create, IConnector } from '@connect2ic/core';
 
 import { ConnectedIdentity, ConnectType } from '@/types/identity';
 
-import { principal2account } from '../account';
-import { getConnectDerivationOrigin } from '../env';
-import { isPrincipalText } from '../principals';
+import { principal2account } from '../../utils/account';
+import { getConnectDerivationOrigin } from '../../utils/env';
+import { isPrincipalText } from '../../utils/principals';
 import { getActorCreatorByActiveProvider } from './creator';
 import { CustomInternetIdentity } from './providers/ii';
 import { CustomPlugWallet } from './providers/plug';

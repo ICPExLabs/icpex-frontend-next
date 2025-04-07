@@ -1,8 +1,8 @@
 import { getCrc32 } from '@dfinity/principal/lib/esm/utils/getCrc';
 import { sha224 } from '@dfinity/principal/lib/esm/utils/sha224';
 
-import { string2array } from './common/data/arrays';
-import { array2hex, hex2array } from './common/data/hex';
+import { string2array } from './arrays';
+import { array2hex, hex2array } from './hex';
 import { string2principal } from './principals';
 
 // Calculate account from Principal

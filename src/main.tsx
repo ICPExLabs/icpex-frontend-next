@@ -6,8 +6,8 @@ import { I18nextProvider } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import { createClient } from './components/connect/connect.ts';
 import i18n from './locale/index.ts';
-import { createClient } from './utils/connect/connect.ts';
 
 import 'animate.css';
 import './assets/css/tailwind.css';
