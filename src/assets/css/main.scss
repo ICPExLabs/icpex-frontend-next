@@ -1,4 +1,13 @@
-html , body {
-
+html,
+body {
+    font-family: "Instrument_Sans" !important;
 }
 
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

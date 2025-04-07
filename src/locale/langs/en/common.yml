@@ -7,3 +7,7 @@ nav:
 
 search:
     placeholder: Search by symbol or canister id
+    noResults: No tokens found.
+    recent: Recent searches
+    popular: Popular tokens
+    tokens: Tokens
