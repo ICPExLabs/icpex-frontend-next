@@ -16,7 +16,7 @@ interface IdentityStore {
     connectedIdentity: ConnectedIdentity | undefined;
     setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => void;
 
-    tokenList: TokenInfo[];
+    tokenList: TokenInfo[] | undefined;
     setTokenList: (tokenList: TokenInfo[]) => void;
 }
 
