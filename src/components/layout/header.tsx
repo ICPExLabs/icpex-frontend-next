@@ -14,6 +14,7 @@ const Header = () => {
     const scroll = useScroll(document);
     // const theme = useAppStore((state) => state.theme);
     // const changeTheme = useAppStore((state) => state.toggleTheme);
+    // const { theme, changeTheme } = useAppStore();
 
     return (
         <>

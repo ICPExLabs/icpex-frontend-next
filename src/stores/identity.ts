@@ -5,20 +5,14 @@ import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { ConnectedIdentity } from '@/types/identity';
 import { isDevMode } from '@/utils/env';
 
-interface IdentityState {
+interface IdentityStore {
     showLoginModal: boolean;
     showInfoModal: boolean;
     connectedIdentity: ConnectedIdentity | undefined;
-}
 
-interface IdentityActions {
     setShowLoginModal: (show: boolean) => void;
     setShowInfoModal: (show: boolean) => void;
     setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => void;
-}
-
-interface IdentityStore extends IdentityState {
-    actions: IdentityActions;
 }
 
 const STORE_NAME = 'IdentityStore';
@@ -37,29 +31,29 @@ export const useIdentityStore = create<IdentityStore>()(
     devtools(
         subscribeWithSelector((set, get) => ({
             showLoginModal: false,
+            setShowLoginModal: (showLoginModal) => set({ showLoginModal }),
+
             showInfoModal: false,
+            setShowInfoModal: (showInfoModal) => set({ showInfoModal }),
+
             connectedIdentity: undefined,
-            actions: {
-                setShowLoginModal: (showLoginModal) => set({ showLoginModal }),
-                setShowInfoModal: (showInfoModal) => set({ showInfoModal }),
-                setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => {
-                    // console.warn('identity state connected', connectedIdentity);
-                    let delta: Partial<IdentityState> = {};
-                    if (connectedIdentity === undefined) {
-                        delta = resetConnectedState(connectedIdentity); // logout
+            setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => {
+                // console.warn('identity state connected', connectedIdentity);
+                let delta: Partial<IdentityState> = {};
+                if (connectedIdentity === undefined) {
+                    delta = resetConnectedState(connectedIdentity); // logout
+                } else {
+                    // connected
+                    const { connectedIdentity: old } = get();
+                    if (old === undefined) {
+                        delta = resetConnectedState(connectedIdentity); // no connect, new
+                    } else if (old.principal === connectedIdentity.principal) {
+                        delta = { connectedIdentity }; // no change
                     } else {
-                        // connected
-                        const { connectedIdentity: old } = get();
-                        if (old === undefined) {
-                            delta = resetConnectedState(connectedIdentity); // no connect, new
-                        } else if (old.principal === connectedIdentity.principal) {
-                            delta = { connectedIdentity }; // no change
-                        } else {
-                            delta = resetConnectedState(connectedIdentity); // change principal
-                        }
+                        delta = resetConnectedState(connectedIdentity); // change principal
                     }
-                    return set({ ...delta });
-                },
+                }
+                return set({ ...delta });
             },
         })),
         {
@@ -68,11 +62,6 @@ export const useIdentityStore = create<IdentityStore>()(
         },
     ),
 );
-
-export const useShowLoginModal = () => useIdentityStore((state) => state.showLoginModal);
-export const useShowInfoModal = () => useIdentityStore((state) => state.showInfoModal);
-export const useConnectedIdentity = () => useIdentityStore((state) => state.connectedIdentity);
-export const useIdentityActions = () => useIdentityStore((state) => state.actions);
 
 // Devtools setup
 if (isDev) {

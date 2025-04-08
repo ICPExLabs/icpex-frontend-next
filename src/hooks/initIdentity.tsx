@@ -1,13 +1,11 @@
 import { useConnect } from '@connect2ic/react';
 
 import { checkConnected } from '@/components/connect/connect';
-import { useConnectedIdentity, useIdentityActions } from '@/stores/identity';
+import { useIdentityStore } from '@/stores/identity';
 import { writeLastConnectType } from '@/utils/storage';
 
 export const InitIdentity = () => {
-    const connectedIdentity = useConnectedIdentity();
-    const { setConnectedIdentity } = useIdentityActions();
-    const { setShowLoginModal } = useIdentityActions();
+    const { connectedIdentity, setConnectedIdentity, setShowLoginModal } = useIdentityStore();
 
     useConnect({
         onConnect: (connected: any) => {

@@ -4,13 +4,13 @@ import { ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { useIdentityActions, useShowLoginModal } from '@/stores/identity';
+import { useIdentityStore } from '@/stores/identity';
 import { cn } from '@/utils/classNames';
 
 import Icon from '../ui/icon';
 
 export const LoginButton = () => {
-    const { setShowLoginModal } = useIdentityActions();
+    const { setShowLoginModal } = useIdentityStore();
 
     const openLogin = () => {
         setShowLoginModal(true);
@@ -33,8 +33,7 @@ type TypeWalletListItem = {
 const LoginModal = () => {
     const { t } = useTranslation();
 
-    const { setShowLoginModal } = useIdentityActions();
-    const showLoginModal = useShowLoginModal();
+    const { setShowLoginModal, showLoginModal } = useIdentityStore();
 
     const [isChecked, setIsChecked] = useState(true);
 

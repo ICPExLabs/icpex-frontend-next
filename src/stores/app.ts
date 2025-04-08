@@ -14,8 +14,9 @@ type ThemeMode = 'light' | 'dark';
 interface AppState {
     language: SupportedLanguage;
     designLang: Locale;
-    theme: ThemeMode;
     setLanguage: (language: SupportedLanguage) => void;
+
+    theme: ThemeMode;
     setTheme: (theme: ThemeMode) => void;
     toggleTheme: () => void;
     initThemeListener: () => () => void;
@@ -55,24 +56,21 @@ export const useAppStore = create<AppState>()(
             (set, get) => ({
                 language: 'en',
                 designLang: en_US,
-                theme: getSystemTheme(),
-
                 setLanguage: (language) => {
                     setLanguage(language);
                     set({ language, designLang: language === 'zh-CN' ? zh_CN : en_US });
                 },
 
+                theme: getSystemTheme(),
                 setTheme: (theme) => {
                     set({ theme });
                     applyTheme(theme);
                 },
-
                 toggleTheme: () => {
                     const newTheme = get().theme === 'light' ? 'dark' : 'light';
                     set({ theme: newTheme });
                     applyTheme(newTheme);
                 },
-
                 initThemeListener: () => {
                     applyTheme(get().theme);
                     return createThemeListener(set);
