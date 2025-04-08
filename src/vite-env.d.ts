@@ -11,3 +11,11 @@ declare module '*.yml' {
 }
 
 export type BuildMode = 'production' | 'development';
+
+export interface ImportMetaEnv {
+    // build mode
+    BUILD_MODE: BuildMode;
+    CONNECT_HOST: string;
+
+    // others ...
+}
