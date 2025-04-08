@@ -17,7 +17,8 @@ interface AppState {
     setLanguage: (language: SupportedLanguage) => void;
 
     theme: ThemeMode;
-    setTheme: (theme: ThemeMode) => void;
+    currentTheme: 'system' | ThemeMode;
+    setTheme: (theme: 'system' | ThemeMode) => void;
     toggleTheme: () => void;
     initThemeListener: () => () => void;
 }
@@ -37,11 +38,15 @@ const applyTheme = (theme: ThemeMode) => {
 
 const getSystemTheme = (): ThemeMode => (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
-const createThemeListener = (set: (state: Partial<AppState>) => void) => {
+const createThemeListener = (set: (state: Partial<AppState>) => void, get: () => AppState) => {
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-        const theme = e.matches ? 'dark' : 'light';
-        set({ theme });
-        applyTheme(theme);
+        const newSystemTheme = e.matches ? 'dark' : 'light';
+        const { currentTheme, theme } = get();
+
+        if (currentTheme === 'system' && theme !== newSystemTheme) {
+            set({ theme: newSystemTheme });
+            applyTheme(newSystemTheme);
+        }
     };
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -56,15 +61,23 @@ export const useAppStore = create<AppState>()(
             (set, get) => ({
                 language: 'en',
                 designLang: en_US,
+
                 setLanguage: (language) => {
                     setLanguage(language);
                     set({ language, designLang: language === 'zh-CN' ? zh_CN : en_US });
                 },
 
+                currentTheme: 'system',
                 theme: getSystemTheme(),
                 setTheme: (theme) => {
-                    set({ theme });
-                    applyTheme(theme);
+                    if (theme === 'system') {
+                        const systemTheme = getSystemTheme();
+                        set({ theme: systemTheme, currentTheme: 'system' });
+                        applyTheme(systemTheme);
+                    } else {
+                        set({ theme, currentTheme: theme });
+                        applyTheme(theme);
+                    }
                 },
                 toggleTheme: () => {
                     const newTheme = get().theme === 'light' ? 'dark' : 'light';
@@ -72,8 +85,12 @@ export const useAppStore = create<AppState>()(
                     applyTheme(newTheme);
                 },
                 initThemeListener: () => {
-                    applyTheme(get().theme);
-                    return createThemeListener(set);
+                    const { currentTheme, theme } = get();
+
+                    const initialTheme = currentTheme === 'system' ? getSystemTheme() : theme;
+                    applyTheme(initialTheme);
+
+                    return createThemeListener(set, get);
                 },
             }),
             {
