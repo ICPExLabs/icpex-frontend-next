@@ -68,10 +68,10 @@ const MenuModal = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                        className="absolute top-[50px] right-0 z-50 w-[160px] rounded-2xl bg-white p-3 shadow-lg outline outline-[#e3e8ff]"
+                        className="absolute top-[50px] right-0 z-50 w-[155px] rounded-[20px] bg-white p-3 shadow-lg outline outline-[#e3e8ff]"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             <div className="rounded-full border-[1px] border-[#E4E9FF] p-1">
                                 <div className="flex items-center justify-center gap-x-3 text-sm font-medium text-[#272E4D]">
                                     <div
