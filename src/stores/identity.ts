@@ -58,7 +58,6 @@ export const useIdentityStore = create<IdentityStore>()(
                             delta = resetConnectedState(connectedIdentity); // change principal
                         }
                     }
-                    console.debug('🚀 ~ connectedIdentity:', connectedIdentity);
                     return set({ ...delta });
                 },
             },

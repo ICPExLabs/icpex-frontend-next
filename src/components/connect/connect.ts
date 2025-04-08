@@ -23,7 +23,6 @@ export const createClient = () => {
     // todo whitelist
     const whitelist = [];
     const derivationOrigin = getConnectDerivationOrigin();
-    // console.debug(`derivationOrigin ====> ${derivationOrigin}`, import.meta.env);
 
     const globalProviderConfig = {
         appName: 'ICPEx',

@@ -5,19 +5,15 @@ import { checkConnected } from '@/components/connect/connect';
 import { useConnectedIdentity, useIdentityActions } from '@/stores/identity';
 
 export const InitIdentity = () => {
-    const { setConnectedIdentity } = useIdentityActions();
     const connectedIdentity = useConnectedIdentity();
+    const { setConnectedIdentity } = useIdentityActions();
+    const { setShowLoginModal } = useIdentityActions();
 
-    const {
-        isConnected,
-        activeProvider: provider,
-        principal,
-    } = useConnect({
+    const { isConnected } = useConnect({
         onConnect: (connected: any) => {
             const principal = connected.principal;
             const provider = connected.activeProvider;
             console.log('app onConnect', principal, provider);
-
             checkConnected(
                 connectedIdentity,
                 {
@@ -25,25 +21,17 @@ export const InitIdentity = () => {
                     principal,
                     provider,
                 },
-                () => {},
-                async (identity) => setConnectedIdentity(identity),
+                () => {
+                    setShowLoginModal(false);
+                },
+                async (identity) => {
+                    console.log('🚀 ~ identity:', identity);
+                    setConnectedIdentity(identity);
+                },
             );
         },
         onDisconnect: () => setConnectedIdentity(undefined), // 退出登录
     });
-
-    useEffect(() => {
-        checkConnected(
-            connectedIdentity,
-            {
-                isConnected,
-                principal,
-                provider,
-            },
-            () => {},
-            async (identity) => setConnectedIdentity(identity),
-        );
-    }, [connectedIdentity, isConnected, principal, provider, setConnectedIdentity]);
 
     useEffect(() => {
         console.log(isConnected);

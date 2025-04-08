@@ -4,10 +4,9 @@ import { ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { useIdentityActions, useIdentityStore, useShowLoginModal } from '@/stores/identity';
+import { useIdentityActions, useShowLoginModal } from '@/stores/identity';
 import { cn } from '@/utils/classNames';
 
-import { checkConnected } from '../connect/connect';
 import Icon from '../ui/icon';
 
 export const LoginButton = () => {
@@ -36,8 +35,6 @@ const LoginModal = () => {
 
     const { setShowLoginModal } = useIdentityActions();
     const showLoginModal = useShowLoginModal();
-    const connectedIdentity = useIdentityStore((state) => state.connectedIdentity);
-    const { setConnectedIdentity } = useIdentityActions();
 
     const [isChecked, setIsChecked] = useState(true);
 
@@ -58,33 +55,7 @@ const LoginModal = () => {
         },
     ];
 
-    const { connect } = useConnect({
-        onConnect: (connected: any) => {
-            console.debug('🚀 ~ LoginModal ~ data:', connected);
-            // Signed in
-            const principal = connected.principal;
-            const provider = connected.activeProvider;
-
-            checkConnected(
-                connectedIdentity,
-                {
-                    isConnected: true,
-                    principal,
-                    provider,
-                },
-                () => {
-                    setShowLoginModal(false);
-                },
-                async (identity) => {
-                    console.debug('🚀 ~ LoginModal ~ identity:', identity);
-                    setConnectedIdentity(identity);
-                },
-            );
-        },
-        onDisconnect: () => {
-            // Signed out
-        },
-    });
+    const { connect } = useConnect();
 
     const handleConnect = async (wallet: string) => {
         if (!isChecked) {
