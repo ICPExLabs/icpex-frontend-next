@@ -4,6 +4,12 @@ nav:
     explore: Explore
     tools: Tools
     ai: AI
+menu:
+    twitter: Twitter
+    discord: Discord
+    github: Github
+    telegram: Telegram
+    whitePaper: WhitePaper
 
 search:
     placeholder: Search by symbol or canister id

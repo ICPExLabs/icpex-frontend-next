@@ -54,3 +54,8 @@ export const getConnectDerivationOrigin = (): string | undefined => {
             return undefined;
     }
 };
+
+// get import env value
+export const getImportMetaEnv = (key: keyof ImportMetaEnv) => {
+    return import.meta.env[key];
+};

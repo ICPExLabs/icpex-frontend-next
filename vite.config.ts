@@ -52,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         envDir: 'env',
-        envPrefix: ['BUILD', 'CONNECT', 'ALCHEMY'],
+        envPrefix: ['BUILD', 'CONNECT', 'ALCHEMY', 'HEADER_MENU'],
         clearScreen: false,
         server: {
             hmr: {

@@ -1,10 +1,48 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { getImportMetaEnv } from '@/utils/env';
 
 import Icon from '../ui/icon';
 
+type MenuItem = {
+    label: string;
+    href: string;
+    icon: ReactElement;
+};
+
 const MenuModal = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { t } = useTranslation();
+
+    const menuItems: MenuItem[] = [
+        {
+            label: t('common.menu.twitter'),
+            href: getImportMetaEnv('HEADER_MENU_TWITTER_LINK'),
+            icon: <Icon name="x" className="h-5 w-5" />,
+        },
+        {
+            label: t('common.menu.discord'),
+            href: getImportMetaEnv('HEADER_MENU_DISCORD_LINK'),
+            icon: <Icon name="discord" className="h-5 w-5" />,
+        },
+        {
+            label: t('common.menu.telegram'),
+            href: getImportMetaEnv('HEADER_MENU_TELEGRAM_LINK'),
+            icon: <Icon name="telegram" className="h-5 w-5" />,
+        },
+        {
+            label: t('common.menu.whitePaper'),
+            href: getImportMetaEnv('HEADER_MENU_WHITEPAPER_LINK'),
+            icon: <Icon name="document" className="h-5 w-5" />,
+        },
+        {
+            label: t('common.menu.github'),
+            href: getImportMetaEnv('HEADER_MENU_GITHUB_LINK'),
+            icon: <Icon name="github" className="h-5 w-5" />,
+        },
+    ];
 
     return (
         <div className="relative flex">
@@ -31,12 +69,14 @@ const MenuModal = () => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="space-y-2">
-                            {['Menu Item 1', 'Menu Item 2', 'Menu Item 3'].map((item, index) => (
+                            {menuItems.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-100"
+                                    className="flex cursor-pointer items-center justify-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-100"
+                                    onClick={() => window.open(item.href, '_blank')}
                                 >
-                                    {item}
+                                    {item.icon}
+                                    <div className="flex-1 text-left">{item.label}</div>
                                 </div>
                             ))}
                         </div>
