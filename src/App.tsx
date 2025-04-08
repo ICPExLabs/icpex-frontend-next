@@ -2,7 +2,7 @@ import { LocaleProvider } from '@douyinfe/semi-ui';
 import { useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 
-import { initIdentity } from './hooks/initIdentity';
+import { InitIdentity, InitTokenList } from './hooks/initIdentity';
 import { setLanguage } from './locale';
 import routes from './routes/routes';
 import { useAppStore } from './stores/app';
@@ -13,16 +13,13 @@ function App() {
     const { language, designLang, initThemeListener } = useAppStore();
     useEffect(() => setLanguage(language), [language]);
 
-    // 综合要初始化的动作
-    const initial = () => {
-        // init theme
+    useEffect(() => {
         initThemeListener();
+    }, [initThemeListener]);
 
-        // 加载登录信息
-        initIdentity();
-    };
+    InitIdentity();
 
-    initial();
+    InitTokenList();
 
     return <LocaleProvider locale={designLang}>{views}</LocaleProvider>;
 }

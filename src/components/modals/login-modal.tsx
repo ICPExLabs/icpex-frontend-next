@@ -1,5 +1,5 @@
 import { useConnect } from '@connect2ic/react';
-import { SideSheet } from '@douyinfe/semi-ui';
+import { SideSheet, Toast } from '@douyinfe/semi-ui';
 import { ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -66,6 +66,10 @@ const LoginModal = () => {
     });
 
     const handleConnect = async (wallet: string) => {
+        if (!isChecked) {
+            Toast.error(t('common.connect.terms'));
+            return false;
+        }
         try {
             await connect(wallet);
         } catch (error) {

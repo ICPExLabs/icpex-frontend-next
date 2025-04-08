@@ -9,11 +9,16 @@ interface IdentityState {
     showLoginModal: boolean;
     showInfoModal: boolean;
     connectedIdentity: ConnectedIdentity | undefined;
-    actions: {
-        setShowLoginModal: (show: boolean) => void;
-        setShowInfoModal: (show: boolean) => void;
-        setConnectedIdentity: (connectedIdentity?: ConnectedIdentity) => void;
-    };
+}
+
+interface IdentityActions {
+    setShowLoginModal: (show: boolean) => void;
+    setShowInfoModal: (show: boolean) => void;
+    setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => void;
+}
+
+interface IdentityStore extends IdentityState {
+    actions: IdentityActions;
 }
 
 const STORE_NAME = 'IdentityStore';
@@ -28,7 +33,7 @@ const resetConnectedState = (connectedIdentity?: ConnectedIdentity) => {
     };
 };
 
-export const useIdentityStore = create<IdentityState>()(
+export const useIdentityStore = create<IdentityStore>()(
     devtools(
         subscribeWithSelector((set, get) => ({
             showLoginModal: false,
@@ -37,7 +42,7 @@ export const useIdentityStore = create<IdentityState>()(
             actions: {
                 setShowLoginModal: (showLoginModal) => set({ showLoginModal }),
                 setShowInfoModal: (showInfoModal) => set({ showInfoModal }),
-                setConnectedIdentity: (connectedIdentity?: ConnectedIdentity) => {
+                setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => {
                     // console.warn('identity state connected', connectedIdentity);
                     let delta: Partial<IdentityState> = {};
                     if (connectedIdentity === undefined) {
@@ -67,6 +72,7 @@ export const useIdentityStore = create<IdentityState>()(
 
 export const useShowLoginModal = () => useIdentityStore((state) => state.showLoginModal);
 export const useShowInfoModal = () => useIdentityStore((state) => state.showInfoModal);
+export const useConnectedIdentity = () => useIdentityStore((state) => state.connectedIdentity);
 export const useIdentityActions = () => useIdentityStore((state) => state.actions);
 
 // Devtools setup
