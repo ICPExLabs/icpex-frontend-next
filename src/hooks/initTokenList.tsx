@@ -1,7 +1,11 @@
-import { useEffect } from 'react';
+import { fetchTokenList } from '@/canister/swap/apis';
+
+import { useExecuteOnce } from './useExecuteOnce';
 
 export const InitTokenList = () => {
-    useEffect(() => {
-        console.log(123);
-    }, []);
+    useExecuteOnce(() => {
+        fetchTokenList().then((res) => {
+            console.log('Token list:', res);
+        });
+    });
 };

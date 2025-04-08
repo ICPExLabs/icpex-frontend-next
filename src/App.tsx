@@ -19,7 +19,6 @@ function App() {
     }, [initThemeListener]);
 
     InitIdentity();
-
     InitTokenList();
 
     return <LocaleProvider locale={designLang}>{views}</LocaleProvider>;

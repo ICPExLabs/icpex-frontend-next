@@ -1,5 +1,4 @@
 import { useConnect } from '@connect2ic/react';
-import { useEffect } from 'react';
 
 import { checkConnected } from '@/components/connect/connect';
 import { useConnectedIdentity, useIdentityActions } from '@/stores/identity';
@@ -10,7 +9,7 @@ export const InitIdentity = () => {
     const { setConnectedIdentity } = useIdentityActions();
     const { setShowLoginModal } = useIdentityActions();
 
-    const { isConnected } = useConnect({
+    useConnect({
         onConnect: (connected: any) => {
             const principal = connected.principal;
             const provider = connected.activeProvider;
@@ -34,12 +33,4 @@ export const InitIdentity = () => {
         },
         onDisconnect: () => setConnectedIdentity(undefined), // 退出登录
     });
-
-    useEffect(() => {
-        console.log(isConnected);
-    }, [isConnected]);
-
-    // useEffect(() => {
-    //     console.log(isInitializing);
-    // }, [isInitializing]);
 };

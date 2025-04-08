@@ -36,12 +36,12 @@ const Header = () => {
                         {/* <div
                             onClick={() => changeTheme()}
                             className={cn(
-                                'flex justify-center items-center cursor-pointer h-[40px] w-[40px] focus:outline-none',
+                                'flex h-[40px] w-[40px] cursor-pointer items-center justify-center focus:outline-none',
                             )}
                         >
                             <Icon
                                 name={theme ?? 'light'}
-                                className="flex-shrink-0 w-7 h-7 transition-transform duration-200 cursor-pointer"
+                                className="h-7 w-7 flex-shrink-0 cursor-pointer transition-transform duration-200"
                             />
                         </div> */}
                         <MenuModal />
