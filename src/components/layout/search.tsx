@@ -2,9 +2,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { TokenInfo } from '@/canister/swap/swap.did.d';
+import { useIdentityStore } from '@/stores/identity';
 import { cn } from '@/utils/classNames';
+import { parseLowerCaseSearch } from '@/utils/search';
 
 import Icon from '../ui/icon';
+import { TokenLogo } from '../ui/logo';
 import { TokenPriceChangePercentage } from '../ui/price';
 
 // ! test code
@@ -23,147 +27,78 @@ type TypeSearchResultItem = {
     token_price_change_percentage_7d: number;
 };
 type TypeSearchResult = TypeSearchResultItem[];
-const mockSearchResults: TypeSearchResult = [
-    {
-        token_name: 'Chainlink',
-        token_symbol: 'LINK',
-        token_address: '0x514910771af9ca656af840dff83e8264ecf986ca',
-        token_decimals: 18,
-        token_logo: 'https://cryptologos.cc/logos/chainlink-link-logo.png',
-        token_blockchain: 'Ethereum',
-        token_type: 'Token',
-        token_standard: 'ERC-20',
-        token_total_supply: '1000000000',
-        token_price: '18.56',
-        token_price_change_percentage_24h: -1.23,
-        token_price_change_percentage_7d: 3.45,
-    },
-    {
-        token_name: 'Polygon',
-        token_symbol: 'MATIC',
-        token_address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
-        token_decimals: 18,
-        token_logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-        token_blockchain: 'Polygon',
-        token_type: 'Coin',
-        token_standard: 'ERC-20',
-        token_total_supply: '10000000000',
-        token_price: '0.92',
-        token_price_change_percentage_24h: 4.56,
-        token_price_change_percentage_7d: -2.34,
-    },
-    {
-        token_name: 'Uniswap',
-        token_symbol: 'UNI',
-        token_address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
-        token_decimals: 18,
-        token_logo: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
-        token_blockchain: 'Ethereum',
-        token_type: 'Token',
-        token_standard: 'ERC-20',
-        token_total_supply: '1000000000',
-        token_price: '6.78',
-        token_price_change_percentage_24h: +0.89,
-        token_price_change_percentage_7d: -1.23,
-    },
-];
-const mockPopularResults: TypeSearchResult = [
-    {
-        token_name: 'Ethereum',
-        token_symbol: 'ETH',
-        token_address: '0x0000000000000000000000000000000000000000',
-        token_decimals: 18,
-        token_logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-        token_blockchain: 'Ethereum',
-        token_type: 'Coin',
-        token_standard: 'ERC-20',
-        token_total_supply: '120000000',
-        token_price: '3200.42',
-        token_price_change_percentage_24h: 2.34,
-        token_price_change_percentage_7d: 5.67,
-    },
-    {
-        token_name: 'USD Coin',
-        token_symbol: 'USDC',
-        token_address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-        token_decimals: 6,
-        token_logo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png',
-        token_blockchain: 'Ethereum',
-        token_type: 'Stablecoin',
-        token_standard: 'ERC-20',
-        token_total_supply: '56000000000',
-        token_price: '1.00',
-        token_price_change_percentage_24h: 0.0,
-        token_price_change_percentage_7d: 0.01,
-    },
-];
 
-const SearchResultItem = ({ data }: { data: TypeSearchResultItem }) => {
+const SearchResultItem = ({ tokenName }: { tokenName: string }) => {
+    const { tokenList } = useIdentityStore();
+    const [tokenData, setTokenData] = useState<TokenInfo>();
+
+    const [tokenPrice, setTokenPrice] = useState<number>(0);
+    const [changePercentage, setChangePercentage] = useState<number>(0);
+
     const openToken = () => {
         console.log(123);
     };
+
+    useEffect(() => {
+        if (!tokenName || !tokenList?.length) return;
+
+        const matchedToken = tokenList.find((token) => token.name === tokenName);
+
+        if (matchedToken) {
+            setTokenData(matchedToken);
+
+            // ! test code
+            setTokenPrice(100);
+            setChangePercentage(1.8);
+        }
+    }, [tokenList, tokenName, setTokenData]);
 
     return (
         <div
             onClick={openToken}
             className="flex h-[52px] w-full cursor-pointer items-center justify-between px-4 duration-75 hover:bg-[#f2f4ff]"
         >
-            <div className="flex">
-                <img src={data.token_logo} alt="token_logo" className="h-9 w-9 flex-shrink-0" />
-                <div className="ml-[11px] flex flex-col">
-                    <p className="text-base font-medium text-[#272e4d]">{data.token_name}</p>
-                    <p className="text-xs font-medium text-[#96a0c8]">{data.token_blockchain}</p>
-                </div>
-            </div>
-            <div className="ml-[11px] flex flex-col items-end">
-                <p className="text-base font-medium text-[#272e4d]">${data.token_price}</p>
-                <TokenPriceChangePercentage value={data.token_price_change_percentage_24h} />
-            </div>
+            {tokenData && (
+                <>
+                    <div className="flex items-center">
+                        <TokenLogo canisterId={tokenData.canister_id.toString()} className="h-9 w-9 flex-shrink-0" />
+
+                        <div className="ml-[11px] flex flex-col">
+                            <p className="text-base font-medium text-[#272e4d]">{tokenData.name}</p>
+                            <p className="text-xs font-medium text-[#96a0c8]">{tokenData.symbol}</p>
+                        </div>
+                    </div>
+                    <div className="ml-[11px] flex flex-col items-end">
+                        <p className="text-base font-medium text-[#272e4d]">${tokenPrice}</p>
+                        <TokenPriceChangePercentage value={changePercentage} />
+                    </div>
+                </>
+            )}
         </div>
     );
 };
 
+const popularTokens = ['Internet Computer', 'ICExplorer'];
 const SearchComponents = () => {
     const { t } = useTranslation();
+    const { tokenList } = useIdentityStore();
 
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
     const [keyword, setKeyword] = useState<string>('');
     const [searchResult, setSearchResult] = useState<TypeSearchResult | null>(null);
-    const [popularList, setPopularList] = useState<TypeSearchResult | null>(null);
-
-    // ! test code
-    const getSearchResult = useCallback(async (query: string): Promise<TypeSearchResult> => {
-        return new Promise((resolve) => {
-            if (query.toLowerCase() === 't') {
-                resolve(mockSearchResults);
-            }
-            resolve([]);
-        });
-    }, []);
 
     useEffect(() => {
-        if (!keyword.trim()) {
+        if (!parseLowerCaseSearch(keyword)) {
             setSearchResult(null);
             return;
         }
 
-        const timer = setTimeout(async () => {
-            const results = await getSearchResult(keyword);
-            setSearchResult(results);
-        }, 100);
-
-        return () => clearTimeout(timer);
-    }, [keyword, getSearchResult, isOpenSearch]);
-
-    const init = () => {
-        setPopularList(mockPopularResults);
-    };
+        console.log(keyword);
+    }, [keyword, isOpenSearch]);
 
     useEffect(() => {
-        init();
-
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === '/' && e.ctrlKey) {
                 e.preventDefault();
@@ -212,6 +147,7 @@ const SearchComponents = () => {
                             onChange={(e) => setKeyword(e.target.value)}
                             aria-label="Search"
                             onFocus={() => setIsOpenSearch(true)}
+                            disabled={!tokenList || !tokenList.length}
                         />
                     </div>
 
@@ -220,33 +156,17 @@ const SearchComponents = () => {
                             <div className="no-scrollbar flex max-h-[504px] min-h-[170px] w-full flex-col overflow-y-scroll pb-[15px]">
                                 {!keyword && (
                                     <>
-                                        {/* <div className="mt-[10px] mb-[8px] flex w-full items-center px-4">
-                                                <Icon name="history" className="h-4 w-3.5 text-[#97a0c9]"></Icon>
-                                                <p className="ml-2 text-sm font-medium text-[#272e4d]">
-                                                    {t('common.search.recent')}
-                                                </p>
-                                            </div>
-                                            <div className="flex w-full flex-col">
-                                                {mockPopularResults.map((item, index) => (
-                                                    <SearchResultItem key={index} data={item} />
-                                                ))}
-                                            </div> */}
-
-                                        {popularList && popularList.length ? (
-                                            <>
-                                                <div className="mt-[10px] flex w-full items-center px-4">
-                                                    <Icon name="popular" className="h-4 w-3.5 text-[#97a0c9]"></Icon>
-                                                    <p className="ml-2 text-sm font-medium text-[#272e4d]">
-                                                        {t('common.search.popular')}
-                                                    </p>
-                                                </div>
-                                                <div className="mt-2 flex w-full flex-col">
-                                                    {popularList.map((item, index) => (
-                                                        <SearchResultItem key={index} data={item} />
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : null}
+                                        <div className="mt-[10px] flex w-full items-center px-4">
+                                            <Icon name="popular" className="h-4 w-3.5 text-[#97a0c9]"></Icon>
+                                            <p className="ml-2 text-sm font-medium text-[#272e4d]">
+                                                {t('common.search.popular')}
+                                            </p>
+                                        </div>
+                                        <div className="mt-2 flex w-full flex-col">
+                                            {popularTokens.map((item, index) => (
+                                                <SearchResultItem key={index} tokenName={item} />
+                                            ))}
+                                        </div>
                                     </>
                                 )}
 
@@ -264,9 +184,9 @@ const SearchComponents = () => {
                                             </div>
                                         ) : (
                                             <div className="flex w-full flex-col">
-                                                {searchResult.map((item, index) => (
+                                                {/* {searchResult.map((item, index) => (
                                                     <SearchResultItem key={index} data={item} />
-                                                ))}
+                                                ))} */}
                                             </div>
                                         )}
                                     </>

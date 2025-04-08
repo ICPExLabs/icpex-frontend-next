@@ -1,58 +1,57 @@
 // prettier-ignore // cSpell:words eurc dogmi dolr elna goldao icvc kinic motoko nfidw sneed trax yuku draggin icpcc neutrinite nfid origyn
 
 // CK
-import TOKEN_IC_CK_BTC_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckBTC.min.svg';
-import TOKEN_IC_CK_ETH_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckETH.min.svg';
-import TOKEN_IC_CK_EURC_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckEURC.min.svg';
-import TOKEN_IC_CK_LINK_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckLINK.min.svg';
-import TOKEN_IC_CK_OCT_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckOCT.min.svg';
-import TOKEN_IC_CK_PEPE_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckPEPE.min.svg';
-import TOKEN_IC_CK_SHIB_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckSHIB.min.svg';
-import TOKEN_IC_CK_UNI_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckUNI.min.svg';
-import TOKEN_IC_CK_USDC_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckUSDC.min.svg';
-import TOKEN_IC_CK_USDT_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckUSDT.min.svg';
-import TOKEN_IC_CK_WBTC_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckWBTC.min.svg';
-import TOKEN_IC_CK_WSTETH_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckWSTETH.min.svg';
-import TOKEN_IC_CK_XAUT_SVG from 'data-base64:@/assets/tokenLogoSvg/ck/ckXAUT.min.svg';
+import TOKEN_IC_CK_BTC_SVG from '@/assets/tokenLogoSvg/ck/ckBTC.min.svg';
+import TOKEN_IC_CK_ETH_SVG from '@/assets/tokenLogoSvg/ck/ckETH.min.svg';
+import TOKEN_IC_CK_EURC_SVG from '@/assets/tokenLogoSvg/ck/ckEURC.min.svg';
+import TOKEN_IC_CK_LINK_SVG from '@/assets/tokenLogoSvg/ck/ckLINK.min.svg';
+import TOKEN_IC_CK_OCT_SVG from '@/assets/tokenLogoSvg/ck/ckOCT.min.svg';
+import TOKEN_IC_CK_PEPE_SVG from '@/assets/tokenLogoSvg/ck/ckPEPE.min.svg';
+import TOKEN_IC_CK_SHIB_SVG from '@/assets/tokenLogoSvg/ck/ckSHIB.min.svg';
+import TOKEN_IC_CK_UNI_SVG from '@/assets/tokenLogoSvg/ck/ckUNI.min.svg';
+import TOKEN_IC_CK_USDC_SVG from '@/assets/tokenLogoSvg/ck/ckUSDC.min.svg';
+import TOKEN_IC_CK_USDT_SVG from '@/assets/tokenLogoSvg/ck/ckUSDT.min.svg';
+import TOKEN_IC_CK_WBTC_SVG from '@/assets/tokenLogoSvg/ck/ckWBTC.min.svg';
+import TOKEN_IC_CK_WSTETH_SVG from '@/assets/tokenLogoSvg/ck/ckWSTETH.min.svg';
+import TOKEN_IC_CK_XAUT_SVG from '@/assets/tokenLogoSvg/ck/ckXAUT.min.svg';
 // IC
-import TOKEN_IC_ICP_SVG from 'data-base64:@/assets/tokenLogoSvg/ICP.min.svg';
-import TOKEN_IC_SNS_____PNG from 'data-base64:@/assets/tokenLogoSvg/sns/---.png';
-import TOKEN_IC_SNS_ALICE_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/ALICE.png';
-import TOKEN_IC_SNS_BOOM_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/BOOM.png';
+import TOKEN_IC_ICP_SVG from '@/assets/tokenLogoSvg/ICP.min.svg';
+import TOKEN_IC_SNS_____PNG from '@/assets/tokenLogoSvg/sns/---.png';
+import TOKEN_IC_SNS_ALICE_PNG from '@/assets/tokenLogoSvg/sns/ALICE.png';
+import TOKEN_IC_SNS_BOOM_PNG from '@/assets/tokenLogoSvg/sns/BOOM.png';
 // SNS
-import TOKEN_IC_SNS_CHAT_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/CHAT.png';
-import TOKEN_IC_SNS_CONF_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/CONF.png';
-import TOKEN_IC_SNS_CTZ_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/CTZ.png';
-import TOKEN_IC_SNS_DCD_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/DCD.png';
-import TOKEN_IC_SNS_DKP_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/DKP.png';
-import TOKEN_IC_SNS_DOGMI_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/DOGMI.png';
-import TOKEN_IC_SNS_DOLR_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/DOLR.png';
-import TOKEN_IC_SNS_ELNA_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/ELNA.png';
-import TOKEN_IC_SNS_EST_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/EST.png';
-import TOKEN_IC_SNS_FPL_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/FPL.png';
-import TOKEN_IC_SNS_FUEL_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/FUEL.png';
-import TOKEN_IC_SNS_GHOST_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/GHOST.png';
-import TOKEN_IC_SNS_GOLDAO_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/GOLDAO.png';
-import TOKEN_IC_SNS_ICE_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/ICE.png';
-import TOKEN_IC_SNS_ICL_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/ICL.png';
-import TOKEN_IC_SNS_ICS_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/ICS.png';
-import TOKEN_IC_SNS_ICVC_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/ICVC.png';
-import TOKEN_IC_SNS_KINIC_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/KINIC.png';
-import TOKEN_IC_SNS_KONG_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/KONG.png';
-import TOKEN_IC_SNS_MOTOKO_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/MOTOKO.png';
-import TOKEN_IC_SNS_NFIDW_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/NFIDW.png';
-import TOKEN_IC_SNS_NTN_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/NTN.png';
-import TOKEN_IC_SNS_NUA_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/NUA.png';
-import TOKEN_IC_SNS_OGY_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/OGY.png';
-import TOKEN_IC_SNS_PANDA_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/PANDA.png';
-import TOKEN_IC_SNS_SEER_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/SEER.png';
-import TOKEN_IC_SNS_SNEED_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/SNEED.png';
-import TOKEN_IC_SNS_SONIC_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/SONIC.png';
-import TOKEN_IC_SNS_TRAX_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/TRAX.png';
-import TOKEN_IC_SNS_WELL_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/WELL.png';
-import TOKEN_IC_SNS_WTN_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/WTN.png';
-import TOKEN_IC_SNS_YUKU_PNG from 'data-base64:@/assets/tokenLogoSvg/sns/YUKU.png';
-
+import TOKEN_IC_SNS_CHAT_PNG from '@/assets/tokenLogoSvg/sns/CHAT.png';
+import TOKEN_IC_SNS_CONF_PNG from '@/assets/tokenLogoSvg/sns/CONF.png';
+import TOKEN_IC_SNS_CTZ_PNG from '@/assets/tokenLogoSvg/sns/CTZ.png';
+import TOKEN_IC_SNS_DCD_PNG from '@/assets/tokenLogoSvg/sns/DCD.png';
+import TOKEN_IC_SNS_DKP_PNG from '@/assets/tokenLogoSvg/sns/DKP.png';
+import TOKEN_IC_SNS_DOGMI_PNG from '@/assets/tokenLogoSvg/sns/DOGMI.png';
+import TOKEN_IC_SNS_DOLR_PNG from '@/assets/tokenLogoSvg/sns/DOLR.png';
+import TOKEN_IC_SNS_ELNA_PNG from '@/assets/tokenLogoSvg/sns/ELNA.png';
+import TOKEN_IC_SNS_EST_PNG from '@/assets/tokenLogoSvg/sns/EST.png';
+import TOKEN_IC_SNS_FPL_PNG from '@/assets/tokenLogoSvg/sns/FPL.png';
+import TOKEN_IC_SNS_FUEL_PNG from '@/assets/tokenLogoSvg/sns/FUEL.png';
+import TOKEN_IC_SNS_GHOST_PNG from '@/assets/tokenLogoSvg/sns/GHOST.png';
+import TOKEN_IC_SNS_GOLDAO_PNG from '@/assets/tokenLogoSvg/sns/GOLDAO.png';
+import TOKEN_IC_SNS_ICE_PNG from '@/assets/tokenLogoSvg/sns/ICE.png';
+import TOKEN_IC_SNS_ICL_PNG from '@/assets/tokenLogoSvg/sns/ICL.png';
+import TOKEN_IC_SNS_ICS_PNG from '@/assets/tokenLogoSvg/sns/ICS.png';
+import TOKEN_IC_SNS_ICVC_PNG from '@/assets/tokenLogoSvg/sns/ICVC.png';
+import TOKEN_IC_SNS_KINIC_PNG from '@/assets/tokenLogoSvg/sns/KINIC.png';
+import TOKEN_IC_SNS_KONG_PNG from '@/assets/tokenLogoSvg/sns/KONG.png';
+import TOKEN_IC_SNS_MOTOKO_PNG from '@/assets/tokenLogoSvg/sns/MOTOKO.png';
+import TOKEN_IC_SNS_NFIDW_PNG from '@/assets/tokenLogoSvg/sns/NFIDW.png';
+import TOKEN_IC_SNS_NTN_PNG from '@/assets/tokenLogoSvg/sns/NTN.png';
+import TOKEN_IC_SNS_NUA_PNG from '@/assets/tokenLogoSvg/sns/NUA.png';
+import TOKEN_IC_SNS_OGY_PNG from '@/assets/tokenLogoSvg/sns/OGY.png';
+import TOKEN_IC_SNS_PANDA_PNG from '@/assets/tokenLogoSvg/sns/PANDA.png';
+import TOKEN_IC_SNS_SEER_PNG from '@/assets/tokenLogoSvg/sns/SEER.png';
+import TOKEN_IC_SNS_SNEED_PNG from '@/assets/tokenLogoSvg/sns/SNEED.png';
+import TOKEN_IC_SNS_SONIC_PNG from '@/assets/tokenLogoSvg/sns/SONIC.png';
+import TOKEN_IC_SNS_TRAX_PNG from '@/assets/tokenLogoSvg/sns/TRAX.png';
+import TOKEN_IC_SNS_WELL_PNG from '@/assets/tokenLogoSvg/sns/WELL.png';
+import TOKEN_IC_SNS_WTN_PNG from '@/assets/tokenLogoSvg/sns/WTN.png';
+import TOKEN_IC_SNS_YUKU_PNG from '@/assets/tokenLogoSvg/sns/YUKU.png';
 import { cn } from '@/utils/classNames';
 
 const LOGO_RECORD: Record<string, string> = {
@@ -109,10 +108,10 @@ const LOGO_RECORD: Record<string, string> = {
     'zfcdd-tqaaa-aaaaq-aaaga-cai': TOKEN_IC_SNS_DKP_PNG,
 };
 
-export const TokenLogo = ({ principalId, className }: { principalId: string; className: string }) => {
-    const logo = LOGO_RECORD[principalId];
+export const TokenLogo = ({ canisterId, className = '' }: { canisterId: string; className?: string }) => {
+    const logo = LOGO_RECORD[canisterId];
 
     return (
-        <img className={cn('object-contain', className)} src={logo} alt={`${principalId} token logo`} loading="lazy" />
+        <img className={cn('object-contain', className)} src={logo} alt={`${canisterId} token logo`} loading="lazy" />
     );
 };

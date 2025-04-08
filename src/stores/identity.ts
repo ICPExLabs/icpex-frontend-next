@@ -2,17 +2,22 @@ import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
+import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { ConnectedIdentity } from '@/types/identity';
 import { isDevMode } from '@/utils/env';
 
 interface IdentityStore {
     showLoginModal: boolean;
-    showInfoModal: boolean;
-    connectedIdentity: ConnectedIdentity | undefined;
-
     setShowLoginModal: (show: boolean) => void;
+
+    showInfoModal: boolean;
     setShowInfoModal: (show: boolean) => void;
+
+    connectedIdentity: ConnectedIdentity | undefined;
     setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => void;
+
+    tokenList: TokenInfo[];
+    setTokenList: (tokenList: TokenInfo[]) => void;
 }
 
 const STORE_NAME = 'IdentityStore';
@@ -55,6 +60,9 @@ export const useIdentityStore = create<IdentityStore>()(
                 }
                 return set({ ...delta });
             },
+
+            tokenList: undefined,
+            setTokenList: (tokenList) => set({ tokenList }),
         })),
         {
             enabled: isDev,
