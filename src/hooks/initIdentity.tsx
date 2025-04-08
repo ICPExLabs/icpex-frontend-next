@@ -41,5 +41,3 @@ export const InitIdentity = () => {
     //     console.log(isInitializing);
     // }, [isInitializing]);
 };
-
-export const InitTokenList = () => {};

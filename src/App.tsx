@@ -2,7 +2,8 @@ import { LocaleProvider } from '@douyinfe/semi-ui';
 import { useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 
-import { InitIdentity, InitTokenList } from './hooks/initIdentity';
+import { InitIdentity } from './hooks/initIdentity';
+import { InitTokenList } from './hooks/initTokenList';
 import { setLanguage } from './locale';
 import routes from './routes/routes';
 import { useAppStore } from './stores/app';
