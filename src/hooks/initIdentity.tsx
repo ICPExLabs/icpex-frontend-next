@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { checkConnected } from '@/components/connect/connect';
 import { useConnectedIdentity, useIdentityActions } from '@/stores/identity';
+import { writeLastConnectType } from '@/utils/storage';
 
 export const InitIdentity = () => {
     const connectedIdentity = useConnectedIdentity();
@@ -26,6 +27,7 @@ export const InitIdentity = () => {
                 },
                 async (identity) => {
                     console.log('🚀 ~ identity:', identity);
+                    writeLastConnectType(identity.connectType); // set last login type to local storage
                     setConnectedIdentity(identity);
                 },
             );
