@@ -10,16 +10,27 @@ import { cn } from '@/utils/classNames';
 import Icon from '../ui/icon';
 
 export const LoginButton = () => {
-    const { setShowLoginModal } = useIdentityStore();
+    const { connectedIdentity, setShowLoginModal } = useIdentityStore();
 
     const openLogin = () => {
         setShowLoginModal(true);
     };
 
+    if (connectedIdentity) {
+        return null;
+    }
+
     return (
-        <div onClick={openLogin} className="flex h-[40px] w-[40px] cursor-pointer items-center justify-center border">
-            login
-        </div>
+        <>
+            {!connectedIdentity && (
+                <div
+                    onClick={openLogin}
+                    className="flex h-[40px] cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-[#7236FE] to-[#7178FF] px-5 text-sm font-semibold text-white"
+                >
+                    Connect
+                </div>
+            )}
+        </>
     );
 };
 

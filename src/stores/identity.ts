@@ -44,7 +44,7 @@ export const useIdentityStore = create<IdentityStore>()(
             connectedIdentity: undefined,
             setConnectedIdentity: (connectedIdentity: ConnectedIdentity | undefined) => {
                 // console.warn('identity state connected', connectedIdentity);
-                let delta: Partial<IdentityState> = {};
+                let delta: Partial<IdentityStore> = {};
                 if (connectedIdentity === undefined) {
                     delta = resetConnectedState(connectedIdentity); // logout
                 } else {
