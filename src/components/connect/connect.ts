@@ -23,14 +23,12 @@ export const createClient = () => {
     // todo whitelist
     const whitelist = [];
     const derivationOrigin = getConnectDerivationOrigin();
-    // console.debug(`derivationOrigin ====> ${derivationOrigin}`);
+    // console.debug(`derivationOrigin ====> ${derivationOrigin}`, import.meta.env);
 
     const globalProviderConfig = {
         appName: 'ICPEx',
         dev: true,
-        host: 'https://icp0.io', // 'https://boundary.ic0.app'
-        // host: window.location.origin,
-        // host: import.meta.env.CONNECT_HOST,
+        host: import.meta.env.CONNECT_HOST, // 'https://boundary.ic0.app'
         customDomain: derivationOrigin,
         whitelist,
     };
