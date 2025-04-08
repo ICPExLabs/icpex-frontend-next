@@ -1,6 +1,7 @@
 import { useScroll } from 'ahooks';
 import { NavLink } from 'react-router-dom';
 
+// import { useAppStore } from '@/stores/app';
 import { cn } from '@/utils/classNames';
 
 import { LoginButton } from '../modals/login-modal';
@@ -11,6 +12,8 @@ import SearchComponents from './search';
 
 const Header = () => {
     const scroll = useScroll(document);
+    // const theme = useAppStore((state) => state.theme);
+    // const changeTheme = useAppStore((state) => state.toggleTheme);
 
     return (
         <>
@@ -29,6 +32,18 @@ const Header = () => {
                     <SearchComponents />
 
                     <div className="flex flex-1 items-center justify-end gap-x-[10px]">
+                        {/* theme change */}
+                        {/* <div
+                            onClick={() => changeTheme()}
+                            className={cn(
+                                'flex justify-center items-center cursor-pointer h-[40px] w-[40px] focus:outline-none',
+                            )}
+                        >
+                            <Icon
+                                name={theme ?? 'light'}
+                                className="flex-shrink-0 w-7 h-7 transition-transform duration-200 cursor-pointer"
+                            />
+                        </div> */}
                         <MenuModal />
                         <LoginButton />
                     </div>
