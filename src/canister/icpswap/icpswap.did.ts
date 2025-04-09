@@ -155,6 +155,6 @@ export const idlFactory = ({ IDL }) => {
         userStorage: IDL.Func([Address], [IDL.Opt(IDL.Text)], ['query']),
     });
 };
-export const init = ({ IDL }) => {
+export const init = () => {
     return [];
 };

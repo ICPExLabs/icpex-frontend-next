@@ -2,13 +2,14 @@ text: text
 batch: + Add Batch
 swap:
     title: Swap
-    pay: You pay
+    pay: You Pay
     receive: You Receive
     connect: Connect Wallet
     insufficient: Insufficient {{ symbol }}
     enterAmount: Enter an amount
     half: Half
     max: Max
+    select: Select Token
 limit:
     title: Limit
     limitTip1: When 1

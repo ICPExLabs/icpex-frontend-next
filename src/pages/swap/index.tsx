@@ -1,8 +1,7 @@
-import path from 'path';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
+import { useAppStore } from '@/stores/app';
 import { cn } from '@/utils/classNames';
 
 import BatchComponents from './components/batch';
@@ -10,11 +9,13 @@ import PriceComponents from './components/price';
 import SlippageComponents from './components/slippage';
 
 function SwapTabs({ children }: { children: React.ReactNode }) {
-    const { pathname } = useLocation();
     const { t } = useTranslation();
+    const { pathname } = useLocation();
+
+    const { walletMode } = useAppStore();
 
     return (
-        <div className="mx-auto mt-[80px] w-full max-w-[520px] flex-col">
+        <div className="mx-auto mt-[50px] w-full max-w-[520px] flex-col">
             <div className="flex">
                 <div className="flex flex-1 items-center gap-x-[15px]">
                     <Link
@@ -38,7 +39,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <SlippageComponents />
-                {pathname.includes('/swap') && <BatchComponents />}
+                {walletMode === 'contract' && <BatchComponents />}
             </div>
 
             <div className="mt-[10px] flex w-full">{children}</div>
