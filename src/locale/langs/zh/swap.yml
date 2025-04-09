@@ -1,1 +1,11 @@
 text: text
+batch: + Add Batch
+swap:
+    title: Swap
+    pay: You pay
+    receive: You Receive
+    connect: Connect Wallet
+    insufficient: Insufficient {{ symbol }}
+    enterAmount: Enter an amount
+limit:
+    title: Limit

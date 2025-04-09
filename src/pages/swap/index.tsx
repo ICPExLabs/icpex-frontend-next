@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
 import { cn } from '@/utils/classNames';
@@ -8,6 +9,7 @@ import SettingComponents from './components/setting';
 
 function SwapTabs({ children }: { children: React.ReactNode }) {
     const location = useLocation();
+    const { t } = useTranslation();
     const [active, setActive] = useState('/');
 
     useEffect(() => {
@@ -27,7 +29,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                             (active === '/' || active === '/swap') && 'bg-[#7178FF] text-white',
                         )}
                     >
-                        Swap
+                        {t('swap.swap.title')}
                     </Link>
                     <Link
                         to="/limit"
@@ -36,7 +38,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                             active === '/limit' && 'bg-[#7178FF] text-white',
                         )}
                     >
-                        Limit
+                        {t('swap.limit.title')}
                     </Link>
                 </div>
 
