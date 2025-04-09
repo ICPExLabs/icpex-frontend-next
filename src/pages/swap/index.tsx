@@ -7,15 +7,17 @@ import { cn } from '@/utils/classNames';
 import PriceComponents from './components/price';
 import SettingComponents from './components/setting';
 
+export type ActiveType = '/' | '/limit' | '/swap';
+
 function SwapTabs({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const { t } = useTranslation();
-    const [active, setActive] = useState('/');
+    const [active, setActive] = useState<ActiveType>('/');
 
     useEffect(() => {
         const { pathname } = location;
 
-        setActive(pathname);
+        setActive(pathname as ActiveType);
     }, [location]);
 
     return (
@@ -42,7 +44,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     </Link>
                 </div>
 
-                <SettingComponents />
+                <SettingComponents active={active} />
             </div>
 
             <div className="mt-[10px] flex w-full">{children}</div>

@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import Icon from '@/components/ui/icon';
 
-function SettingComponents() {
+import { ActiveType } from '../index';
+
+function SettingComponents({ active }: { active: ActiveType }) {
     const { t } = useTranslation();
     return (
         <div className="flex items-center">
@@ -14,12 +16,14 @@ function SettingComponents() {
             <div className="ml-3 cursor-pointer">
                 <Icon name="setting" className="h-10 w-10" />
             </div>
-            <Button
-                size="default"
-                className="ml-3 !rounded-full !bg-white !px-4 !py-5 text-sm font-medium !text-[#272E4D]"
-            >
-                {t('swap.batch')}
-            </Button>
+            {active !== '/limit' && (
+                <Button
+                    size="default"
+                    className="ml-3 !rounded-full !bg-white !px-4 !py-5 text-sm font-medium !text-[#272E4D]"
+                >
+                    {t('swap.batch')}
+                </Button>
+            )}
         </div>
     );
 }
