@@ -46,7 +46,7 @@ export function AmountInput({ value, onChange, placeholder = '0.00', className =
                 <div className="h-6 w-6 shrink-0 rounded-full bg-white"></div>
                 <div className="flex-1 text-left">{token.symbol}</div>
                 <div className="flex h-4 w-4 shrink-0 items-center">
-                    <Icon name="down" className="h-3 w-3" />
+                    <Icon name="arrow-down" className="h-3 w-3" />
                 </div>
             </div>
         </div>
