@@ -7,5 +7,10 @@ swap:
     connect: Connect Wallet
     insufficient: Insufficient {{ symbol }}
     enterAmount: Enter an amount
+    half: Half
+    max: Max
 limit:
     title: Limit
+    confirm: Confirm
+    info: Limits may not execute exactly when tokens reach the specified price.
+    learn: Learn More
