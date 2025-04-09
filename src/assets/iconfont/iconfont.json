@@ -4,7 +4,7 @@
   "font_class": "icon-",
   "font_family": "iconfont",
   "url": "https://codesign.qq.com/app/icon/539539995223013/detail",
-  "icons_count": 53,
+  "icons_count": 55,
   "icons": [
     {
       "id": 538559142643039,
@@ -482,6 +482,24 @@
       "unicode": "e03f",
       "unicode_decimal": 57407,
       "section": "color-icon"
+    },
+    {
+      "id": 540548576353743,
+      "name": "success",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"zyzlyches__icon zyzlyches__design-iconfont\" viewBox=\"0 0 1024 1024\">\n  <path d=\"M779.939 279l42.483 42.37-423.496 424.618L202 550.658l42.253-42.6 154.445 153.194z\" fill=\"currentColor\"></path>\n</svg>",
+      "class_name": "success",
+      "unicode": "e040",
+      "unicode_decimal": 57408,
+      "section": "icpex-icon"
+    },
+    {
+      "id": 540548576353744,
+      "name": "correct",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 32 32\" class=\"ze6zyq16v__ty1b6sv09__design-iconfont ze6zyq16v__design-iconfont\">\n  <path d=\"M28.6316 4L11.8063 20.8421L3.36842 12.3874L0 15.7558L11.8063 27.5789L32 7.36842L28.6316 4Z\" fill=\"currentColor\"></path>\n</svg>",
+      "class_name": "correct",
+      "unicode": "e041",
+      "unicode_decimal": 57409,
+      "section": "icpex-icon"
     }
   ]
 }

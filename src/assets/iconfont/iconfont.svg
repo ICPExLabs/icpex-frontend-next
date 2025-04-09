@@ -188,6 +188,12 @@
       <glyph glyph-name="icp-swap" unicode="&#xE03F;" d="M0 812M512 812L512 812Q1024 812 1024 300L1024 300Q1024-212 512-212L512-212Q0-212 0 300L0 300Q0 812 512 812Z"  horiz-adv-x="1024" vert-adv-y="1024"  />
 
       
+      <glyph glyph-name="success" unicode="&#xE040;" d="M779.939 533L822.422 490.63 398.926 66.012 202 261.342 244.253 303.942 398.698 150.748Z"  horiz-adv-x="1024" vert-adv-y="1024"  />
+
+      
+      <glyph glyph-name="correct" unicode="&#xE041;" d="M916.2112 684L377.8016 145.0528 107.7894 415.6032 0 307.8144 377.8016-70.5248 1024 576.2106 916.2112 684Z"  horiz-adv-x="1024" vert-adv-y="1024"  />
+
+      
 
   </font>
   </defs>
