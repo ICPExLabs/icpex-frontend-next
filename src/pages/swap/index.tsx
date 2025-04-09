@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
 import { cn } from '@/utils/classNames';
@@ -8,6 +9,7 @@ import SettingComponents from './components/setting';
 
 function SwapTabs({ children }: { children: React.ReactNode }) {
     const location = useLocation();
+    const { t } = useTranslation();
     const [active, setActive] = useState('/');
 
     useEffect(() => {
@@ -23,14 +25,20 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/swap"
                         className={cn(
-                            'text-[14px] text-black',
-                            (active === '/' || active === '/swap') && 'text-[#7178FF]',
+                            'rounded-full px-5 py-2 text-center text-base font-semibold text-black',
+                            (active === '/' || active === '/swap') && 'bg-[#7178FF] text-white',
                         )}
                     >
-                        Swap
+                        {t('swap.swap.title')}
                     </Link>
-                    <Link to="/limit" className={cn('text-[14px] text-black', active === '/limit' && 'text-[#7178FF]')}>
-                        Limit
+                    <Link
+                        to="/limit"
+                        className={cn(
+                            'rounded-full px-5 py-2 text-center text-base font-semibold text-black',
+                            active === '/limit' && 'bg-[#7178FF] text-white',
+                        )}
+                    >
+                        {t('swap.limit.title')}
                     </Link>
                 </div>
 
