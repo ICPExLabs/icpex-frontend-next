@@ -1,3 +1,4 @@
+import path from 'path';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -8,18 +9,9 @@ import BatchComponents from './components/batch';
 import PriceComponents from './components/price';
 import SlippageComponents from './components/slippage';
 
-export type ActiveType = '/' | '/limit' | '/swap';
-
 function SwapTabs({ children }: { children: React.ReactNode }) {
-    const location = useLocation();
+    const { pathname } = useLocation();
     const { t } = useTranslation();
-    const [active, setActive] = useState<ActiveType>('/');
-
-    useEffect(() => {
-        const { pathname } = location;
-
-        setActive(pathname as ActiveType);
-    }, [location]);
 
     return (
         <div className="mx-auto mt-[80px] w-full max-w-[520px] flex-col">
@@ -29,7 +21,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                         to="/swap"
                         className={cn(
                             'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
-                            (active === '/' || active === '/swap') && 'bg-[#7178FF] text-white',
+                            (pathname === '/' || pathname.includes('/swap')) && 'bg-[#7178FF] text-white',
                         )}
                     >
                         {t('swap.swap.title')}
@@ -38,7 +30,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                         to="/limit"
                         className={cn(
                             'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
-                            active === '/limit' && 'bg-[#7178FF] text-white',
+                            pathname.includes('/limit') && 'bg-[#7178FF] text-white',
                         )}
                     >
                         {t('swap.limit.title')}
@@ -46,7 +38,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <SlippageComponents />
-                {active !== '/limit' && <BatchComponents />}
+                {pathname.includes('/swap') && <BatchComponents />}
             </div>
 
             <div className="mt-[10px] flex w-full">{children}</div>
