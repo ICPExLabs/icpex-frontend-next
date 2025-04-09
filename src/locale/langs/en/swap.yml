@@ -7,6 +7,8 @@ swap:
     connect: Connect Wallet
     insufficient: Insufficient {{ symbol }}
     enterAmount: Enter an amount
+    half: Half
+    max: Max
 limit:
     title: Limit
 setting:
@@ -18,3 +20,6 @@ setting:
     expertTip: Allow high price impact trades and skip the confirm screen. Use at your own risk.
     auto: Auto
     close: Close
+    confirm: Confirm
+    info: Limits may not execute exactly when tokens reach the specified price.
+    learn: Learn More

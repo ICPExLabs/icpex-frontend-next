@@ -8,15 +8,17 @@ import BatchComponents from './components/batch';
 import PriceComponents from './components/price';
 import SlippageComponents from './components/slippage';
 
+export type ActiveType = '/' | '/limit' | '/swap';
+
 function SwapTabs({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const { t } = useTranslation();
-    const [active, setActive] = useState('/');
+    const [active, setActive] = useState<ActiveType>('/');
 
     useEffect(() => {
         const { pathname } = location;
 
-        setActive(pathname);
+        setActive(pathname as ActiveType);
     }, [location]);
 
     return (
@@ -44,7 +46,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <SlippageComponents />
-                <BatchComponents />
+                {active !== '/limit' && <BatchComponents />}
             </div>
 
             <div className="mt-[10px] flex w-full">{children}</div>
