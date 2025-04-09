@@ -3,7 +3,7 @@ import { cn } from '@/utils/classNames';
 import Icon from './icon';
 
 type TokenPriceChangePercentageProps = {
-    value: number;
+    value: string | number;
     className?: string;
     showIcon?: boolean;
     precision?: number;
@@ -15,6 +15,10 @@ export const TokenPriceChangePercentage = ({
     showIcon = true,
     precision = 2,
 }: TokenPriceChangePercentageProps) => {
+    if (typeof value === 'string') {
+        return <div className="inline-flex items-center text-xs font-medium text-[#97a0c9]">{value}</div>;
+    }
+
     const normalizedValue = Number.isFinite(value) ? value : 0;
     const isPositive = normalizedValue > 0;
     const isNegative = normalizedValue < 0;

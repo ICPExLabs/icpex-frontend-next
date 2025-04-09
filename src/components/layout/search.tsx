@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { parseLowerCaseSearch } from '@/utils/search';
 
-import { get_token_price_ic_by_canister_id } from '../api/price';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
 import { TokenPriceChangePercentage } from '../ui/price';
@@ -23,10 +23,7 @@ const SearchResultItem = ({
     closeSearch: () => void;
 }) => {
     const { tokenList } = useTokenStore();
-    const [tokenData, setTokenData] = useState<TokenInfo>();
-
-    const [tokenPrice, setTokenPrice] = useState<number | undefined>(undefined);
-    const [changePercentage, setChangePercentage] = useState<number | undefined>(undefined);
+    const [tokenData, setTokenData] = useState<TokenInfo | undefined>();
 
     useEffect(() => {
         if (token) {
@@ -42,18 +39,7 @@ const SearchResultItem = ({
         }
     }, [tokenList, token, tokenName, setTokenData]);
 
-    useEffect(() => {
-        if (tokenData) {
-            get_token_price_ic_by_canister_id(tokenData.canister_id.toString()).then((res) => {
-                if (res) {
-                    if (typeof res?.price === 'string') {
-                        setTokenPrice(Number(res.price));
-                    }
-                    if (typeof res?.price_change_24h === 'string') setChangePercentage(Number(res.price_change_24h));
-                }
-            });
-        }
-    }, [tokenData]);
+    const priceData = useTokenPrice(tokenData?.canister_id.toString());
 
     return (
         <div className="flex h-[52px] w-full cursor-pointer items-center justify-between px-4 duration-75 hover:bg-[#f2f4ff]">
@@ -70,13 +56,13 @@ const SearchResultItem = ({
                         </div>
                     </div>
                     <div className="ml-[11px] flex flex-col items-end gap-y-1">
-                        {typeof tokenPrice === 'number' ? (
-                            <p className="text-base font-medium text-[#272e4d]">${tokenPrice}</p>
+                        {priceData ? (
+                            <p className="text-base font-medium text-[#272e4d]">${priceData.price || '--'}</p>
                         ) : (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
                         )}
-                        {typeof changePercentage === 'number' ? (
-                            <TokenPriceChangePercentage value={changePercentage} />
+                        {priceData ? (
+                            <TokenPriceChangePercentage value={priceData.price_change_24h || '--'} />
                         ) : (
                             <Icon name="loading" className="h-[12px] w-[12px] animate-spin text-[#96a0c8]" />
                         )}
