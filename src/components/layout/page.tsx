@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 
 import LoginModal from '../modals/login-modal';
+import UserInfoModal from '../modals/user-modal';
 import Footer from './footer';
 import Header from './header';
 
@@ -27,6 +28,9 @@ function PageLayout({ children }: { children: React.ReactNode }) {
 
             {/* login modal */}
             <LoginModal />
+
+            {/* userInfo modal */}
+            <UserInfoModal />
         </>
     );
 }

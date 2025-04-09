@@ -81,7 +81,7 @@ const MenuModal = () => {
                                         )}
                                         onClick={() => setTheme('system')}
                                     >
-                                        Auto
+                                        {t('common.menu.auto')}
                                     </div>
                                     <div
                                         className={cn(

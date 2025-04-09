@@ -10,7 +10,7 @@ menu:
     github: Github
     telegram: Telegram
     whitePaper: WhitePaper
-
+    auto: Auto
 search:
     placeholder: Search by symbol or canister id
     noResults: No tokens found.
@@ -22,3 +22,7 @@ connect:
     protocol1: I have read, understand and agree to the
     protocol2: Terms of Service.
     terms: Please agree to the Terms of Service.
+    connect: Connect
+switchWallet:
+    contractWallet: Contract Wallet
+    wallet: Wallet

@@ -10,6 +10,7 @@ import { cn } from '@/utils/classNames';
 import Icon from '../ui/icon';
 
 export const LoginButton = () => {
+    const { t } = useTranslation();
     const { connectedIdentity, setShowLoginModal } = useIdentityStore();
 
     const openLogin = () => {
@@ -27,7 +28,7 @@ export const LoginButton = () => {
                     onClick={openLogin}
                     className="flex h-[40px] cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-[#7236FE] to-[#7178FF] px-5 text-sm font-semibold text-white"
                 >
-                    Connect
+                    {t('common.connect.connect')}
                 </div>
             )}
         </>
@@ -43,9 +44,9 @@ type TypeWalletListItem = {
 };
 const LoginModal = () => {
     const { t } = useTranslation();
+    const { connect } = useConnect();
 
     const { setShowLoginModal, showLoginModal } = useIdentityStore();
-
     const [isChecked, setIsChecked] = useState(true);
 
     const WalletList: TypeWalletListItem[] = [
@@ -64,8 +65,6 @@ const LoginModal = () => {
             walletName: 'Plug',
         },
     ];
-
-    const { connect } = useConnect();
 
     const handleConnect = async (wallet: string) => {
         if (!isChecked) {

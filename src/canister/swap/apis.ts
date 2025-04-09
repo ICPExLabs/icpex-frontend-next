@@ -5,7 +5,7 @@ import { idlFactory } from './swap.did.ts';
 
 const canisterID = 'piwiu-wiaaa-aaaaj-azzka-cai';
 
-export const fetchTokenList = async () => {
+export const get_tokens_query = async () => {
     try {
         const create: _SERVICE = await getAnonymousActorCreatorByAgent()(idlFactory, canisterID);
         const res: TokenInfo[] = await create.tokens_query();

@@ -10,6 +10,6 @@ export const writeStorage = (key: string, value: string) => {
     localStorage.setItem(key, value);
 };
 
-const LAST_CONNECT_TYPE = '__last_connect_type__';
+const LAST_CONNECT_TYPE = '__ICPEX_LAST_CONNECT_TYPE__';
 export const readLastConnectType = () => readStorage(LAST_CONNECT_TYPE) ?? '';
 export const writeLastConnectType = (connectType: ConnectType | '') => writeStorage(LAST_CONNECT_TYPE, connectType);

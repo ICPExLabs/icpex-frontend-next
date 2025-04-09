@@ -48,7 +48,7 @@ const routes: RouteObject[] = [
         ),
     },
     {
-        path: '/explore',
+        path: '/explore/:canisterId',
         element: (
             <PageLayout>
                 <ExplorePage />

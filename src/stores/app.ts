@@ -10,6 +10,7 @@ import { SupportedLanguage } from '@/types/app';
 import { isDevMode } from '@/utils/env';
 
 type ThemeMode = 'light' | 'dark';
+type TypeWalletMode = 'wallet' | 'contract';
 
 interface AppState {
     language: SupportedLanguage;
@@ -21,6 +22,9 @@ interface AppState {
     setTheme: (theme: 'system' | ThemeMode) => void;
     toggleTheme: () => void;
     initThemeListener: () => () => void;
+
+    walletMode: TypeWalletMode;
+    setWalletMode: (walletMode: TypeWalletMode) => void;
 }
 
 const isDev = isDevMode();
@@ -92,6 +96,9 @@ export const useAppStore = create<AppState>()(
 
                     return createThemeListener(set, get);
                 },
+
+                walletMode: 'wallet',
+                setWalletMode: (walletMode) => set({ walletMode }),
             }),
             {
                 name: STORAGE_KEY,

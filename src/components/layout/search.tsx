@@ -1,78 +1,87 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { useIdentityStore } from '@/stores/identity';
+import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { parseLowerCaseSearch } from '@/utils/search';
 
+import { get_token_price_ic_by_canister_id } from '../api/price';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
 import { TokenPriceChangePercentage } from '../ui/price';
 
-// ! test code
-type TypeSearchResultItem = {
-    token_name: string;
-    token_symbol: string;
-    token_address: string;
-    token_decimals: number;
-    token_logo: string;
-    token_blockchain: string;
-    token_type: string;
-    token_standard: string;
-    token_total_supply: string;
-    token_price: string;
-    token_price_change_percentage_24h: number;
-    token_price_change_percentage_7d: number;
-};
-type TypeSearchResult = TypeSearchResultItem[];
-
-const SearchResultItem = ({ tokenName }: { tokenName: string }) => {
-    const { tokenList } = useIdentityStore();
+const SearchResultItem = ({
+    token,
+    tokenName,
+    closeSearch,
+}: {
+    token?: TokenInfo;
+    tokenName?: string;
+    closeSearch: () => void;
+}) => {
+    const { tokenList } = useTokenStore();
     const [tokenData, setTokenData] = useState<TokenInfo>();
 
-    const [tokenPrice, setTokenPrice] = useState<number>(0);
-    const [changePercentage, setChangePercentage] = useState<number>(0);
-
-    const openToken = () => {
-        console.log(123);
-    };
+    const [tokenPrice, setTokenPrice] = useState<number | undefined>(undefined);
+    const [changePercentage, setChangePercentage] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        if (!tokenName || !tokenList?.length) return;
+        if (token) {
+            setTokenData(token);
+        } else {
+            if (!tokenName || !tokenList?.length) return;
 
-        const matchedToken = tokenList.find((token) => token.name === tokenName);
+            const matchedToken = tokenList.find((token) => token.name === tokenName);
 
-        if (matchedToken) {
-            setTokenData(matchedToken);
-
-            // ! test code
-            setTokenPrice(100);
-            setChangePercentage(1.8);
+            if (matchedToken) {
+                setTokenData(matchedToken);
+            }
         }
-    }, [tokenList, tokenName, setTokenData]);
+    }, [tokenList, token, tokenName, setTokenData]);
+
+    useEffect(() => {
+        if (tokenData) {
+            get_token_price_ic_by_canister_id(tokenData.canister_id.toString()).then((res) => {
+                if (res) {
+                    if (typeof res?.price === 'string') {
+                        setTokenPrice(Number(res.price));
+                    }
+                    if (typeof res?.price_change_24h === 'string') setChangePercentage(Number(res.price_change_24h));
+                }
+            });
+        }
+    }, [tokenData]);
 
     return (
-        <div
-            onClick={openToken}
-            className="flex h-[52px] w-full cursor-pointer items-center justify-between px-4 duration-75 hover:bg-[#f2f4ff]"
-        >
+        <div className="flex h-[52px] w-full cursor-pointer items-center justify-between px-4 duration-75 hover:bg-[#f2f4ff]">
             {tokenData && (
-                <>
-                    <div className="flex items-center">
+                <Link onClick={closeSearch} to={`/explore/${tokenData.canister_id.toString()}`} className="flex w-full">
+                    <div className="flex flex-1 items-center">
                         <TokenLogo canisterId={tokenData.canister_id.toString()} className="h-9 w-9 flex-shrink-0" />
 
-                        <div className="ml-[11px] flex flex-col">
-                            <p className="text-base font-medium text-[#272e4d]">{tokenData.name}</p>
+                        <div className="ml-[11px] flex flex-1 flex-col">
+                            <p className="line-clamp-1 w-full text-base font-medium break-all text-[#272e4d]">
+                                {tokenData.name}
+                            </p>
                             <p className="text-xs font-medium text-[#96a0c8]">{tokenData.symbol}</p>
                         </div>
                     </div>
-                    <div className="ml-[11px] flex flex-col items-end">
-                        <p className="text-base font-medium text-[#272e4d]">${tokenPrice}</p>
-                        <TokenPriceChangePercentage value={changePercentage} />
+                    <div className="ml-[11px] flex flex-col items-end gap-y-1">
+                        {typeof tokenPrice === 'number' ? (
+                            <p className="text-base font-medium text-[#272e4d]">${tokenPrice}</p>
+                        ) : (
+                            <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                        )}
+                        {typeof changePercentage === 'number' ? (
+                            <TokenPriceChangePercentage value={changePercentage} />
+                        ) : (
+                            <Icon name="loading" className="h-[12px] w-[12px] animate-spin text-[#96a0c8]" />
+                        )}
                     </div>
-                </>
+                </Link>
             )}
         </div>
     );
@@ -81,22 +90,33 @@ const SearchResultItem = ({ tokenName }: { tokenName: string }) => {
 const popularTokens = ['Internet Computer', 'ICExplorer'];
 const SearchComponents = () => {
     const { t } = useTranslation();
-    const { tokenList } = useIdentityStore();
+    const { tokenList } = useTokenStore();
 
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
     const [keyword, setKeyword] = useState<string>('');
-    const [searchResult, setSearchResult] = useState<TypeSearchResult | null>(null);
+    const [searchResult, setSearchResult] = useState<TokenInfo[] | null>(null);
+
+    const closeSearch = () => {
+        setIsOpenSearch(false);
+    };
 
     useEffect(() => {
-        if (!parseLowerCaseSearch(keyword)) {
+        if (!isOpenSearch) return;
+
+        const val = parseLowerCaseSearch(keyword);
+        if (!val || !tokenList) {
             setSearchResult(null);
             return;
         }
 
-        console.log(keyword);
-    }, [keyword, isOpenSearch]);
+        const arr = tokenList.filter(
+            (item) => item.canister_id.toString() === val || item.symbol.toLowerCase().includes(val),
+        );
+
+        setSearchResult(arr.length ? arr : null);
+    }, [keyword, isOpenSearch, tokenList]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -130,7 +150,7 @@ const SearchComponents = () => {
                 )}
             </AnimatePresence>
 
-            <div className="relative ml-[72px] h-10 w-[440px]">
+            <div className="relative mr-[30px] ml-[72px] h-10 w-[440px]">
                 <div
                     className={cn(
                         'absolute z-10 flex w-full flex-col items-center rounded-[40px] bg-[#f2f4ff]',
@@ -149,6 +169,14 @@ const SearchComponents = () => {
                             onFocus={() => setIsOpenSearch(true)}
                             disabled={!tokenList || !tokenList.length}
                         />
+                        <Icon
+                            onClick={() => setKeyword('')}
+                            name="close"
+                            className={cn(
+                                'h-[15px] w-[15px] flex-shrink-0 cursor-pointer text-[#97A0C9] opacity-0 duration-75',
+                                keyword && 'opacity-100',
+                            )}
+                        />
                     </div>
 
                     {isOpenSearch && (
@@ -164,7 +192,11 @@ const SearchComponents = () => {
                                         </div>
                                         <div className="mt-2 flex w-full flex-col">
                                             {popularTokens.map((item, index) => (
-                                                <SearchResultItem key={index} tokenName={item} />
+                                                <SearchResultItem
+                                                    key={index}
+                                                    tokenName={item}
+                                                    closeSearch={closeSearch}
+                                                />
                                             ))}
                                         </div>
                                     </>
@@ -184,9 +216,13 @@ const SearchComponents = () => {
                                             </div>
                                         ) : (
                                             <div className="flex w-full flex-col">
-                                                {/* {searchResult.map((item, index) => (
-                                                    <SearchResultItem key={index} data={item} />
-                                                ))} */}
+                                                {searchResult.map((item, index) => (
+                                                    <SearchResultItem
+                                                        key={index}
+                                                        token={item}
+                                                        closeSearch={closeSearch}
+                                                    />
+                                                ))}
                                             </div>
                                         )}
                                     </>

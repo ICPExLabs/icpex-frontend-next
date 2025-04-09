@@ -37,6 +37,7 @@ import TOKEN_IC_SNS_ICE_PNG from '@/assets/tokenLogoSvg/sns/ICE.png';
 import TOKEN_IC_SNS_ICL_PNG from '@/assets/tokenLogoSvg/sns/ICL.png';
 import TOKEN_IC_SNS_ICS_PNG from '@/assets/tokenLogoSvg/sns/ICS.png';
 import TOKEN_IC_SNS_ICVC_PNG from '@/assets/tokenLogoSvg/sns/ICVC.png';
+import TOKEN_IC_SNS_ICX_PNG from '@/assets/tokenLogoSvg/sns/ICX.png';
 import TOKEN_IC_SNS_KINIC_PNG from '@/assets/tokenLogoSvg/sns/KINIC.png';
 import TOKEN_IC_SNS_KONG_PNG from '@/assets/tokenLogoSvg/sns/KONG.png';
 import TOKEN_IC_SNS_MOTOKO_PNG from '@/assets/tokenLogoSvg/sns/MOTOKO.png';
@@ -106,12 +107,24 @@ const LOGO_RECORD: Record<string, string> = {
     'nfjys-2iaaa-aaaaq-aaena-cai': TOKEN_IC_SNS_FUEL_PNG,
     'ifwyg-gaaaa-aaaaq-aaeqq-cai': TOKEN_IC_SNS_ICE_PNG,
     'zfcdd-tqaaa-aaaaq-aaaga-cai': TOKEN_IC_SNS_DKP_PNG,
+    'lvfsa-2aaaa-aaaaq-aaeyq-cai': TOKEN_IC_SNS_ICX_PNG,
 };
 
 export const TokenLogo = ({ canisterId, className = '' }: { canisterId: string; className?: string }) => {
     const logo = LOGO_RECORD[canisterId];
 
     return (
-        <img className={cn('object-contain', className)} src={logo} alt={`${canisterId} token logo`} loading="lazy" />
+        <>
+            {!logo && <div className={cn('rounded-full border border-[#ccc] object-contain', className)}></div>}
+
+            {logo && (
+                <img
+                    className={cn('object-contain', className)}
+                    src={logo}
+                    alt={`${canisterId} token logo`}
+                    loading="lazy"
+                />
+            )}
+        </>
     );
 };

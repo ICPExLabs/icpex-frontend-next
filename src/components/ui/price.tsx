@@ -21,7 +21,6 @@ export const TokenPriceChangePercentage = ({
     const isZero = normalizedValue === 0;
 
     const displayValue = normalizedValue.toFixed(precision);
-    const absoluteValue = Math.abs(normalizedValue);
 
     return (
         <div
@@ -42,7 +41,7 @@ export const TokenPriceChangePercentage = ({
                     {isNegative && <Icon name="down" className="mr-1 h-[5px] w-[9px] min-w-[9px]" aria-hidden="true" />}
                 </>
             )}
-            {absoluteValue}%
+            {displayValue}%
         </div>
     );
 };

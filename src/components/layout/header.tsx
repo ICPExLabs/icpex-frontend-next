@@ -1,3 +1,4 @@
+import { useConnect } from '@connect2ic/react';
 import { useScroll } from 'ahooks';
 import { NavLink } from 'react-router-dom';
 
@@ -5,11 +6,15 @@ import { cn } from '@/utils/classNames';
 
 import { LoginButton } from '../modals/login-modal';
 import MenuModal from '../modals/menu-modal';
+import { SwitchWalletButton } from '../modals/switch-wallet';
+import { UserInfoButton } from '../modals/user-modal';
 import Icon from '../ui/icon';
 import NavComponents from './nav';
 import SearchComponents from './search';
 
 const Header = () => {
+    const { isConnected, isInitializing } = useConnect();
+
     const scroll = useScroll(document);
 
     return (
@@ -30,7 +35,17 @@ const Header = () => {
 
                     <div className="flex flex-1 items-center justify-end gap-x-[10px]">
                         <MenuModal />
-                        <LoginButton />
+
+                        {isInitializing ? (
+                            'loading'
+                        ) : isConnected ? (
+                            <>
+                                <SwitchWalletButton />
+                                <UserInfoButton />
+                            </>
+                        ) : (
+                            <LoginButton />
+                        )}
                     </div>
                 </div>
             </header>
