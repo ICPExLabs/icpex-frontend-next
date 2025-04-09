@@ -25,6 +25,12 @@ interface AppState {
 
     walletMode: TypeWalletMode;
     setWalletMode: (walletMode: TypeWalletMode) => void;
+
+    swapSlippage: number;
+    setSwapSlippage: (slippage: number) => void;
+
+    isSwapExpertMode: boolean;
+    setIsSwapExpertMode: (isSwapExpertMode: boolean) => void;
 }
 
 const isDev = isDevMode();
@@ -99,6 +105,12 @@ export const useAppStore = create<AppState>()(
 
                 walletMode: 'wallet',
                 setWalletMode: (walletMode) => set({ walletMode }),
+
+                swapSlippage: 0.5,
+                setSwapSlippage: (swapSlippage) => set({ swapSlippage }),
+
+                isSwapExpertMode: false,
+                setIsSwapExpertMode: (isSwapExpertMode) => set({ isSwapExpertMode }),
             }),
             {
                 name: STORAGE_KEY,

@@ -26,3 +26,39 @@ body {
         background-color: transparent;
     }
 }
+
+.dropdown-modal {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.semi-switch {
+    background-color: #d9d9d9;
+}
+
+.semi-switch:hover {
+    background-color: #d9d9d9;
+}
+
+.semi-switch-checked {
+    background-color: #07c160;
+}
+
+.semi-switch-checked:hover {
+    background-color: #07c160;
+}
+
+.semi-input-wrapper-focus:active {
+    border: 0;
+}
+
+.semi-input-wrapper {
+    color: #97a0c9;
+    border: 0;
+
+    .semi-input {
+        padding: 0;
+        outline: none;
+    }
+}

@@ -4,8 +4,9 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { cn } from '@/utils/classNames';
 
+import BatchComponents from './components/batch';
 import PriceComponents from './components/price';
-import SettingComponents from './components/setting';
+import SlippageComponents from './components/slippage';
 
 function SwapTabs({ children }: { children: React.ReactNode }) {
     const location = useLocation();
@@ -25,7 +26,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/swap"
                         className={cn(
-                            'rounded-full px-5 py-2 text-center text-base font-semibold text-black',
+                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
                             (active === '/' || active === '/swap') && 'bg-[#7178FF] text-white',
                         )}
                     >
@@ -34,7 +35,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/limit"
                         className={cn(
-                            'rounded-full px-5 py-2 text-center text-base font-semibold text-black',
+                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
                             active === '/limit' && 'bg-[#7178FF] text-white',
                         )}
                     >
@@ -42,7 +43,8 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     </Link>
                 </div>
 
-                <SettingComponents />
+                <SlippageComponents />
+                <BatchComponents />
             </div>
 
             <div className="mt-[10px] flex w-full">{children}</div>

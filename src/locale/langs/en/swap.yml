@@ -9,3 +9,12 @@ swap:
     enterAmount: Enter an amount
 limit:
     title: Limit
+setting:
+    slippage: Slippage
+    title: Swap settings
+    tolerance: Slippage Tolerance
+    tolerancePlaceholder: '0.5'
+    expert: Expert Mode
+    expertTip: Allow high price impact trades and skip the confirm screen. Use at your own risk.
+    auto: Auto
+    close: Close
