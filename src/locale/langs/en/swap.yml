@@ -11,6 +11,9 @@ swap:
     max: Max
 limit:
     title: Limit
+    limitTip1: When 1
+    limitTip2: is worth
+    expiry: Expiry
 setting:
     slippage: Slippage
     title: Swap settings

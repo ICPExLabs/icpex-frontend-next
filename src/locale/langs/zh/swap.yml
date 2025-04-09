@@ -11,6 +11,18 @@ swap:
     max: Max
 limit:
     title: Limit
+    limitTip1: When 1
+    limitTip2: is worth
+    expiry: Expiry
+setting:
+    slippage: Slippage
+    title: Swap settings
+    tolerance: Slippage Tolerance
+    tolerancePlaceholder: '0.5'
+    expert: Expert Mode
+    expertTip: Allow high price impact trades and skip the confirm screen. Use at your own risk.
+    auto: Auto
+    close: Close
     confirm: Confirm
     info: Limits may not execute exactly when tokens reach the specified price.
     learn: Learn More
