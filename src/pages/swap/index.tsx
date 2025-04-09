@@ -23,13 +23,19 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/swap"
                         className={cn(
-                            'text-[14px] text-black',
-                            (active === '/' || active === '/swap') && 'text-[#7178FF]',
+                            'rounded-full px-5 py-2 text-center text-base font-semibold text-black',
+                            (active === '/' || active === '/swap') && 'bg-[#7178FF] text-white',
                         )}
                     >
                         Swap
                     </Link>
-                    <Link to="/limit" className={cn('text-[14px] text-black', active === '/limit' && 'text-[#7178FF]')}>
+                    <Link
+                        to="/limit"
+                        className={cn(
+                            'rounded-full px-5 py-2 text-center text-base font-semibold text-black',
+                            active === '/limit' && 'bg-[#7178FF] text-white',
+                        )}
+                    >
                         Limit
                     </Link>
                 </div>
