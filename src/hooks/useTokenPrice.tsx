@@ -122,11 +122,12 @@ export const useAllTokenPriceAndChange = () => {
 
 // contract wallet -> tokens balance
 export type TokenBalanceInfo = TokenPriceInfo & { balance: string | number; usd: string | number };
-
 export const useContractTokensAndBalance = () => {
     const tokenList = useAllTokenPriceAndChange();
     const [balanceData, setBalanceData] = useState<TokenBalanceInfo[] | undefined>();
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const { connectedIdentity } = useIdentityStore();
+    const [refreshCount, setRefreshCount] = useState(0); // 用于强制刷新
 
     const fetchData = useCallback(async () => {
         if (!connectedIdentity) return undefined;
@@ -134,6 +135,7 @@ export const useContractTokensAndBalance = () => {
         const { principal } = connectedIdentity;
 
         try {
+            setIsRefreshing(true);
             const balances = await get_tokens_balance(connectedIdentity, {
                 owner: principal,
             });
@@ -157,16 +159,25 @@ export const useContractTokensAndBalance = () => {
             setBalanceData(result);
         } catch (error) {
             console.error('🚀 ~ useTokenPriceAndBalance ~ error:', error);
+        } finally {
+            setIsRefreshing(false);
         }
     }, [connectedIdentity, tokenList]);
 
+    const refreshData = useCallback(() => {
+        setRefreshCount((prev) => prev + 1); // 增加计数触发重新获取
+    }, []);
+
     useEffect(() => {
         if (!connectedIdentity) return;
-
-        if (!tokenList?.length) return undefined;
+        if (!tokenList?.length) return;
 
         fetchData();
-    }, [connectedIdentity, fetchData, tokenList]);
+    }, [connectedIdentity, fetchData, tokenList, refreshCount, refreshData]);
 
-    return balanceData;
+    return {
+        balanceData,
+        refreshData,
+        isRefreshing,
+    };
 };

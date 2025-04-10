@@ -58,10 +58,6 @@ export const SelectTokenModal = ({
         return tokenList;
     }, [searchKeyword, tokenList]);
 
-    useEffect(() => {
-        console.log(list);
-    }, [list]);
-
     return (
         <Modal
             centered={true}
