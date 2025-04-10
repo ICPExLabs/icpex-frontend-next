@@ -1,4 +1,5 @@
 import { TokenInfo } from '@/canister/swap/swap.did.d';
+import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
 import { TypeTokenPrice } from '@/hooks/useTokenPrice';
 
@@ -41,7 +42,13 @@ const PriceItem = ({ tokenInfo, price }: { tokenInfo: TokenInfo; price: TypeToke
                 </div>
             </div>
             <p className="text-base font-medium text-[#272e4d]">
-                {!price?.price ? '--' : `$${parseFloat(price?.price.toFixed(8))}`}
+                {price ? (
+                    <p className="text-base font-medium text-[#272e4d]">
+                        ${price?.price ? parseFloat(price?.price.toFixed(8)) : '--'}
+                    </p>
+                ) : (
+                    <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                )}
             </p>
         </div>
     );
