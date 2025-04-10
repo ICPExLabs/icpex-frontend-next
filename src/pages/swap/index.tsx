@@ -43,8 +43,6 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="mt-[10px] flex w-full">{children}</div>
-
-            <PriceComponents />
         </div>
     );
 }

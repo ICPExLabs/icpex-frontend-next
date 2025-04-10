@@ -5,11 +5,12 @@ import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { get_token_price_ic, get_token_price_ic_by_canister_id } from '@/components/api/price';
 import { useTokenStore } from '@/stores/token';
 
+export type TypeTokenPrice = {
+    price?: number;
+    price_change_24h?: number;
+};
 export const useTokenPrice = (canisterId: string | undefined, decimals: number = 8) => {
-    const [priceData, setPriceData] = useState<{
-        price?: number;
-        price_change_24h?: number;
-    }>();
+    const [priceData, setPriceData] = useState<TypeTokenPrice>();
 
     useEffect(() => {
         if (!canisterId) {

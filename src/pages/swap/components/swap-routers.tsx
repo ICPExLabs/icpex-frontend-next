@@ -30,7 +30,7 @@ const SwapRouters = () => {
     ];
 
     return (
-        <div className="mt-5 w-full space-y-4">
+        <div className="mt-[30px] w-full gap-y-5">
             {routes.map((route) => (
                 <div
                     key={route.name}
