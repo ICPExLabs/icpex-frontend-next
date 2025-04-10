@@ -6,7 +6,7 @@ import {
     InitError,
     TransferError,
 } from '@connect2ic/core';
-import { ActorSubclass, Agent } from '@dfinity/agent';
+import { ActorSubclass, Agent, HttpAgent } from '@dfinity/agent';
 import { IDL } from '@dfinity/candid';
 import { Principal } from '@dfinity/principal';
 import { err, ok } from 'neverthrow';
@@ -227,8 +227,14 @@ export class CustomPlugWallet {
         }
         try {
             // Fetch root key for certificate validation during development
+            const agent = new HttpAgent({
+                ...this.#config,
+                identity: this.#identity, // Create agent with identity
+            });
+
             if (this.#config.dev) {
-                const res = await this.#ic.agent
+                // Fetch root key for certificate validation during development
+                const res = await agent
                     .fetchRootKey()
                     .then(() => ok(true))
                     .catch(() => err({ kind: CreateActorError.FetchRootKeyFailed }));
