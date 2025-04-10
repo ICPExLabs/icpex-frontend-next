@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { useCallback, useEffect, useState } from 'react';
 
 import { get_all_tokens } from '@/canister/icpswap/apis';
+import { get_tokens_balance } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { get_token_price_ic, get_token_price_ic_by_canister_id } from '@/components/api/price';
+import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 
 export type TypeTokenPrice = {
@@ -117,4 +120,53 @@ export const useAllTokenPriceAndChange = () => {
     return priceData;
 };
 
-// todo user token price and balance
+// contract wallet -> tokens balance
+export type TokenBalanceInfo = TokenPriceInfo & { balance: string | number; usd: string | number };
+
+export const useContractTokensAndBalance = () => {
+    const tokenList = useAllTokenPriceAndChange();
+    const [balanceData, setBalanceData] = useState<TokenBalanceInfo[] | undefined>();
+    const { connectedIdentity } = useIdentityStore();
+
+    const fetchData = useCallback(async () => {
+        if (!connectedIdentity) return undefined;
+        if (!tokenList || !tokenList?.length) return undefined;
+        const { principal } = connectedIdentity;
+
+        try {
+            const balances = await get_tokens_balance(connectedIdentity, {
+                owner: principal,
+            });
+            const result = tokenList?.map((item) => {
+                const token = balances.find((token) => token.canister_id.toString() === item.canister_id.toString());
+                if (token) {
+                    return {
+                        ...item,
+                        balance: token.balance,
+                        usd: item.price ? BigNumber(item.price).multipliedBy(token.balance).toFixed(2) : '0',
+                    };
+                }
+
+                return {
+                    ...item,
+                    balance: 0,
+                    usd: 0,
+                };
+            });
+
+            setBalanceData(result);
+        } catch (error) {
+            console.error('🚀 ~ useTokenPriceAndBalance ~ error:', error);
+        }
+    }, [connectedIdentity, tokenList]);
+
+    useEffect(() => {
+        if (!connectedIdentity) return;
+
+        if (!tokenList?.length) return undefined;
+
+        fetchData();
+    }, [connectedIdentity, fetchData, tokenList]);
+
+    return balanceData;
+};
