@@ -179,7 +179,7 @@ function LimitPage() {
 
             <div className="mt-3 flex items-start gap-2 rounded-[18px] border border-[#EAEDFF] p-4 text-sm text-[#666]">
                 <Icon name="info" className="mt-1 h-4 w-4 text-[#97A0C9]" />
-                <p>
+                <div>
                     {t('swap.setting.info')}
                     <div
                         className="text-blue-500 underline cursor-pointer"
@@ -192,7 +192,7 @@ function LimitPage() {
                     >
                         {t('swap.setting.learn')}
                     </div>
-                </p>
+                </div>
             </div>
         </div>
     );
