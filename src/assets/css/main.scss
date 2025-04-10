@@ -72,12 +72,33 @@ body {
     color: inherit;
 }
 
-
-
 .amount-input .semi-input-wrapper {
     color: #272e4d;
 }
 
 .amount-input .semi-input-wrapper .semi-input-default::placeholder {
-    color: #97a0c9;
+    color: #97a0c9 !important;
+}
+
+.amount-input .semi-input-wrapper .semi-input-disabled::placeholder {
+    -webkit-text-fill-color: #97a0c9 !important;
+}
+
+@layer utilities {
+    .bg-swap-btn {
+        background-image: linear-gradient(90deg, #7236FE 2.44%, #7178FF 99.84%);
+    }
+}
+
+.semi-modal-mask {
+    background: rgba(0, 0, 0, 0.60);
+    backdrop-filter: blur(4px);
+}
+
+.semi-modal {
+    .semi-modal-content {
+        background-color: transparent;
+        box-shadow: none;
+        border: none;
+    }
 }

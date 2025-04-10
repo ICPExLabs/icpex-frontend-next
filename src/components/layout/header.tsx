@@ -6,11 +6,11 @@ import { cn } from '@/utils/classNames';
 
 import { LoginButton } from '../modals/login-modal';
 import MenuModal from '../modals/menu-modal';
-import { SwitchWalletButton } from '../modals/switch-wallet';
 import { UserInfoButton } from '../modals/user-modal';
 import Icon from '../ui/icon';
 import NavComponents from './nav';
 import SearchComponents from './search';
+import { SwitchWalletButton } from './switch-wallet';
 
 const Header = () => {
     const { isConnected, isInitializing } = useConnect();

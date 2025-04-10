@@ -31,7 +31,7 @@ const ICRCTag = ({ tag }: { tag: TagType }) => {
 const PriceItem = ({ tokenInfo, price }: { tokenInfo: TokenInfo; price: TypeTokenPrice | undefined }) => {
     return (
         <div className="flex w-full items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center gap-x-[10px]">
                 <TokenLogo className="h-12 w-12 shrink-0" canisterId={tokenInfo.canister_id.toString()} />
                 <div className="flex flex-col">
                     <div className="flex items-center gap-x-[7px]">

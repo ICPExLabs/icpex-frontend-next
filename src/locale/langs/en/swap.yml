@@ -4,12 +4,16 @@ swap:
     title: Swap
     pay: You Pay
     receive: You Receive
-    connect: Connect Wallet
-    insufficient: Insufficient {{ symbol }}
-    enterAmount: Enter an amount
     half: Half
     max: Max
     select: Select Token
+swapBtn:
+    init: Connect Initial
+    connect: Connect Wallet
+    enterAmount: Enter an amount
+    insufficient: Insufficient {{ symbol }}
+    select: Select Token
+    swap: Swap
 limit:
     title: Limit
     limitTip1: When 1
@@ -27,3 +31,9 @@ setting:
     confirm: Confirm
     info: Limits may not execute exactly when tokens reach the specified price.
     learn: Learn More
+select:
+    title: Select Token
+    searchPlaceholder: Search by symbol or canister id
+    zero: Hide zero balances
+    sort: Sort by value
+    loading: Loading...

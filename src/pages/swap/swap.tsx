@@ -1,11 +1,12 @@
-import { Button } from '@douyinfe/semi-ui';
-import { useEffect, useState } from 'react';
+import { useConnect } from '@connect2ic/react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
 import Icon from '@/components/ui/icon';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useAppStore } from '@/stores/app';
+import { useIdentityStore } from '@/stores/identity';
 
 import AmountInput from './components/amount-input';
 import PriceComponents from './components/price';
@@ -14,6 +15,8 @@ import SwapRouters from './components/swap-routers';
 function SwapPage() {
     const { t } = useTranslation();
     const { walletMode } = useAppStore();
+    const { isConnected, isInitializing } = useConnect();
+    const { setShowLoginModal } = useIdentityStore();
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
     const [payToken, setPayToken] = useState<string | undefined>('ICP');
@@ -25,6 +28,11 @@ function SwapPage() {
     const [receiveToken, setReceiveToken] = useState<string | undefined>();
     const [receiveTokenInfo, setReceiveTokenInfo] = useState<TokenInfo | undefined>();
     const receiveTokenPrice = useTokenPrice(receiveTokenInfo?.canister_id.toString());
+
+    const exchangeRate = useMemo(() => {
+        if (!payTokenPrice?.price || !receiveTokenPrice?.price) return 0;
+        return payTokenPrice?.price / receiveTokenPrice?.price;
+    }, [payTokenPrice, receiveTokenPrice]);
 
     const onSwapDirectionChange = () => {
         if (!receiveToken || !receiveTokenInfo || !payToken || !payTokenInfo) {
@@ -48,14 +56,14 @@ function SwapPage() {
         setPayAmount(payTokenBalance);
     };
 
+    const onSwapChange = () => {
+        console.log('swap');
+    };
+
     useEffect(() => {
         // ! get token balance
         setPayTokenBalance(999);
     }, [payTokenInfo]);
-
-    useEffect(() => {
-        // ! get token balance
-    }, [receiveTokenInfo]);
 
     return (
         <div className="flex w-full flex-col">
@@ -123,26 +131,62 @@ function SwapPage() {
                 </p>
             </div>
 
-            <Button
-                theme="solid"
-                size="large"
-                className="!h-14 w-full !rounded-xl bg-gradient-to-br from-[#7236FE] to-[#7178FF] !text-lg font-medium text-white disabled:!from-[#F2F4FF] disabled:!to-[#F2F4FF] disabled:!text-[#97A0C9]"
-                disabled={false}
-            >
-                {t('swap.swap.connect')}
-                {/* TODO: Insufficient token */}
-                {/* {t('swap.swap.insufficient', { symbol: 'ICP' })} */}
-                {/* TODO: Enter an amount */}
-                {/* {t('swap.swap.enterAmount')} */}
-            </Button>
+            <div className="h-[60px] w-full">
+                {(() => {
+                    const isDisabled =
+                        isInitializing ||
+                        !payTokenBalance ||
+                        !payToken ||
+                        !receiveToken ||
+                        !payAmount ||
+                        !receiveAmount ||
+                        payAmount > payTokenBalance;
+                    const isNotConnected = !isInitializing && !isConnected;
 
-            <div className="mt-3 flex items-center justify-between text-sm font-medium text-[#666]">
-                <div>1 ICP = 73,235.52 CHAT</div>
-                <div className="flex items-center gap-x-1">
-                    <Icon name="gas" className="h-3 w-3 text-[#666]" />
-                    <span>$0.01</span>
-                </div>
+                    const buttonConfig = {
+                        disabled: {
+                            className: 'bg-[#f2f4ff] text-[#97a0c9] cursor-not-allowed',
+                            text: (() => {
+                                if (isInitializing || !payTokenBalance) return t('swap.swapBtn.init');
+                                if (!payToken || !receiveToken) return t('swap.swapBtn.select');
+                                if (!payAmount || !receiveAmount) return t('swap.swapBtn.enterAmount');
+                                if (payAmount > payTokenBalance)
+                                    return t('swap.swapBtn.insufficient', { symbol: payToken });
+                                return '';
+                            })(),
+                            onClick: undefined,
+                        },
+                        active: {
+                            className: 'bg-swap-btn text-white cursor-pointer',
+                            text: isNotConnected ? t('swap.swapBtn.connect') : t('swap.swapBtn.swap'),
+                            onClick: isNotConnected ? () => setShowLoginModal(true) : onSwapChange,
+                        },
+                    };
+
+                    const config = isDisabled ? buttonConfig.disabled : buttonConfig.active;
+
+                    return (
+                        <div
+                            onClick={config.onClick || undefined}
+                            className={`flex h-full w-full items-center justify-center rounded-[18px] text-lg font-semibold ${config.className}`}
+                        >
+                            <p>{config.text}</p>
+                        </div>
+                    );
+                })()}
             </div>
+
+            {payTokenPrice?.price && receiveTokenPrice?.price && (
+                <div className="mt-3 flex w-full items-center justify-between">
+                    <p className="text-sm font-medium text-[#666]">
+                        1 {payToken} = {parseFloat(exchangeRate.toFixed(8))} {receiveToken}
+                    </p>
+                    <div className="flex items-center gap-x-1">
+                        <Icon name="gas" className="h-3 w-3 text-[#666]" />
+                        <p className="text-sm font-medium text-[#666]">$0.01</p>
+                    </div>
+                </div>
+            )}
 
             {walletMode === 'wallet' && <SwapRouters />}
 
