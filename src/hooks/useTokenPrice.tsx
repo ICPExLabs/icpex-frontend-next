@@ -74,15 +74,30 @@ export const useAllTokenPriceAndChange = () => {
         const fetchData = async () => {
             try {
                 // Fetch all price
-                const allTokenPrices = await get_token_price_ic();
+                const [allTokenPrices, allTokenList] = await Promise.all([get_token_price_ic(), get_all_tokens()]);
 
                 const results = tokenList.map((token) => {
                     const canisterId = token.canister_id.toString();
                     const matchedToken = allTokenPrices.find((item) => item.canister_id === canisterId);
+                    const matchedToken2 = allTokenList.find((item) => item.address === canisterId);
+
+                    const common = {
+                        ...token,
+                        standard: matchedToken2?.standard || '',
+                    };
+                    if (!matchedToken) {
+                        return {
+                            ...common,
+                            price: matchedToken2?.priceUSD ? Number(matchedToken2?.priceUSD) : undefined,
+                            price_change_24h: matchedToken2?.priceUSDChange
+                                ? Number(matchedToken2.priceUSDChange)
+                                : undefined,
+                        };
+                    }
 
                     return {
-                        ...token,
-                        price: matchedToken?.price ? Number(matchedToken.price) : undefined,
+                        ...common,
+                        price: matchedToken?.price ? Number(matchedToken?.price) : undefined,
                         price_change_24h: matchedToken?.price_change_24h
                             ? Number(matchedToken.price_change_24h)
                             : undefined,
