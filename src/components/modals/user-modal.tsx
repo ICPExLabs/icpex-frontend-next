@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 
-import { useContractTokensAndBalance } from '@/hooks/useTokenPrice';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
+import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { shrinkPrincipal } from '@/utils/text';
 
@@ -42,7 +42,7 @@ const UserInfoModal = () => {
     const { showInfoModal, setShowInfoModal } = useIdentityStore();
     const { principal, activeProvider, disconnect } = useConnect();
 
-    const { balanceData } = useContractTokensAndBalance();
+    const { allTokenBalance } = useTokenStore();
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState<'wallet' | 'contract'>(walletMode);
     const [currentTab, setCurrentTab] = useState<'Tokens' | 'Pools' | 'History'>('Tokens');
@@ -211,8 +211,8 @@ const UserInfoModal = () => {
                     <div className="w-full flex-1 overflow-y-auto">
                         {/* Token List */}
                         <div className="">
-                            {balanceData &&
-                                balanceData.map((token, index) => (
+                            {allTokenBalance ? (
+                                allTokenBalance.map((token, index) => (
                                     <div
                                         key={index}
                                         className="flex items-center justify-between px-5 py-2 hover:bg-[#F2F4FF]"
@@ -232,7 +232,7 @@ const UserInfoModal = () => {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-medium text-[#272E4D]">
-                                                {token.usd ? `$${token.usd}` : '0.00'}
+                                                {token.price ? `$${parseFloat(token.price?.toFixed(8))}` : '0.00'}
                                             </p>
                                             <TokenPriceChangePercentage
                                                 value={token.price_change_24h || 0}
@@ -240,7 +240,10 @@ const UserInfoModal = () => {
                                             />
                                         </div>
                                     </div>
-                                ))}
+                                ))
+                            ) : (
+                                <></>
+                            )}
                         </div>
                     </div>
                 </div>

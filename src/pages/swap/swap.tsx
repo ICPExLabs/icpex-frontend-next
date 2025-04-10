@@ -2,9 +2,8 @@ import { useConnect } from '@connect2ic/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TokenInfo } from '@/canister/swap/swap.did.d';
 import Icon from '@/components/ui/icon';
-import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 
@@ -20,19 +19,17 @@ function SwapPage() {
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
     const [payToken, setPayToken] = useState<string | undefined>('ICP');
-    const [payTokenInfo, setPayTokenInfo] = useState<TokenInfo | undefined>();
-    const payTokenPrice = useTokenPrice(payTokenInfo?.canister_id.toString());
+    const payTokenInfo = useTokenInfoAndBalanceBySymbol(payToken);
     const [payTokenBalance, setPayTokenBalance] = useState<number | undefined>(0.53);
 
     const [receiveAmount, setReceiveAmount] = useState<number | undefined>();
     const [receiveToken, setReceiveToken] = useState<string | undefined>();
-    const [receiveTokenInfo, setReceiveTokenInfo] = useState<TokenInfo | undefined>();
-    const receiveTokenPrice = useTokenPrice(receiveTokenInfo?.canister_id.toString());
+    const receiveTokenInfo = useTokenInfoAndBalanceBySymbol(receiveToken);
 
     const exchangeRate = useMemo(() => {
-        if (!payTokenPrice?.price || !receiveTokenPrice?.price) return 0;
-        return payTokenPrice?.price / receiveTokenPrice?.price;
-    }, [payTokenPrice, receiveTokenPrice]);
+        if (!payTokenInfo?.price || !receiveTokenInfo?.price) return 0;
+        return payTokenInfo?.price / receiveTokenInfo?.price;
+    }, [payTokenInfo, receiveTokenInfo]);
 
     const onSwapDirectionChange = () => {
         if (!receiveToken || !receiveTokenInfo || !payToken || !payTokenInfo) {
@@ -40,10 +37,7 @@ function SwapPage() {
         }
 
         setPayToken(receiveToken);
-        setPayTokenInfo(receiveTokenInfo);
-
         setReceiveToken(payToken);
-        setReceiveTokenInfo(payTokenInfo);
     };
 
     const onHalfChange = () => {
@@ -61,7 +55,6 @@ function SwapPage() {
     };
 
     useEffect(() => {
-        // ! get token balance
         setPayTokenBalance(999);
     }, [payTokenInfo]);
 
@@ -77,11 +70,10 @@ function SwapPage() {
                     token={payToken}
                     onTokenChange={setPayToken}
                     tokenInfo={payTokenInfo}
-                    onTokenInfoChange={setPayTokenInfo}
                 />
                 <div className="flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666666]">
-                        ${payTokenPrice?.price ? (payTokenPrice.price * (payAmount || 0)).toFixed(2) : '0.00'}
+                        ${payTokenInfo?.price ? (payTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
                     </p>
                     <div className="flex items-center">
                         <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
@@ -124,10 +116,9 @@ function SwapPage() {
                     token={receiveToken}
                     onTokenChange={setReceiveToken}
                     tokenInfo={receiveTokenInfo}
-                    onTokenInfoChange={setReceiveTokenInfo}
                 />
                 <p className="text-sm font-medium text-[#666666]">
-                    ${receiveTokenPrice?.price ? (receiveTokenPrice.price * (payAmount || 0)).toFixed(2) : '0.00'}
+                    ${receiveTokenInfo?.price ? (receiveTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
                 </p>
             </div>
 
@@ -176,7 +167,7 @@ function SwapPage() {
                 })()}
             </div>
 
-            {payTokenPrice?.price && receiveTokenPrice?.price && (
+            {payTokenInfo?.price && receiveTokenInfo?.price && (
                 <div className="mt-3 flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666]">
                         1 {payToken} = {parseFloat(exchangeRate.toFixed(8))} {receiveToken}
@@ -190,12 +181,7 @@ function SwapPage() {
 
             {walletMode === 'wallet' && <SwapRouters />}
 
-            <PriceComponents
-                payTokenInfo={payTokenInfo}
-                payTokenPrice={payTokenPrice}
-                receiveTokenInfo={receiveTokenInfo}
-                receiveTokenPrice={receiveTokenPrice}
-            />
+            <PriceComponents payTokenInfo={payTokenInfo} receiveTokenInfo={receiveTokenInfo} />
         </div>
     );
 }

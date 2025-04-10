@@ -1,34 +1,43 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { get_tokens_query } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
+import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 
 import { useExecuteOnce } from './useExecuteOnce';
-import { useContractTokensAndBalance } from './useTokenPrice';
+import { getAllTokensAndBalance, getAllTokensPrice } from './useToken';
 
 export const InitTokenList = () => {
-    const { setTokenList, setAllTokenBalance } = useTokenStore();
-    const { balanceData, refreshData } = useContractTokensAndBalance();
+    const { connectedIdentity } = useIdentityStore();
+
+    const { tokenList, setTokenList, setAllTokenBalance } = useTokenStore();
+
+    const priceInit = useCallback(async () => {
+        if (!tokenList) return;
+
+        try {
+            const priceList = await getAllTokensPrice(tokenList);
+            if (priceList) {
+                setAllTokenBalance(priceList);
+
+                if (connectedIdentity) {
+                    const priceListAndBalance = await getAllTokensAndBalance(priceList, connectedIdentity);
+                    setAllTokenBalance(priceListAndBalance);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch token data:', error);
+        }
+    }, [tokenList, setAllTokenBalance, connectedIdentity]);
 
     useEffect(() => {
-        if (!balanceData) return;
-        console.log('🚀 ~ useEffect ~ balanceData:', balanceData);
-
-        // Initial fetch
-        setAllTokenBalance(balanceData);
-
-        // Set up polling
-        const intervalId = setInterval(() => {
-            refreshData();
-        }, 10000);
-
-        return () => clearInterval(intervalId);
-    }, [balanceData, refreshData, setAllTokenBalance]);
+        priceInit();
+    }, [tokenList, priceInit]);
 
     useExecuteOnce(() => {
-        get_tokens_query().then((tokenInfoArray: TokenInfo[]) => {
-            setTokenList(tokenInfoArray);
+        get_tokens_query().then((tokenList: TokenInfo[]) => {
+            setTokenList(tokenList);
         });
     });
 };

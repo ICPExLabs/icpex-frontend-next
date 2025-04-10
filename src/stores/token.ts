@@ -3,15 +3,15 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { TokenBalanceInfo } from '@/hooks/useTokenPrice';
+import { TokenBalanceInfo } from '@/hooks/useToken';
 import { isDevMode } from '@/utils/env';
 
 interface TokenStore {
     tokenList: TokenInfo[] | undefined;
     setTokenList: (tokenList: TokenInfo[]) => void;
 
-    allTokenBalance: TokenBalanceInfo[];
-    setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[]) => void;
+    allTokenBalance: TokenBalanceInfo[] | any;
+    setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[] | any) => void;
 }
 
 const STORE_NAME = 'TokenStore';

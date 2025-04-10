@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useTokenInfoAndBalanceByCanisterId } from '@/hooks/useToken';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { parseLowerCaseSearch } from '@/utils/search';
@@ -39,7 +39,7 @@ const SearchResultItem = ({
         }
     }, [tokenList, token, tokenName, setTokenData]);
 
-    const priceData = useTokenPrice(tokenData?.canister_id.toString());
+    const priceData = useTokenInfoAndBalanceByCanisterId(tokenData?.canister_id.toString());
 
     return (
         <div className="flex h-[52px] w-full cursor-pointer items-center justify-between px-4 duration-75 hover:bg-[#f2f4ff]">
@@ -57,7 +57,9 @@ const SearchResultItem = ({
                     </div>
                     <div className="ml-[11px] flex flex-col items-end gap-y-1">
                         {priceData ? (
-                            <p className="text-base font-medium text-[#272e4d]">${priceData.price || '--'}</p>
+                            <p className="text-base font-medium text-[#272e4d]">
+                                ${priceData.price ? parseFloat(priceData.price?.toFixed(8)) : '--'}
+                            </p>
                         ) : (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
                         )}

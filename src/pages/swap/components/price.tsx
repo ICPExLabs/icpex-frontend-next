@@ -1,21 +1,22 @@
-import { TokenInfo } from '@/canister/swap/swap.did.d';
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
-import { TypeTokenPrice } from '@/hooks/useTokenPrice';
+import { TagType, TokenBalanceInfo } from '@/hooks/useToken';
 
-type TagType = 'ICRC-1' | 'ICRC-2';
-const ICRCTag = ({ tag }: { tag: TagType }) => {
+const ICRCTag = ({ tag }: { tag?: TagType }) => {
     const tagConfig = {
-        'ICRC-1': {
+        ICRC1: {
             text: 'ICRC-1',
             bgColor: '#006732', // 绿色
         },
-        'ICRC-2': {
+        ICRC2: {
             text: 'ICRC-2',
             bgColor: '#3f4c83', // 蓝色
         },
     };
 
+    if (!tag) {
+        return <></>;
+    }
     const config = tagConfig[tag];
     if (!config) return null;
     return (
@@ -28,7 +29,8 @@ const ICRCTag = ({ tag }: { tag: TagType }) => {
     );
 };
 
-const PriceItem = ({ tokenInfo, price }: { tokenInfo: TokenInfo; price: TypeTokenPrice | undefined }) => {
+const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
+    console.log('🚀 ~ PriceItem ~ tokenInfo:', tokenInfo);
     return (
         <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-x-[10px]">
@@ -36,15 +38,15 @@ const PriceItem = ({ tokenInfo, price }: { tokenInfo: TokenInfo; price: TypeToke
                 <div className="flex flex-col">
                     <div className="flex items-center gap-x-[7px]">
                         <p className="text-base font-medium text-[#272e4d]">{tokenInfo.symbol}</p>
-                        <ICRCTag tag="ICRC-1" />
+                        <ICRCTag tag={tokenInfo?.standard} />
                     </div>
                     <p className="text-xs font-medium text-[#97A0C9]">{tokenInfo.name}</p>
                 </div>
             </div>
             <p className="text-base font-medium text-[#272e4d]">
-                {price ? (
+                {tokenInfo ? (
                     <p className="text-base font-medium text-[#272e4d]">
-                        ${price?.price ? parseFloat(price?.price.toFixed(8)) : '--'}
+                        {tokenInfo?.price ? `$${parseFloat(tokenInfo?.price.toFixed(8))}` : '--'}
                     </p>
                 ) : (
                     <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
@@ -56,19 +58,15 @@ const PriceItem = ({ tokenInfo, price }: { tokenInfo: TokenInfo; price: TypeToke
 
 function PriceComponents({
     payTokenInfo,
-    payTokenPrice,
     receiveTokenInfo,
-    receiveTokenPrice,
 }: {
-    payTokenInfo: TokenInfo | undefined;
-    payTokenPrice: TypeTokenPrice | undefined;
-    receiveTokenInfo: TokenInfo | undefined;
-    receiveTokenPrice: TypeTokenPrice | undefined;
+    payTokenInfo: TokenBalanceInfo | undefined;
+    receiveTokenInfo: TokenBalanceInfo | undefined;
 }) {
     return (
         <div className="mt-[30px] flex w-full flex-col items-center justify-center gap-y-5">
-            {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} price={payTokenPrice} />}
-            {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} price={receiveTokenPrice} />}
+            {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} />}
+            {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} />}
         </div>
     );
 }

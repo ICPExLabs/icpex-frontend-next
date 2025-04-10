@@ -1,12 +1,11 @@
 import { InputNumber } from '@douyinfe/semi-ui';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { SelectTokenModal } from '@/components/modals/select-token-modal';
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
-import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 
 interface AmountInputProps {
@@ -17,7 +16,6 @@ interface AmountInputProps {
     token?: string;
     onTokenChange: (value: string) => void;
     tokenInfo?: TokenInfo | undefined;
-    onTokenInfoChange: (value: TokenInfo) => void;
 }
 
 const AmountInput = ({
@@ -28,22 +26,10 @@ const AmountInput = ({
     token,
     onTokenChange,
     tokenInfo,
-    onTokenInfoChange,
 }: AmountInputProps) => {
     const { t } = useTranslation();
-    const { tokenList } = useTokenStore();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
-
-    useEffect(() => {
-        if (token && tokenList) {
-            tokenList.map((item) => {
-                if (item.symbol === token) {
-                    onTokenInfoChange(item);
-                }
-            });
-        }
-    }, [token, tokenList, onTokenInfoChange]);
 
     return (
         <>
