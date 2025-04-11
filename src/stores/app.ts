@@ -10,7 +10,7 @@ import { SupportedLanguage } from '@/types/app';
 import { isDevMode } from '@/utils/env';
 
 type ThemeMode = 'light' | 'dark';
-type TypeWalletMode = 'wallet' | 'contract';
+export type TypeWalletMode = 'wallet' | 'contract';
 
 interface AppState {
     language: SupportedLanguage;

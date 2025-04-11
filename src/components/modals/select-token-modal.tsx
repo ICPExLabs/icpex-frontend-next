@@ -1,5 +1,5 @@
 import { Modal, Switch } from '@douyinfe/semi-ui';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';

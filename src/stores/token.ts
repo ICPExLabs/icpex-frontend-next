@@ -12,6 +12,18 @@ interface TokenStore {
 
     allTokenBalance: TokenBalanceInfo[] | any;
     setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[] | any) => void;
+
+    showSendModal: boolean;
+    setShowSendModal: (show: boolean) => void;
+
+    showReceiveModal: boolean;
+    setShowReceiveModal: (show: boolean) => void;
+
+    showTransferInModal: boolean;
+    setShowTransferInModal: (show: boolean) => void;
+
+    showTransferOutModal: boolean;
+    setShowTransferOutModal: (show: boolean) => void;
 }
 
 const STORE_NAME = 'TokenStore';
@@ -25,6 +37,18 @@ export const useTokenStore = create<TokenStore>()(
 
             allTokenBalance: [],
             setAllTokenBalance: (allTokenBalance) => set({ allTokenBalance }),
+
+            showSendModal: false,
+            setShowSendModal: (show) => set({ showSendModal: show }),
+
+            showReceiveModal: false,
+            setShowReceiveModal: (show) => set({ showReceiveModal: show }),
+
+            showTransferInModal: false,
+            setShowTransferInModal: (show) => set({ showTransferInModal: show }),
+
+            showTransferOutModal: false,
+            setShowTransferOutModal: (show) => set({ showTransferOutModal: show }),
         })),
         {
             enabled: isDev,

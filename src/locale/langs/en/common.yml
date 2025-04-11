@@ -19,6 +19,7 @@ search:
     recent: Recent searches
     popular: Popular tokens
     tokens: Tokens
+
 connect:
     title: Connect Wallet
     protocol1: I have read, understand and agree to the
@@ -28,3 +29,12 @@ connect:
 switchWallet:
     contractWallet: Contract Wallet
     wallet: Wallet
+loading: Loading...
+userInfo:
+    tokens: Tokens
+    pools: Pools
+    history: History
+    send: Send
+    receive: Receive
+    transferIn: Transfer In
+    transferOut: Transfer Out

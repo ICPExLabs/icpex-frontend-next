@@ -12,7 +12,7 @@ export const SwitchWalletButton = () => {
             <div className="relative flex h-10 flex-shrink-0 items-center rounded-3xl border border-[#eeeeee] bg-[#fff] px-[5px]">
                 <div
                     className={cn(
-                        'flex h-8 cursor-pointer items-center rounded-3xl bg-transparent px-[10px] text-sm font-medium text-[#666666] duration-75 hover:text-[#272e4d]',
+                        'flex h-8 cursor-pointer items-center rounded-3xl bg-transparent px-[10px] text-sm font-medium text-[#666666] duration-75',
                         walletMode === 'contract' && 'bg-[#07c160] text-[#fff]',
                     )}
                     onClick={() => setWalletMode('contract')}
@@ -21,7 +21,7 @@ export const SwitchWalletButton = () => {
                 </div>
                 <div
                     className={cn(
-                        'flex h-8 cursor-pointer items-center rounded-3xl bg-transparent px-[10px] text-sm font-medium text-[#666666] duration-75 hover:text-[#fff]',
+                        'flex h-8 cursor-pointer items-center rounded-3xl bg-transparent px-[10px] text-sm font-medium text-[#666666] duration-75',
                         walletMode === 'wallet' && 'bg-[#07c160] text-[#fff]',
                     )}
                     onClick={() => setWalletMode('wallet')}

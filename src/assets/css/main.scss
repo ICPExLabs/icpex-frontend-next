@@ -54,7 +54,7 @@ body {
 }
 
 .semi-input-wrapper {
-    color: #97a0c9;
+    color: #999999;
     border: 0;
 
     .semi-input {
@@ -82,11 +82,11 @@ body {
 }
 
 .amount-input .semi-input-wrapper .semi-input-default::placeholder {
-    color: #97a0c9 !important;
+    color: #999999 !important;
 }
 
 .amount-input .semi-input-wrapper .semi-input-disabled::placeholder {
-    -webkit-text-fill-color: #97a0c9 !important;
+    -webkit-text-fill-color: #999999 !important;
 }
 
 @layer utilities {

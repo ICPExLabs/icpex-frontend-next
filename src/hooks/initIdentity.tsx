@@ -11,7 +11,7 @@ export const InitIdentity = () => {
         onConnect: (connected: any) => {
             const principal = connected.principal;
             const provider = connected.activeProvider;
-            console.log('app onConnect', principal, provider);
+
             checkConnected(
                 connectedIdentity,
                 {
@@ -29,6 +29,6 @@ export const InitIdentity = () => {
                 },
             );
         },
-        onDisconnect: () => setConnectedIdentity(undefined), // 退出登录
+        onDisconnect: () => setConnectedIdentity(undefined),
     });
 };
