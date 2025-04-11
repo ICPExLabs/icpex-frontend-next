@@ -1,9 +1,13 @@
 import { useConnect } from '@connect2ic/react';
+import { Toast } from '@douyinfe/semi-ui';
+import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { execute_complete_swap, swap_and_withdraw } from '@/components/api/swap';
 import Icon from '@/components/ui/icon';
 import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
+import { useSwapFees } from '@/hooks/useWalletSwap';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 import { cn } from '@/utils/classNames';
@@ -16,9 +20,10 @@ export type TypeSwapRouter = 'KongSwap' | 'ICPSwap' | 'ICPEx';
 
 function SwapPage() {
     const { t } = useTranslation();
-    const { walletMode } = useAppStore();
+    const { swapSlippage, walletMode } = useAppStore();
+
     const { isConnected, isInitializing } = useConnect();
-    const { setShowLoginModal } = useIdentityStore();
+    const { connectedIdentity, setShowLoginModal } = useIdentityStore();
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
     const [payToken, setPayToken] = useState<string | undefined>('ICP');
@@ -30,6 +35,14 @@ function SwapPage() {
     const receiveTokenInfo = useTokenInfoAndBalanceBySymbol(receiveToken);
 
     const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('KongSwap');
+    const [loading, setLoading] = useState<boolean>(false);
+
+    // loading
+    const { fee, amountOut, oneAmountOut } = useSwapFees({
+        from: payTokenInfo,
+        to: receiveTokenInfo,
+        fromAmount: payAmount,
+    });
 
     const exchangeRate = useMemo(() => {
         if (!payTokenInfo?.price || !receiveTokenInfo?.price) return 0;
@@ -55,12 +68,87 @@ function SwapPage() {
         setPayAmount(payTokenBalance);
     };
 
-    const onSwapChange = () => {
-        console.log('swap');
+    const onSwapChange = async () => {
+        console.log('contract mode swap');
+        if (!connectedIdentity) return;
+
+        try {
+            // TODO: tip warning
+            if (!payTokenInfo || !receiveTokenInfo) return;
+
+            if (!payAmount || !amountOut) return;
+
+            setLoading(true);
+
+            const amountOutMin = BigNumber(amountOut)
+                .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
+                .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
+                .toFixed(0)
+                .toString();
+
+            const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
+
+            const params = {
+                from_canister_id: payTokenInfo.canister_id.toString(),
+                to_canister_id: receiveTokenInfo.canister_id.toString(),
+                amount_in: amountIn,
+                amount_out_min: amountOutMin.toString(),
+                fee,
+                decimals: payTokenInfo.decimals,
+            };
+
+            const result = await swap_and_withdraw(connectedIdentity, params);
+            console.log('🚀 ~ onSwapRouterChange ~ result:', result);
+
+            setLoading(false);
+            Toast.success('Swap successfully');
+        } catch (error) {
+            console.error('🚀 ~ onSwapChange ~ error:', error);
+            setLoading(false);
+            Toast.error('Swap failed');
+        }
     };
 
-    const onSwapRouterChange = () => {
-        console.log('swap');
+    // swap wallet
+    const onSwapRouterChange = async () => {
+        console.log('wallet mode swap');
+        if (!connectedIdentity) return;
+
+        try {
+            // TODO: tip warning
+            if (!payTokenInfo || !receiveTokenInfo) return;
+
+            if (!payAmount || !amountOut) return;
+
+            setLoading(true);
+
+            const amountOutMin = BigNumber(amountOut)
+                .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
+                .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
+                .toFixed(0)
+                .toString();
+
+            const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
+
+            const params = {
+                from_canister_id: payTokenInfo.canister_id.toString(),
+                to_canister_id: receiveTokenInfo.canister_id.toString(),
+                amount_in: amountIn,
+                amount_out_min: amountOutMin.toString(),
+                fee,
+                decimals: payTokenInfo.decimals,
+            };
+
+            const result = await execute_complete_swap(connectedIdentity, params);
+            console.log('🚀 ~ onSwapRouterChange ~ result:', result);
+
+            setLoading(false);
+            Toast.success('Swap successfully');
+        } catch (error) {
+            console.error('🚀 ~ onSwapChange ~ error:', error);
+            setLoading(false);
+            Toast.error('Swap failed');
+        }
     };
 
     useEffect(() => {
@@ -82,11 +170,11 @@ function SwapPage() {
     }, [payAmount, exchangeRate]);
 
     return (
-        <div className="flex w-full flex-col">
+        <div className="flex flex-col w-full">
             <div className="mb-2 rounded-[18px] border border-[#e3e8ff] bg-[#ffffff] px-5 py-[17px]">
                 <p className="mb-5 text-base font-medium text-[#666]">{t('swap.swap.pay')}</p>
                 <AmountInput
-                    className="mb-5 flex justify-between"
+                    className="flex justify-between mb-5"
                     placeholder="0.00"
                     amount={payAmount}
                     onAmountChange={setPayAmount}
@@ -94,7 +182,7 @@ function SwapPage() {
                     onTokenChange={setPayToken}
                     tokenInfo={payTokenInfo}
                 />
-                <div className="flex w-full items-center justify-between">
+                <div className="flex justify-between items-center w-full">
                     <p className="text-sm font-medium text-[#666666]">
                         ${payTokenInfo?.price ? (payTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
                     </p>
@@ -127,15 +215,15 @@ function SwapPage() {
                     onClick={onSwapDirectionChange}
                     className="absolute -top-7 left-1/2 flex translate-x-[-50%] cursor-pointer justify-center"
                 >
-                    <Icon name="exchange" className="h-10 w-10" />
+                    <Icon name="exchange" className="w-10 h-10" />
                 </div>
 
                 <p className="mb-5 text-base font-medium text-[#666]">{t('swap.swap.receive')}</p>
                 <AmountInput
-                    className="mb-5 flex justify-between"
+                    className="flex justify-between mb-5"
                     placeholder="0.00"
-                    amount={receiveAmount}
-                    onAmountChange={setReceiveAmount}
+                    amount={amountOut ? Number(Number(amountOut).toFixed(3)) : undefined}
+                    onAmountChange={() => {}}
                     token={receiveToken}
                     onTokenChange={setReceiveToken}
                     tokenInfo={receiveTokenInfo}
@@ -155,7 +243,8 @@ function SwapPage() {
                         !receiveToken ||
                         !payAmount ||
                         !receiveAmount ||
-                        payAmount > payTokenBalance;
+                        payAmount > payTokenBalance ||
+                        loading;
                     const isNotConnected = !isInitializing && !isConnected;
 
                     const buttonConfig = {
@@ -200,6 +289,9 @@ function SwapPage() {
                                 config.className,
                             )}
                         >
+                            {loading && (
+                                <Icon name="loading" className="mr-2 h-[24px] w-[24px] animate-spin text-[#7178FF]" />
+                            )}
                             <p className={cn('text-lg font-semibold', config.textClassName)}>{config.text}</p>
                         </div>
                     );
@@ -207,11 +299,12 @@ function SwapPage() {
             </div>
 
             {payTokenInfo?.price && receiveTokenInfo?.price && (
-                <div className="mt-3 flex w-full items-center justify-between">
+                <div className="flex justify-between items-center mt-3 w-full">
                     <p className="text-sm font-medium text-[#666]">
-                        1 {payToken} = {parseFloat(exchangeRate.toFixed(8))} {receiveToken}
+                        1 {payToken} = {oneAmountOut ? Number(oneAmountOut) : parseFloat(exchangeRate.toFixed(8))}{' '}
+                        {receiveToken}
                     </p>
-                    <div className="flex items-center gap-x-1">
+                    <div className="flex gap-x-1 items-center">
                         <Icon name="gas" className="h-3 w-3 text-[#666]" />
                         <p className="text-sm font-medium text-[#666]">$0.01</p>
                     </div>

@@ -142,3 +142,45 @@ export const get_wallet_all_token_balance = async (
         return bs;
     });
 };
+
+// wallet -> icrc2_approve
+export const icrc2_approve = async (
+    identity: ConnectedIdentity,
+    canister_id: string,
+    arg: {
+        spender: string;
+        amount: string;
+        subaccount?: string;
+        fee?: string;
+        memo?: string;
+        created_at_time?: string;
+        expected_allowance?: string;
+    },
+): Promise<string> => {
+    const { creator } = identity;
+    const actor: _SERVICE = await creator(idlFactory, canister_id);
+    const r = await actor.icrc2_approve({
+        fee: wrapOptionMap(arg.fee, string2bigint),
+        memo: wrapOptionMap(arg.memo, hex2array),
+        from_subaccount: wrapOptionMap(arg.subaccount, hex2array),
+        created_at_time: wrapOptionMap(arg.created_at_time, string2bigint),
+        amount: string2bigint(arg.amount),
+        expected_allowance: [],
+        expires_at: [],
+        spender: {
+            owner: string2principal(arg.spender),
+            subaccount: wrapOptionMap(arg.subaccount, hex2array),
+        },
+    });
+
+    return unwrapRustResultMap(
+        r,
+        (result) => {
+            return bigint2string(result);
+        },
+        (e) => {
+            console.error(`call token_withdraw failed`, arg, e);
+            throw new Error(unwrapVariantKey(e));
+        },
+    );
+};
