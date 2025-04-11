@@ -2,18 +2,14 @@ import { Button } from '@douyinfe/semi-ui';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TokenInfo } from '@/canister/swap/swap.did.d';
 import Icon from '@/components/ui/icon';
 import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
 import { cn } from '@/utils/classNames';
-
-// import { useAppStore } from '@/stores/app';
 
 import AmountInput from './components/amount-input';
 
 function LimitPage() {
     const { t } = useTranslation();
-    // const { walletMode } = useAppStore();
 
     const options = ['Market', '5%', '10%', '20%'];
     const [selectedType, setSelectedType] = useState('Market');

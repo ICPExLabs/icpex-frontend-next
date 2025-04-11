@@ -30,7 +30,6 @@ const ICRCTag = ({ tag }: { tag?: TagType }) => {
 };
 
 const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
-    console.log('🚀 ~ PriceItem ~ tokenInfo:', tokenInfo);
     return (
         <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-x-[10px]">
@@ -43,15 +42,14 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
                     <p className="text-xs font-medium text-[#97A0C9]">{tokenInfo.name}</p>
                 </div>
             </div>
-            <p className="text-base font-medium text-[#272e4d]">
-                {tokenInfo ? (
-                    <p className="text-base font-medium text-[#272e4d]">
-                        {tokenInfo?.price ? `$${parseFloat(tokenInfo?.price.toFixed(8))}` : '--'}
-                    </p>
-                ) : (
-                    <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
-                )}
-            </p>
+
+            {tokenInfo ? (
+                <p className="text-base font-medium text-[#272e4d]">
+                    {tokenInfo?.price ? `$${parseFloat(tokenInfo?.price.toFixed(8))}` : '--'}
+                </p>
+            ) : (
+                <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+            )}
         </div>
     );
 };
@@ -64,7 +62,7 @@ function PriceComponents({
     receiveTokenInfo: TokenBalanceInfo | undefined;
 }) {
     return (
-        <div className="mt-[30px] flex w-full flex-col items-center justify-center gap-y-5">
+        <div className="mt-[20px] flex w-full flex-col items-center justify-center gap-y-5">
             {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} />}
             {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} />}
         </div>

@@ -5,7 +5,6 @@ import { useAppStore } from '@/stores/app';
 import { cn } from '@/utils/classNames';
 
 import BatchComponents from './components/batch';
-import PriceComponents from './components/price';
 import SlippageComponents from './components/slippage';
 
 function SwapTabs({ children }: { children: React.ReactNode }) {

@@ -6,10 +6,13 @@ import Icon from '@/components/ui/icon';
 import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
+import { cn } from '@/utils/classNames';
 
 import AmountInput from './components/amount-input';
 import PriceComponents from './components/price';
 import SwapRouters from './components/swap-routers';
+
+export type TypeSwapRouter = 'KongSwap' | 'ICPSwap' | 'ICPEx';
 
 function SwapPage() {
     const { t } = useTranslation();
@@ -25,6 +28,8 @@ function SwapPage() {
     const [receiveAmount, setReceiveAmount] = useState<number | undefined>();
     const [receiveToken, setReceiveToken] = useState<string | undefined>();
     const receiveTokenInfo = useTokenInfoAndBalanceBySymbol(receiveToken);
+
+    const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('KongSwap');
 
     const exchangeRate = useMemo(() => {
         if (!payTokenInfo?.price || !receiveTokenInfo?.price) return 0;
@@ -54,9 +59,19 @@ function SwapPage() {
         console.log('swap');
     };
 
+    const onSwapRouterChange = () => {
+        console.log('swap');
+    };
+
     useEffect(() => {
         setPayTokenBalance(999);
     }, [payTokenInfo]);
+
+    useEffect(() => {
+        if (walletMode === 'contract') {
+            setSwapRouter('ICPEx');
+        }
+    }, [walletMode]);
 
     return (
         <div className="flex w-full flex-col">
@@ -145,23 +160,38 @@ function SwapPage() {
                                     return t('swap.swapBtn.insufficient', { symbol: payToken });
                                 return '';
                             })(),
+                            textClassName: 'text-[#97a0c9]',
                             onClick: undefined,
                         },
                         active: {
                             className: 'bg-swap-btn text-white cursor-pointer',
                             text: isNotConnected ? t('swap.swapBtn.connect') : t('swap.swapBtn.swap'),
+                            textClassName: 'text-[#fff]',
                             onClick: isNotConnected ? () => setShowLoginModal(true) : onSwapChange,
+                        },
+                        swap: {
+                            className: 'bg-swap-btn text-white cursor-pointer',
+                            text: 'Swap with ' + swapRouter,
+                            textClassName: 'text-[#fff]',
+                            onClick: onSwapRouterChange,
                         },
                     };
 
-                    const config = isDisabled ? buttonConfig.disabled : buttonConfig.active;
+                    const config = isDisabled
+                        ? buttonConfig.disabled
+                        : walletMode === 'wallet' && swapRouter !== 'ICPEx'
+                          ? buttonConfig.swap
+                          : buttonConfig.active;
 
                     return (
                         <div
                             onClick={config.onClick || undefined}
-                            className={`flex h-full w-full items-center justify-center rounded-[18px] text-lg font-semibold ${config.className}`}
+                            className={cn(
+                                'flex h-full w-full items-center justify-center rounded-[18px] text-lg font-semibold',
+                                config.className,
+                            )}
                         >
-                            <p>{config.text}</p>
+                            <p className={cn('text-lg font-semibold', config.textClassName)}>{config.text}</p>
                         </div>
                     );
                 })()}
@@ -179,7 +209,14 @@ function SwapPage() {
                 </div>
             )}
 
-            {walletMode === 'wallet' && <SwapRouters />}
+            {walletMode === 'wallet' && (
+                <SwapRouters
+                    swapRouter={swapRouter}
+                    selectedRouter={setSwapRouter}
+                    payTokenInfo={payTokenInfo}
+                    receiveTokenInfo={receiveTokenInfo}
+                />
+            )}
 
             <PriceComponents payTokenInfo={payTokenInfo} receiveTokenInfo={receiveTokenInfo} />
         </div>

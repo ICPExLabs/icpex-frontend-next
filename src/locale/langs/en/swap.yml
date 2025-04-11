@@ -37,3 +37,6 @@ select:
     zero: Hide zero balances
     sort: Sort by value
     loading: Loading...
+router:
+    tip:
+        Using external routing may result in transaction failure with funds temporarily remaining in external contracts.

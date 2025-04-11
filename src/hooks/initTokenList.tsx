@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { get_tokens_query } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
+import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 
@@ -12,10 +13,12 @@ export const InitTokenList = () => {
     const { connectedIdentity } = useIdentityStore();
 
     const { tokenList, setTokenList, setAllTokenBalance } = useTokenStore();
+    const { walletMode } = useAppStore();
 
     const priceInit = useCallback(async () => {
         if (!tokenList) return;
 
+        setAllTokenBalance(tokenList);
         try {
             const priceList = await getAllTokensPrice(tokenList);
             if (priceList) {
@@ -33,7 +36,7 @@ export const InitTokenList = () => {
 
     useEffect(() => {
         priceInit();
-    }, [tokenList, priceInit]);
+    }, [walletMode, priceInit]);
 
     useExecuteOnce(() => {
         get_tokens_query().then((tokenList: TokenInfo[]) => {
