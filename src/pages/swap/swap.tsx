@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { execute_complete_swap, swap_and_withdraw } from '@/components/api/swap';
+import { contract_swap, execute_complete_swap } from '@/components/api/swap';
 import Icon from '@/components/ui/icon';
 import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
 import { useSwapFees } from '@/hooks/useWalletSwap';
@@ -97,7 +97,7 @@ function SwapPage() {
                 decimals: payTokenInfo.decimals,
             };
 
-            const result = await swap_and_withdraw(connectedIdentity, params);
+            const result = await contract_swap(connectedIdentity, params);
             console.log('🚀 ~ onSwapRouterChange ~ result:', result);
 
             setLoading(false);

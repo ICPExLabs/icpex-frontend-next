@@ -10,6 +10,41 @@ import {
 import { ConnectedIdentity } from '@/types/identity';
 import { unwrapVariantKey } from '@/utils/common/variant';
 
+export const contract_swap = async (
+    identity: ConnectedIdentity,
+    arg: {
+        from_canister_id: string;
+        to_canister_id: string;
+        amount_in: string;
+        amount_out_min: string;
+        deadline?: number;
+    },
+) => {
+    try {
+        // Swap
+        const swapResult = await swap_exact_tokens_for_tokens(identity, {
+            from_canister_id: arg.from_canister_id,
+            to_canister_id: arg.to_canister_id,
+            amount_in: arg.amount_in,
+            amount_out_min: arg.amount_out_min,
+            // deadline: arg.deadline,
+        });
+
+        // withdraw from swap
+        // amount0 is token in
+        // amount1 is token out amount
+        const withdrawAmount = swapResult.amounts[1].toString();
+
+        return {
+            swap: swapResult,
+            amount_received: withdrawAmount,
+        };
+    } catch (error: any) {
+        console.error('🚀 ~ contract_swap error:', error);
+        throw new Error(unwrapVariantKey(error));
+    }
+};
+
 // swap and withdraw
 export const swap_and_withdraw = async (
     identity: ConnectedIdentity,
