@@ -16,6 +16,7 @@ interface AmountInputProps {
     token?: string;
     onTokenChange: (value: string) => void;
     tokenInfo?: TokenInfo | undefined;
+    disabled?: boolean;
 }
 
 const AmountInput = ({
@@ -26,6 +27,7 @@ const AmountInput = ({
     token,
     onTokenChange,
     tokenInfo,
+    disabled = false,
 }: AmountInputProps) => {
     const { t } = useTranslation();
 
@@ -34,18 +36,22 @@ const AmountInput = ({
     return (
         <>
             <div className={cn('amount-input mt-2 flex justify-between', className)}>
-                <InputNumber
-                    type="text"
-                    value={amount}
-                    onChange={(val) => {
-                        onAmountChange(val as number);
-                    }}
-                    placeholder={placeholder}
-                    hideButtons
-                    disabled={!tokenInfo}
-                    min={0}
-                    className="flex flex-1 bg-transparent !text-4xl font-semibold"
-                />
+                {disabled ? (
+                    <div className="text-4xl font-medium text-[#999999]">{amount ? amount : '0.00'}</div>
+                ) : (
+                    <InputNumber
+                        type="text"
+                        value={amount}
+                        onChange={(val) => {
+                            onAmountChange(val as number);
+                        }}
+                        placeholder={placeholder}
+                        hideButtons
+                        disabled={!tokenInfo}
+                        min={0}
+                        className="flex flex-1 bg-transparent !text-4xl font-semibold"
+                    />
+                )}
                 <div
                     onClick={() => setShowSelectTokenModal(true)}
                     className="flex h-10 w-[150px] flex-shrink-0 cursor-pointer items-center justify-between gap-x-2 rounded-full border border-[#dddddd] bg-[#fff] px-[10px] text-sm font-medium"

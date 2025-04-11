@@ -73,6 +73,14 @@ function SwapPage() {
         }
     }, [walletMode]);
 
+    useEffect(() => {
+        if (!payAmount || !exchangeRate) {
+            setReceiveAmount(undefined);
+        } else {
+            setReceiveAmount(parseFloat((payAmount * exchangeRate).toFixed(4)));
+        }
+    }, [payAmount, exchangeRate]);
+
     return (
         <div className="flex w-full flex-col">
             <div className="mb-2 rounded-[18px] border border-[#e3e8ff] bg-[#ffffff] px-5 py-[17px]">
@@ -131,6 +139,7 @@ function SwapPage() {
                     token={receiveToken}
                     onTokenChange={setReceiveToken}
                     tokenInfo={receiveTokenInfo}
+                    disabled={true}
                 />
                 <p className="text-sm font-medium text-[#666666]">
                     ${receiveTokenInfo?.price ? (receiveTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
