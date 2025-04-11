@@ -28,8 +28,8 @@ export const UserInfoButton = () => {
                 className="group flex h-10 cursor-pointer items-center justify-center rounded-3xl bg-[#f2f4ff] px-[10px]"
                 onClick={() => setShowInfoModal(true)}
             >
-                {activeProvider?.meta.id === 'plug' && <Icon name="plug" className="mr-2 h-6 w-6 flex-shrink-0"></Icon>}
-                {activeProvider?.meta.id === 'ii' && <Icon name="ii" className="mr-2 h-6 w-6 flex-shrink-0"></Icon>}
+                {activeProvider?.meta.id === 'plug' && <Icon name="plug" className="flex-shrink-0 mr-2 w-6 h-6"></Icon>}
+                {activeProvider?.meta.id === 'ii' && <Icon name="ii" className="flex-shrink-0 mr-2 w-6 h-6"></Icon>}
                 <div className="text-sm font-medium text-[#272e4d]">{shrinkPrincipal(principal)}</div>
             </div>
         </>
@@ -43,6 +43,7 @@ const UserInfoModal = () => {
     const { principal, activeProvider, disconnect } = useConnect();
 
     const { allTokenBalance } = useTokenStore();
+    // console.log('🚀 ~ UserInfoModal ~ allTokenBalance:', allTokenBalance);
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState<'wallet' | 'contract'>(walletMode);
     const [currentTab, setCurrentTab] = useState<'Tokens' | 'Pools' | 'History'>('Tokens');
@@ -66,13 +67,13 @@ const UserInfoModal = () => {
                 closeOnEsc={true}
             >
                 <div className="relative mt-[77px] flex h-[calc(100vh-100px)] w-full flex-col items-center justify-start overflow-hidden rounded-[20px] border border-[#e4e9ff] bg-white py-5 text-center">
-                    <div className="flex w-full items-center justify-baseline px-5">
+                    <div className="flex items-center px-5 w-full justify-baseline">
                         <div className="flex flex-1 items-center">
                             {activeProvider?.meta.id === 'plug' && (
-                                <Icon name="plug" className="mr-4 h-8 w-8 flex-shrink-0"></Icon>
+                                <Icon name="plug" className="flex-shrink-0 mr-4 w-8 h-8"></Icon>
                             )}
                             {activeProvider?.meta.id === 'ii' && (
-                                <Icon name="ii" className="mr-4 h-8 w-8 flex-shrink-0"></Icon>
+                                <Icon name="ii" className="flex-shrink-0 mr-4 w-8 h-8"></Icon>
                             )}
                             <div className="text-base font-medium text-[#666666]">{shrinkPrincipal(principal)}</div>
                             <CopyToClipboard text={principal} onCopy={() => setCopied(true)}>
@@ -98,7 +99,7 @@ const UserInfoModal = () => {
                     <div className="mt-[15px] w-full px-5">
                         {/* Balance Section */}
                         <div className="mb-[15px] flex w-full items-center justify-between">
-                            <div className="text-left font-medium">
+                            <div className="font-medium text-left">
                                 <h2 className="mb-[5px] text-xs text-[#666]">Total Balance</h2>
                                 <div className="flex items-center">
                                     <span className="text-2xl font-medium text-[#272E4D]">$9,029.50</span>
@@ -106,7 +107,7 @@ const UserInfoModal = () => {
                                 </div>
                             </div>
 
-                            <div className="text-left font-medium">
+                            <div className="font-medium text-left">
                                 <h2 className="mb-1 text-xs text-[#666]">Contract Wallet</h2>
                                 <div className="flex items-center">
                                     <span className="text-2xl font-medium">$2850.50</span>
@@ -139,14 +140,14 @@ const UserInfoModal = () => {
 
                         {/* Action Buttons */}
                         {activeTab === 'wallet' && (
-                            <div className="mb-5 grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 mb-5">
                                 <div
                                     className="cursor-pointer rounded-2xl bg-[#7178FF] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#7178FF]/90"
                                     onClick={() => {
                                         // TODO:
                                     }}
                                 >
-                                    <Icon name="out" className="h-6 w-6 text-white" />
+                                    <Icon name="out" className="w-6 h-6 text-white" />
                                     <div className="mt-2 text-base">Send</div>
                                 </div>
                                 <div
@@ -155,7 +156,7 @@ const UserInfoModal = () => {
                                         // TODO:
                                     }}
                                 >
-                                    <Icon name="in" className="h-6 w-6 text-white" />
+                                    <Icon name="in" className="w-6 h-6 text-white" />
                                     <div className="mt-2 text-base">Receive</div>
                                 </div>
                             </div>
@@ -163,14 +164,14 @@ const UserInfoModal = () => {
 
                         {/* Action Buttons - contract wallet */}
                         {activeTab === 'contract' && (
-                            <div className="mb-5 grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 mb-5">
                                 <div
                                     className="cursor-pointer rounded-2xl bg-[#7178FF] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#7178FF]/90"
                                     onClick={() => {
                                         // TODO:
                                     }}
                                 >
-                                    <Icon name="in" className="h-6 w-6 text-white" />
+                                    <Icon name="in" className="w-6 h-6 text-white" />
                                     <div className="mt-2 text-base">Transfer In</div>
                                 </div>
                                 <div
@@ -179,7 +180,7 @@ const UserInfoModal = () => {
                                         // TODO:
                                     }}
                                 >
-                                    <Icon name="out" className="h-6 w-6 text-white" />
+                                    <Icon name="out" className="w-6 h-6 text-white" />
                                     <div className="mt-2 text-base">Transfer Out</div>
                                 </div>
                             </div>
@@ -208,7 +209,7 @@ const UserInfoModal = () => {
                         </div>
                     </div>
 
-                    <div className="w-full flex-1 overflow-y-auto">
+                    <div className="overflow-y-auto flex-1 w-full">
                         {/* Token List */}
                         <div className="">
                             {allTokenBalance ? (
@@ -220,19 +221,23 @@ const UserInfoModal = () => {
                                         <div className="flex items-center">
                                             <TokenLogo
                                                 canisterId={token.canister_id.toString()}
-                                                className="h-9 w-9 rounded-full"
+                                                className="w-9 h-9 rounded-full"
                                             />
                                             <div className="ml-3 text-left">
                                                 <h3 className="text-sm font-medium text-[#272E4D]">{token.name}</h3>
                                                 <p className="text-xs text-[#97A0C9]">
-                                                    {token.balance ? `${token.balance} ` : '0'}
+                                                    {token.balance_wallet &&
+                                                        activeTab === 'wallet' &&
+                                                        `${token.balance_wallet}`}
+                                                    {token.balance && activeTab === 'contract' && `${token.balance}`}
                                                     {token.symbol}
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-medium text-[#272E4D]">
-                                                {token.price ? `$${parseFloat(token.price?.toFixed(8))}` : '0.00'}
+                                                {token.usd_wallet && activeTab === 'wallet' && `$${token.usd_wallet}`}
+                                                {token.usd && activeTab === 'contract' && `$${token.usd}`}
                                             </p>
                                             <TokenPriceChangePercentage
                                                 value={token.price_change_24h || 0}

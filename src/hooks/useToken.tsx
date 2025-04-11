@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 
 import { get_all_tokens } from '@/canister/icpswap/apis';
+import { get_wallet_all_token_balance } from '@/canister/icrc1/apis';
 import { get_tokens_balance } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { get_token_price_ic } from '@/components/api/price';
@@ -90,7 +91,7 @@ export const getAllTokensPrice = async (tokenList: TokenInfo[]) => {
     }
 };
 
-// contract wallet -> tokens balance
+// contract wallet and wallet -> tokens balance
 export type TokenBalanceInfo = TokenPriceInfo & { balance: string | number; usd: string | number };
 
 export const getAllTokensAndBalance = async (
@@ -101,27 +102,40 @@ export const getAllTokensAndBalance = async (
     if (!connectedIdentity) return undefined;
 
     const { principal } = connectedIdentity;
-
+    const canisters = tokenList.map((item) => item.canister_id.toString());
     try {
-        const balances = await get_tokens_balance(connectedIdentity, {
-            owner: principal,
-        });
+        const [balances, walletBalances] = await Promise.all([
+            get_tokens_balance(connectedIdentity, {
+                owner: principal,
+            }),
+            get_wallet_all_token_balance(canisters, principal),
+        ]);
 
         const result = tokenList.map((item) => {
-            const token = balances.find((token) => token.canister_id === item.canister_id.toString());
-
-            if (token) {
-                return {
-                    ...item,
-                    balance: token.balance,
-                    usd: item.price ? BigNumber(item.price).multipliedBy(token.balance).toFixed(2) : '0',
-                };
-            }
+            const token = balances.find((t) => t.canister_id.toString() === item.canister_id.toString());
+            const wallet_token = walletBalances.find((t) => t.canister_id === item.canister_id.toString());
 
             return {
                 ...item,
-                balance: 0,
-                usd: 0,
+                balance: token ? token.balance : 0,
+                usd:
+                    item.price && token
+                        ? BigNumber(item.price)
+                              .multipliedBy(token?.balance || 0)
+                              .toFixed(2)
+                        : '0',
+                balance_wallet: wallet_token
+                    ? BigNumber(wallet_token.balance || 0)
+                          .div(BigNumber(10).pow(item.decimals))
+                          .toFixed(2)
+                    : 0,
+                usd_wallet:
+                    item.price && wallet_token
+                        ? BigNumber(wallet_token.balance || 0)
+                              .times(BigNumber(item.price))
+                              .div(BigNumber(10).pow(item.decimals))
+                              .toFixed(2)
+                        : '0',
             };
         });
 
