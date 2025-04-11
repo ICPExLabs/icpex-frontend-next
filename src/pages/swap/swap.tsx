@@ -96,15 +96,15 @@ function SwapPage() {
                             <p className="text-xs font-medium text-[#666]">{payTokenBalance}</p>
                             <p className="ml-[2px] text-xs font-medium text-[#666]">{payToken}</p>
                         </div>
-                        <div className="ml-2 flex items-center text-xs font-medium text-[#7178FF]">
+                        <div className="ml-2 flex items-center text-xs font-medium text-[#07c160]">
                             <p
-                                className="flex h-[20px] cursor-pointer items-center rounded-l-full border border-r-0 border-[#E4E9FF] px-2 text-xs font-medium text-[#7077ff]"
+                                className="flex h-[20px] cursor-pointer items-center rounded-l-full border border-r-0 border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
                                 onClick={onHalfChange}
                             >
                                 {t('swap.swap.half')}
                             </p>
                             <p
-                                className="flex h-[20px] cursor-pointer items-center rounded-r-full border border-[#E4E9FF] px-2 text-xs font-medium text-[#7077ff]"
+                                className="flex h-[20px] cursor-pointer items-center rounded-r-full border border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
                                 onClick={onMaxChange}
                             >
                                 {t('swap.swap.max')}
@@ -114,7 +114,7 @@ function SwapPage() {
                 </div>
             </div>
 
-            <div className="relative mb-4 rounded-[18px] bg-[#F2F4FF] px-5 py-[17px]">
+            <div className="relative mb-4 rounded-[18px] bg-[#F6F6F6] px-5 py-[17px]">
                 <div
                     onClick={onSwapDirectionChange}
                     className="absolute -top-7 left-1/2 flex translate-x-[-50%] cursor-pointer justify-center"
@@ -151,7 +151,7 @@ function SwapPage() {
 
                     const buttonConfig = {
                         disabled: {
-                            className: 'bg-[#f2f4ff] text-[#97a0c9] cursor-not-allowed',
+                            className: 'bg-[#f6f6f6] text-[#999999] cursor-not-allowed',
                             text: (() => {
                                 if (isInitializing || !payTokenBalance) return t('swap.swapBtn.init');
                                 if (!payToken || !receiveToken) return t('swap.swapBtn.select');
@@ -160,7 +160,7 @@ function SwapPage() {
                                     return t('swap.swapBtn.insufficient', { symbol: payToken });
                                 return '';
                             })(),
-                            textClassName: 'text-[#97a0c9]',
+                            textClassName: 'text-[#999999]',
                             onClick: undefined,
                         },
                         active: {

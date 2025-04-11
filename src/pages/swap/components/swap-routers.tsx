@@ -57,7 +57,7 @@ const SwapRouters = ({
                     }}
                     className={cn(
                         'flex h-[48px] cursor-pointer items-center justify-between rounded-[14px] border border-[#E4E9FF] bg-white px-[14px] transition-all',
-                        route.name === swapRouter && 'border-[#7178FF]',
+                        route.name === swapRouter && 'border-[#07c160]',
                     )}
                 >
                     <div className="flex items-center gap-x-[5px]">
@@ -66,21 +66,23 @@ const SwapRouters = ({
                     </div>
                     <div className="flex items-center gap-x-2">
                         {route.label && (
-                            <p className="flex h-[18px] items-center justify-center rounded bg-[#edeeff] px-[6px] text-xs font-medium text-[#7077ff]">
+                            <p className="flex h-[18px] items-center justify-center rounded bg-[#edeeff] px-[6px] text-xs font-medium text-[#07C160]">
                                 {route.label}
                             </p>
                         )}
                         {/* TODO: add amount */}
                         <p className="text-sm font-medium text-[#666666]">{'amount'}</p>
-                        {route.name === swapRouter && <Icon name="checkbox" className="h-4 w-4 text-[#7178FF]" />}
+                        {route.name === swapRouter && <Icon name="checkbox" className="h-4 w-4 text-[#07c160]" />}
                     </div>
                 </div>
             ))}
 
-            <div className="flex w-full items-center justify-center rounded-[14px] border border-[#ffdcdd] bg-[#fffbfb] px-[14px] py-[10px]">
-                <Icon name="warn" className="mr-3 h-6 w-[26.46px] flex-shrink-0 text-[#ff5457]" />
-                <p className="text-xs font-medium text-[#ff5457]">{t('swap.router.tip')}</p>
-            </div>
+            {swapRouter !== 'ICPEx' && (
+                <div className="flex w-full items-center justify-center rounded-[14px] border border-[#ffdcdd] bg-[#fffbfb] px-[14px] py-[10px]">
+                    <Icon name="warn" className="mr-3 h-6 w-[26.46px] flex-shrink-0 text-[#ff5457]" />
+                    <p className="text-xs font-medium text-[#ff5457]">{t('swap.router.tip')}</p>
+                </div>
+            )}
         </div>
     );
 };

@@ -48,7 +48,7 @@ const AmountInput = ({
                 />
                 <div
                     onClick={() => setShowSelectTokenModal(true)}
-                    className="flex h-10 w-[150px] flex-shrink-0 cursor-pointer items-center justify-between gap-x-2 rounded-full bg-[#E6EBFF] px-[10px] text-sm font-medium"
+                    className="flex h-10 w-[150px] flex-shrink-0 cursor-pointer items-center justify-between gap-x-2 rounded-full border border-[#dddddd] bg-[#fff] px-[10px] text-sm font-medium"
                 >
                     {token && tokenInfo ? (
                         <>

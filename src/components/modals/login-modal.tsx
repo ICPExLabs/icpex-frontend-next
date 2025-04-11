@@ -26,7 +26,7 @@ export const LoginButton = () => {
             {!connectedIdentity && (
                 <div
                     onClick={openLogin}
-                    className="flex h-[40px] cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-[#7236FE] to-[#7178FF] px-5 text-sm font-semibold text-white"
+                    className="flex h-[40px] cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-[#08be65] to-[#2161f9] px-5 text-sm font-semibold text-white"
                 >
                     {t('common.connect.connect')}
                 </div>
@@ -92,7 +92,7 @@ const LoginModal = () => {
                         <div className="text-base font-medium text-[#272e4d]">{t('common.connect.title')}</div>
                         <Icon
                             name="arrow-right"
-                            className="h-5 w-5 cursor-pointer text-[#97A0C9]"
+                            className="h-5 w-5 cursor-pointer text-[#999]"
                             onClick={() => setShowLoginModal(false)}
                         />
                     </div>
@@ -101,7 +101,7 @@ const LoginModal = () => {
                         {WalletList.map((wallet) => (
                             <div
                                 key={wallet.id}
-                                className="flex h-[64px] w-full cursor-pointer items-center gap-x-[15px] rounded-[18px] bg-[#F2F4FF] px-5 duration-75 hover:bg-[#e4e9ff]"
+                                className="flex h-[64px] w-full cursor-pointer items-center gap-x-[15px] rounded-[18px] bg-[#f6f6f6] px-5 duration-75 hover:bg-[#eeeeee]"
                                 onClick={() => handleConnect(wallet.type)}
                             >
                                 {wallet.icon}
@@ -115,10 +115,10 @@ const LoginModal = () => {
                             name="checkbox"
                             className={cn(
                                 'mt-0.5 h-4 w-4 cursor-pointer',
-                                isChecked ? 'text-[#7077FF]' : 'text-[#272E4D]',
+                                isChecked ? 'text-[#07C160]' : 'text-[#272E4D]',
                             )}
                         />
-                        <p className="text-sm font-normal text-[#272e4d]">
+                        <p className="ml-3 text-left text-sm font-normal text-[#999999]">
                             {t('common.connect.protocol1')}
                             <Link to="" className="ml-2 underline" target="_blank">
                                 {t('common.connect.protocol2')}

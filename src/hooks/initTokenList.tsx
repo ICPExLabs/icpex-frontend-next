@@ -5,6 +5,7 @@ import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
+import { isCanisterIdText, isPrincipalText } from '@/utils/principals';
 
 import { useExecuteOnce } from './useExecuteOnce';
 import { getAllTokensAndBalance, getAllTokensPrice } from './useToken';
@@ -40,7 +41,12 @@ export const InitTokenList = () => {
 
     useExecuteOnce(() => {
         get_tokens_query().then((tokenList: TokenInfo[]) => {
-            setTokenList(tokenList);
+            const list: TokenInfo[] = tokenList.filter((item) => {
+                if (isCanisterIdText(item.canister_id.toString())) {
+                    return true;
+                }
+            });
+            setTokenList(list);
         });
     });
 };

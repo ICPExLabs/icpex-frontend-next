@@ -77,15 +77,15 @@ function LimitPage() {
                             <p className="text-xs font-medium text-[#666]">{payTokenBalance}</p>
                             <p className="ml-[2px] text-xs font-medium text-[#666]">{payToken}</p>
                         </div>
-                        <div className="ml-2 flex items-center text-xs font-medium text-[#7178FF]">
+                        <div className="ml-2 flex items-center text-xs font-medium text-[#07c160]">
                             <p
-                                className="flex h-[20px] cursor-pointer items-center rounded-l-full border border-r-0 border-[#E4E9FF] px-2 text-xs font-medium text-[#7077ff]"
+                                className="flex h-[20px] cursor-pointer items-center rounded-l-full border border-r-0 border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
                                 onClick={onHalfChange}
                             >
                                 {t('swap.swap.half')}
                             </p>
                             <p
-                                className="flex h-[20px] cursor-pointer items-center rounded-r-full border border-[#E4E9FF] px-2 text-xs font-medium text-[#7077ff]"
+                                className="flex h-[20px] cursor-pointer items-center rounded-r-full border border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
                                 onClick={onMaxChange}
                             >
                                 {t('swap.swap.max')}
@@ -95,7 +95,7 @@ function LimitPage() {
                 </div>
             </div>
 
-            <div className="relative mb-4 rounded-[18px] bg-[#F2F4FF] px-5 py-[17px]">
+            <div className="relative mb-4 rounded-[18px] bg-[#F6F6F6] px-5 py-[17px]">
                 <div
                     onClick={onSwapDirectionChange}
                     className="absolute -top-7 left-1/2 flex translate-x-[-50%] cursor-pointer justify-center"
@@ -139,8 +139,8 @@ function LimitPage() {
                                     key={opt}
                                     onClick={() => setSelectedType(opt)}
                                     className={cn(
-                                        'cursor-pointer rounded-full border border-[#E4E9FF] px-4 py-1 text-sm font-medium text-[#7178FF]',
-                                        selectedType === opt && 'border-[#7178FF] bg-[#7178FF] text-white',
+                                        'cursor-pointer rounded-full border border-[#E4E9FF] px-4 py-1 text-sm font-medium text-[#07c160]',
+                                        selectedType === opt && 'border-[#07c160] bg-[#07c160] text-white',
                                     )}
                                 >
                                     {opt}
@@ -161,7 +161,7 @@ function LimitPage() {
             <Button
                 theme="solid"
                 size="large"
-                className="!h-14 w-full !rounded-xl bg-gradient-to-br from-[#7236FE] to-[#7178FF] !text-lg font-medium text-white disabled:!from-[#F2F4FF] disabled:!to-[#F2F4FF] disabled:!text-[#97A0C9]"
+                className="!h-14 w-full !rounded-xl bg-gradient-to-br from-[#7236FE] to-[#07c160] !text-lg font-medium text-white disabled:!from-[#F2F4FF] disabled:!to-[#F2F4FF] disabled:!text-[#97A0C9]"
                 disabled={false}
             >
                 {t('swap.setting.confirm')}

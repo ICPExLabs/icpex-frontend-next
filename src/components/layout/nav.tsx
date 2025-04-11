@@ -35,14 +35,14 @@ const NavComponents = () => {
             : !item.isExternal && pathname === item.path;
 
         const linkClassName = cn(
-            'relative flex justify-center text-base font-semibold text-[#666] duration-75 hover:text-[#000]',
-            isActive && 'text-[#000]',
+            'relative flex justify-center text-base font-semibold text-[#666] duration-75 hover:text-[#07C160]',
+            isActive && 'text-[#07C160]',
         );
 
         const indicator = (
             <span
                 className={cn(
-                    'absolute bottom-[-6px] block h-[3px] w-7 rounded-[3px] bg-[#7077ff] opacity-0 duration-75',
+                    'absolute bottom-[-6px] block h-[3px] w-7 rounded-[3px] bg-[#07C160] opacity-0 duration-75',
                     isActive && 'opacity-100',
                 )}
             />

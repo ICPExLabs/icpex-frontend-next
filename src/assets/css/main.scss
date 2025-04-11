@@ -74,6 +74,11 @@ body {
 
 .amount-input .semi-input-wrapper {
     color: #272e4d;
+    background-color: transparent;
+}
+
+.amount-input .semi-input {
+    background-color: transparent;
 }
 
 .amount-input .semi-input-wrapper .semi-input-default::placeholder {
@@ -86,7 +91,7 @@ body {
 
 @layer utilities {
     .bg-swap-btn {
-        background-image: linear-gradient(90deg, #7236FE 2.44%, #7178FF 99.84%);
+        background-image: linear-gradient(90deg, #08BE65 0%, #2161F9 100%);
     }
 }
 

@@ -25,7 +25,7 @@ export const UserInfoButton = () => {
     return (
         <>
             <div
-                className="group flex h-10 cursor-pointer items-center justify-center rounded-3xl bg-[#f2f4ff] px-[10px]"
+                className="group flex h-10 cursor-pointer items-center justify-center rounded-3xl border border-[#eeeeee] bg-[#fff] px-[10px]"
                 onClick={() => setShowInfoModal(true)}
             >
                 {activeProvider?.meta.id === 'plug' && <Icon name="plug" className="mr-2 h-6 w-6 flex-shrink-0"></Icon>}
@@ -78,7 +78,7 @@ const UserInfoModal = () => {
                             <CopyToClipboard text={principal} onCopy={() => setCopied(true)}>
                                 <Icon
                                     name={copied ? 'correct' : 'copy'}
-                                    className="ml-4 h-3.5 w-3.5 cursor-pointer text-[#97a0c9]"
+                                    className="ml-4 h-3.5 w-3.5 cursor-pointer text-[#999]"
                                 ></Icon>
                             </CopyToClipboard>
                         </div>
@@ -86,12 +86,12 @@ const UserInfoModal = () => {
                             <Icon
                                 onClick={disconnect}
                                 name="off"
-                                className="h-[18px] w-[18px] cursor-pointer text-[#97a0c9]"
+                                className="h-[18px] w-[18px] cursor-pointer text-[#999]"
                             ></Icon>
                             <Icon
                                 onClick={() => setShowInfoModal(false)}
                                 name="arrow-right"
-                                className="h-[18px] w-[18px] cursor-pointer text-[#97a0c9]"
+                                className="h-[18px] w-[18px] cursor-pointer text-[#999]"
                             ></Icon>
                         </div>
                     </div>
@@ -116,32 +116,32 @@ const UserInfoModal = () => {
                         </div>
 
                         {/* Tabs */}
-                        <div className="mb-5 flex rounded-2xl border border-[#E4E9FF] bg-white p-1">
-                            <button
+                        <div className="mb-5 flex h-11 items-center rounded-xl border border-[#eeeeee] bg-white px-1">
+                            <div
                                 className={cn(
-                                    'flex-1 rounded-xl py-3 text-center text-sm font-medium',
-                                    activeTab === 'wallet' ? 'bg-[#E4E9FF] text-[#272E4D]' : 'text-[#666]',
+                                    'flex h-9 flex-1 cursor-pointer items-center justify-center rounded-[10px]',
+                                    activeTab === 'wallet' ? 'bg-[#eee] text-[#000]' : 'text-[#666]',
                                 )}
                                 onClick={() => setActiveTab('wallet')}
                             >
-                                {t('common.switchWallet.wallet')}
-                            </button>
-                            <button
+                                <p className="text-sm font-medium">{t('common.switchWallet.wallet')}</p>
+                            </div>
+                            <div
                                 className={cn(
-                                    'flex-1 rounded-xl py-3 text-center text-sm font-medium',
-                                    activeTab === 'contract' ? 'bg-[#E4E9FF] text-[#272E4D]' : 'text-[#666]',
+                                    'flex h-9 flex-1 cursor-pointer items-center justify-center rounded-[10px]',
+                                    activeTab === 'contract' ? 'bg-[#eee] text-[#000]' : 'text-[#666]',
                                 )}
                                 onClick={() => setActiveTab('contract')}
                             >
-                                {t('common.switchWallet.contractWallet')}
-                            </button>
+                                <p className="text-sm font-medium">{t('common.switchWallet.contractWallet')}</p>
+                            </div>
                         </div>
 
                         {/* Action Buttons */}
                         {activeTab === 'wallet' && (
                             <div className="mb-5 grid grid-cols-2 gap-4">
                                 <div
-                                    className="cursor-pointer rounded-2xl bg-[#7178FF] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#7178FF]/90"
+                                    className="cursor-pointer rounded-2xl bg-[#07c160] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#07c160]/90"
                                     onClick={() => {
                                         // TODO:
                                     }}
@@ -150,7 +150,7 @@ const UserInfoModal = () => {
                                     <div className="mt-2 text-base">Send</div>
                                 </div>
                                 <div
-                                    className="cursor-pointer rounded-2xl bg-[#7178FF] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#7178FF]/90"
+                                    className="cursor-pointer rounded-2xl bg-[#07c160] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#07c160]/90"
                                     onClick={() => {
                                         // TODO:
                                     }}
@@ -165,7 +165,7 @@ const UserInfoModal = () => {
                         {activeTab === 'contract' && (
                             <div className="mb-5 grid grid-cols-2 gap-4">
                                 <div
-                                    className="cursor-pointer rounded-2xl bg-[#7178FF] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#7178FF]/90"
+                                    className="cursor-pointer rounded-2xl bg-[#07c160] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#07c160]/90"
                                     onClick={() => {
                                         // TODO:
                                     }}
@@ -174,7 +174,7 @@ const UserInfoModal = () => {
                                     <div className="mt-2 text-base">Transfer In</div>
                                 </div>
                                 <div
-                                    className="cursor-pointer rounded-2xl bg-[#7178FF] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#7178FF]/90"
+                                    className="cursor-pointer rounded-2xl bg-[#07c160] px-4 pt-4 pb-[12px] text-left text-white transition-colors hover:bg-[#07c160]/90"
                                     onClick={() => {
                                         // TODO:
                                     }}

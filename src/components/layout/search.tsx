@@ -61,7 +61,7 @@ const SearchResultItem = ({
                                 ${priceData.price ? parseFloat(priceData.price?.toFixed(8)) : '--'}
                             </p>
                         ) : (
-                            <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                            <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
                         )}
                         {priceData ? (
                             <TokenPriceChangePercentage value={priceData.price_change_24h || '--'} />
@@ -141,7 +141,7 @@ const SearchComponents = () => {
             <div className="relative mr-[30px] ml-[72px] h-10 w-[440px]">
                 <div
                     className={cn(
-                        'absolute z-10 flex w-full flex-col items-center rounded-[40px] bg-[#f2f4ff]',
+                        'absolute z-10 flex w-full flex-col items-center rounded-[40px] border border-[#eeeeee] bg-[#fff]',
                         isOpenSearch && 'rounded-[20px] bg-white',
                     )}
                 >

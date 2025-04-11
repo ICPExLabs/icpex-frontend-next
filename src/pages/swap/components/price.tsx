@@ -48,7 +48,7 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
                     {tokenInfo?.price ? `$${parseFloat(tokenInfo?.price.toFixed(8))}` : '--'}
                 </p>
             ) : (
-                <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
             )}
         </div>
     );

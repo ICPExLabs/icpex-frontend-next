@@ -14,7 +14,7 @@ function PageLayout({ children }: { children: React.ReactNode }) {
             <div className="relative flex min-h-screen w-screen flex-col items-center">
                 <div
                     className="absolute top-0 left-0 h-full w-full object-cover"
-                    style={{ background: 'linear-gradient(180deg, #DCE4FF 0%, #F7F7F7 27.88%, #FFF 66.35%)' }}
+                    style={{ background: 'linear-gradient(180deg, #EFFFF6 0%, #FBFBFB 41.35%)' }}
                 />
 
                 <Header />

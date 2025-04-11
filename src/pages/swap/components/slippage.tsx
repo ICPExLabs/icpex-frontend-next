@@ -32,7 +32,7 @@ function SlippageComponents() {
                                 {t('swap.setting.tolerance')}
                             </p>
                             <div className="mt-2 flex w-full gap-x-[6px]">
-                                <div className="flex h-[30px] w-20 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg bg-[#7077ff] text-xs leading-3 font-medium text-white">
+                                <div className="flex h-[30px] w-20 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg bg-[#07C160] text-xs leading-3 font-medium text-white">
                                     {t('swap.setting.auto')}
                                 </div>
                                 <div className="flex h-[30px] flex-1 items-center justify-center rounded-lg bg-[#f2f4ff] px-[6px]">
@@ -76,7 +76,7 @@ function SlippageComponents() {
 
                     <div
                         onClick={() => setIsDropdownOpen(false)}
-                        className="mt-3 flex h-9 w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-l from-[#7236fe] to-[#7077ff] text-sm font-medium text-white"
+                        className="mt-3 flex h-9 w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-l from-[#7236fe] to-[#07C160] text-sm font-medium text-white"
                     >
                         {t('swap.setting.close')}
                     </div>

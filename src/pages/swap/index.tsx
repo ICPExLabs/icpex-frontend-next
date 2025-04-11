@@ -21,7 +21,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                         to="/swap"
                         className={cn(
                             'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
-                            (pathname === '/' || pathname.includes('/swap')) && 'bg-[#7178FF] text-white',
+                            (pathname === '/' || pathname.includes('/swap')) && 'bg-[#07c160] text-white',
                         )}
                     >
                         {t('swap.swap.title')}
@@ -30,7 +30,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                         to="/limit"
                         className={cn(
                             'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
-                            pathname.includes('/limit') && 'bg-[#7178FF] text-white',
+                            pathname.includes('/limit') && 'bg-[#07c160] text-white',
                         )}
                     >
                         {t('swap.limit.title')}

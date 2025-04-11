@@ -73,10 +73,10 @@ export const SelectTokenModal = ({
                     <Icon
                         onClick={() => setIsShow(false)}
                         name="close"
-                        className="h-6 w-6 cursor-pointer text-[#c9d1fb]"
+                        className="h-6 w-6 cursor-pointer text-[#BFBFBF]"
                     />
                 </div>
-                <div className="mt-[20px] flex h-10 w-full items-center rounded-lg bg-[#f2f4ff]">
+                <div className="mt-[20px] flex h-10 w-full items-center rounded-lg bg-[#F6F6F6]">
                     <Icon name="search" className="ml-3 h-[15px] w-[14px] text-[#c9d1fb]" />
                     <input
                         value={searchKeyword}
@@ -105,15 +105,15 @@ export const SelectTokenModal = ({
                             <div
                                 className={cn(
                                     'h-0 w-0 border-x-[3.5px] border-b-[5px] border-x-transparent',
-                                    (sortBy === 0 || sortBy === 2) && 'border-b-[#c9d1fb]',
-                                    sortBy === 1 && 'border-b-[#7077ff]',
+                                    (sortBy === 0 || sortBy === 2) && 'border-b-[#999]',
+                                    sortBy === 1 && 'border-b-[#07C160]',
                                 )}
                             />
                             <div
                                 className={cn(
                                     'h-0 w-0 border-x-[3.5px] border-t-[5px] border-x-transparent',
-                                    (sortBy === 0 || sortBy === 1) && 'border-t-[#c9d1fb]',
-                                    sortBy === 2 && 'border-t-[#7077ff]',
+                                    (sortBy === 0 || sortBy === 1) && 'border-t-[#999]',
+                                    sortBy === 2 && 'border-t-[#07C160]',
                                 )}
                             />
                         </div>
@@ -121,7 +121,7 @@ export const SelectTokenModal = ({
                 </div>
                 {!tokenList || !tokenList.length ? (
                     <div className="flex h-[426px] flex-col items-center justify-center">
-                        <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#7178FF]" />
+                        <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#07c160]" />
                         <p className="mt-2 text-[16px] font-semibold text-[#272e4d]">{t('swap.select.loading')}</p>
                     </div>
                 ) : (
