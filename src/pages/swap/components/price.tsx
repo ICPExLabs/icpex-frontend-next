@@ -37,15 +37,15 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
                 <TokenLogo className="h-12 w-12 shrink-0" canisterId={tokenInfo.canister_id.toString()} />
                 <div className="flex flex-col">
                     <div className="flex items-center gap-x-[7px]">
-                        <p className="text-base font-medium text-[#272e4d]">{tokenInfo.symbol}</p>
+                        <p className="text-base font-medium text-[#000000]">{tokenInfo.symbol}</p>
                         <ICRCTag tag={tokenInfo?.standard} />
                     </div>
-                    <p className="text-xs font-medium text-[#97A0C9]">{tokenInfo.name}</p>
+                    <p className="text-xs font-medium text-[#999999]">{tokenInfo.name}</p>
                 </div>
             </div>
 
             {tokenInfo ? (
-                <p className="text-base font-medium text-[#272e4d]">
+                <p className="text-base font-medium text-[#000000]">
                     {tokenInfo?.price ? `$${truncateDecimalToBN(tokenInfo?.price, 8)}` : '--'}
                 </p>
             ) : (

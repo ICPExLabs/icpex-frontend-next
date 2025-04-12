@@ -129,7 +129,7 @@ function LimitPage() {
                         <div className="flex items-center gap-x-1">
                             {/* TODO: token icon */}
                             <div className="h-6 w-6 shrink-0 rounded-full bg-white"></div>
-                            <span className="text-base font-medium text-[#272E4D]">CHAT</span>
+                            <span className="text-base font-medium text-[#000000]">CHAT</span>
                         </div>
                     </div>
                     <div className="flex w-full items-center justify-between">
@@ -161,14 +161,14 @@ function LimitPage() {
             <Button
                 theme="solid"
                 size="large"
-                className="!h-14 w-full !rounded-xl bg-gradient-to-br from-[#7236FE] to-[#07c160] !text-lg font-medium text-white disabled:!from-[#F2F4FF] disabled:!to-[#F2F4FF] disabled:!text-[#97A0C9]"
+                className="!h-14 w-full !rounded-xl bg-gradient-to-br from-[#7236FE] to-[#07c160] !text-lg font-medium text-white disabled:!from-[#F2F4FF] disabled:!to-[#F2F4FF] disabled:!text-[#999999]"
                 disabled={false}
             >
                 {t('swap.setting.confirm')}
             </Button>
 
             <div className="mt-3 flex items-start gap-2 rounded-[18px] border border-[#EAEDFF] p-4 text-sm text-[#666]">
-                <Icon name="info" className="mt-1 h-4 w-4 text-[#97A0C9]" />
+                <Icon name="info" className="mt-1 h-4 w-4 text-[#999999]" />
                 <div>
                     {t('swap.setting.info')}
                     <div

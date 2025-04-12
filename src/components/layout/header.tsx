@@ -38,7 +38,7 @@ const Header = () => {
 
                         {isInitializing ? (
                             <div className="group flex h-10 w-[100px] cursor-not-allowed items-center justify-center rounded-3xl bg-[#F2F4FF]">
-                                <p className="text-sm font-medium text-[#97A0C9]">Connect</p>
+                                <p className="text-sm font-medium text-[#999999]">Connect</p>
                             </div>
                         ) : isConnected ? (
                             <>

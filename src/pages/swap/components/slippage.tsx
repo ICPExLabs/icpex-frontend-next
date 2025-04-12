@@ -23,7 +23,7 @@ function SlippageComponents() {
             render={
                 <div className="flex w-60 flex-col rounded-[18px] border border-[#e3e8ff] bg-white px-[17px] pt-[16px] pb-[20px]">
                     <div className="pointer-events-auto flex w-full flex-col">
-                        <p className="text-[16px] leading-[16px] font-semibold text-[#272e4d]">
+                        <p className="text-[16px] leading-[16px] font-semibold text-[#000000]">
                             {t('swap.setting.title')}
                         </p>
 
@@ -40,7 +40,7 @@ function SlippageComponents() {
                                         <InputNumber
                                             value={swapSlippage}
                                             placeholder={t('swap.setting.tolerancePlaceholder')}
-                                            className="flex h-full w-full min-w-auto text-xs font-medium !text-[#97a0c9] outline-none"
+                                            className="flex h-full w-full min-w-auto text-xs font-medium !text-[#999999] outline-none"
                                             hideButtons
                                             step={0.1}
                                             min={0}
@@ -49,7 +49,7 @@ function SlippageComponents() {
                                             }}
                                         />
                                     </div>
-                                    <p className="text-xs leading-3 font-medium text-[#97a0c9]">%</p>
+                                    <p className="text-xs leading-3 font-medium text-[#999999]">%</p>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +60,7 @@ function SlippageComponents() {
                                     {t('swap.setting.expert')}
                                 </p>
                                 <Tooltip position="top" content={t('swap.setting.expertTip')}>
-                                    <Icon name="info" className="ml-2 h-3 w-3 cursor-pointer text-[#97a0c9]"></Icon>
+                                    <Icon name="info" className="ml-2 h-3 w-3 cursor-pointer text-[#999999]"></Icon>
                                 </Tooltip>
                             </div>
 
@@ -85,8 +85,8 @@ function SlippageComponents() {
         >
             <div className="flex items-center gap-x-[10px]">
                 <div className="flex flex-col items-end">
-                    <p className="text-[10px] font-medium text-[#97a0c9]">{t('swap.setting.slippage')}</p>
-                    <p className="text-sm font-medium text-[#272e4d]">{swapSlippage}%</p>
+                    <p className="text-[10px] font-medium text-[#999999]">{t('swap.setting.slippage')}</p>
+                    <p className="text-sm font-medium text-[#000000]">{swapSlippage}%</p>
                 </div>
                 <div
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}

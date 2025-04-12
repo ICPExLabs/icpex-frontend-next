@@ -20,7 +20,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/swap"
                         className={cn(
-                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
+                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-[#666]',
                             (pathname === '/' || pathname.includes('/swap')) && 'bg-[#07c160] text-white',
                         )}
                     >
@@ -29,7 +29,7 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/limit"
                         className={cn(
-                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-black',
+                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-[#666]',
                             pathname.includes('/limit') && 'bg-[#07c160] text-white',
                         )}
                     >

@@ -59,10 +59,10 @@ const AmountInput = ({
                     {token && tokenInfo ? (
                         <>
                             <TokenLogo className="h-6 w-6 shrink-0" canisterId={tokenInfo.canister_id.toString()} />
-                            <p className="line-clamp-1 flex-1 text-left text-base font-medium break-all text-[#272e4d]">
+                            <p className="line-clamp-1 flex-1 text-left text-base font-medium break-all text-[#000000]">
                                 {token}
                             </p>
-                            <Icon name="arrow-down" className="h-3 w-3 text-[#272e4d]" />
+                            <Icon name="arrow-down" className="h-3 w-3 text-[#000000]" />
                         </>
                     ) : (
                         <>

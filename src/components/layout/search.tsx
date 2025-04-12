@@ -50,7 +50,7 @@ const SearchResultItem = ({
                         <TokenLogo canisterId={tokenData.canister_id.toString()} className="h-9 w-9 flex-shrink-0" />
 
                         <div className="ml-[11px] flex flex-1 flex-col">
-                            <p className="line-clamp-1 w-full text-base font-medium break-all text-[#272e4d]">
+                            <p className="line-clamp-1 w-full text-base font-medium break-all text-[#000000]">
                                 {tokenData.name}
                             </p>
                             <p className="text-xs font-medium text-[#96a0c8]">{tokenData.symbol}</p>
@@ -58,7 +58,7 @@ const SearchResultItem = ({
                     </div>
                     <div className="ml-[11px] flex flex-col items-end gap-y-1">
                         {priceData ? (
-                            <p className="text-base font-medium text-[#272e4d]">
+                            <p className="text-base font-medium text-[#000000]">
                                 ${priceData.price ? truncateDecimalToBN(priceData.price, 8) : '--'}
                             </p>
                         ) : (
@@ -147,10 +147,10 @@ const SearchComponents = () => {
                     )}
                 >
                     <div className="flex h-10 w-full flex-shrink-0 items-center px-4">
-                        <Icon name="search" className="h-[15px] w-[15px] flex-shrink-0 text-[#97A0C9]" />
+                        <Icon name="search" className="h-[15px] w-[15px] flex-shrink-0 text-[#999999]" />
                         <input
                             ref={inputRef}
-                            className="ml-3 h-full flex-1 bg-transparent text-sm font-medium text-[#272E4D] outline-none placeholder:text-[#97a0c9]"
+                            className="ml-3 h-full flex-1 bg-transparent text-sm font-medium text-[#000000] outline-none placeholder:text-[#999999]"
                             placeholder={t('common.search.placeholder')}
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
@@ -162,7 +162,7 @@ const SearchComponents = () => {
                             onClick={() => setKeyword('')}
                             name="close"
                             className={cn(
-                                'h-[15px] w-[15px] flex-shrink-0 cursor-pointer text-[#97A0C9] opacity-0 duration-75',
+                                'h-[15px] w-[15px] flex-shrink-0 cursor-pointer text-[#999999] opacity-0 duration-75',
                                 keyword && 'opacity-100',
                             )}
                         />
@@ -174,8 +174,8 @@ const SearchComponents = () => {
                                 {!keyword && (
                                     <>
                                         <div className="mt-[10px] flex w-full items-center px-4">
-                                            <Icon name="popular" className="h-4 w-3.5 text-[#97a0c9]"></Icon>
-                                            <p className="ml-2 text-sm font-medium text-[#272e4d]">
+                                            <Icon name="popular" className="h-4 w-3.5 text-[#999999]"></Icon>
+                                            <p className="ml-2 text-sm font-medium text-[#000000]">
                                                 {t('common.search.popular')}
                                             </p>
                                         </div>
@@ -199,7 +199,7 @@ const SearchComponents = () => {
                                                     name="no"
                                                     className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]"
                                                 />
-                                                <p className="mt-[13px] text-sm font-medium text-[#97a0c9]">
+                                                <p className="mt-[13px] text-sm font-medium text-[#999999]">
                                                     {t('common.search.noResults')}
                                                 </p>
                                             </div>

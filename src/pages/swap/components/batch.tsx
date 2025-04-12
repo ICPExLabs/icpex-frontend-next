@@ -4,7 +4,7 @@ function BatchComponents() {
     const { t } = useTranslation();
 
     return (
-        <div className="ml-[10px] flex h-9 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-sm font-medium text-[#272E4D] duration-75 hover:bg-[#07c160] hover:text-white">
+        <div className="ml-[10px] flex h-9 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-sm font-medium text-[#666666] duration-75 hover:bg-[#07c160] hover:text-white">
             {t('swap.batch')}
         </div>
     );

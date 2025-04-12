@@ -89,7 +89,7 @@ const LoginModal = () => {
             >
                 <div className="relative mt-[77px] flex h-[calc(100vh-100px)] w-full flex-col items-center justify-start rounded-[20px] border border-[#e4e9ff] bg-white p-[20px] text-center">
                     <div className="flex w-full items-center justify-between">
-                        <div className="text-base font-medium text-[#272e4d]">{t('common.connect.title')}</div>
+                        <div className="text-base font-medium text-[#000000]">{t('common.connect.title')}</div>
                         <Icon
                             name="arrow-right"
                             className="h-5 w-5 cursor-pointer text-[#999]"
@@ -105,7 +105,7 @@ const LoginModal = () => {
                                 onClick={() => handleConnect(wallet.type)}
                             >
                                 {wallet.icon}
-                                <div className="text-sm font-medium text-[#272e4d]">{wallet.name}</div>
+                                <div className="text-sm font-medium text-[#000000]">{wallet.name}</div>
                             </div>
                         ))}
                     </div>
@@ -115,7 +115,7 @@ const LoginModal = () => {
                             name="checkbox"
                             className={cn(
                                 'mt-0.5 h-4 w-4 cursor-pointer',
-                                isChecked ? 'text-[#07C160]' : 'text-[#272E4D]',
+                                isChecked ? 'text-[#07C160]' : 'text-[#000000]',
                             )}
                         />
                         <p className="ml-3 text-left text-sm font-normal text-[#999999]">

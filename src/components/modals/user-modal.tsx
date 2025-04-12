@@ -33,7 +33,7 @@ export const UserInfoButton = () => {
             >
                 {activeProvider?.meta.id === 'plug' && <Icon name="plug" className="mr-2 h-6 w-6 flex-shrink-0"></Icon>}
                 {activeProvider?.meta.id === 'ii' && <Icon name="ii" className="mr-2 h-6 w-6 flex-shrink-0"></Icon>}
-                <div className="text-sm font-medium text-[#272e4d]">{shrinkPrincipal(principal)}</div>
+                <div className="text-sm font-medium text-[#000000]">{shrinkPrincipal(principal)}</div>
             </div>
         </>
     );
@@ -178,7 +178,7 @@ const UserInfoModal = () => {
                         <div className="text-left font-medium">
                             <h2 className="mb-[5px] text-xs text-[#666]">Total Balance</h2>
                             <div className="flex items-center">
-                                <span className="text-2xl font-medium text-[#272E4D]">$9,029.50</span>
+                                <span className="text-2xl font-medium text-[#000000]">$9,029.50</span>
                                 <TokenPriceChangePercentage value={0.23} className="ml-1" />
                             </div>
                         </div>
@@ -304,7 +304,7 @@ const UserInfoModal = () => {
                             ) : (
                                 <div className="flex h-[426px] flex-col items-center justify-center">
                                     <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#07c160]" />
-                                    <p className="mt-2 text-[16px] font-semibold text-[#272e4d]">
+                                    <p className="mt-2 text-[16px] font-semibold text-[#000000]">
                                         {t('common.loading')}
                                     </p>
                                 </div>

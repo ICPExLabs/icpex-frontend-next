@@ -16,7 +16,7 @@ export const TokenPriceChangePercentage = ({
     precision = 2,
 }: TokenPriceChangePercentageProps) => {
     if (typeof value === 'string') {
-        return <div className="inline-flex items-center text-xs font-medium text-[#97a0c9]">{value}</div>;
+        return <div className="inline-flex items-center text-xs font-medium text-[#999999]">{value}</div>;
     }
 
     const normalizedValue = Number.isFinite(value) ? value : 0;
