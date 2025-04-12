@@ -7,6 +7,7 @@ import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { useTokenInfoAndBalanceByCanisterId } from '@/hooks/useToken';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
+import { truncateDecimalToBN } from '@/utils/numbers';
 import { parseLowerCaseSearch } from '@/utils/search';
 
 import Icon from '../ui/icon';
@@ -58,7 +59,7 @@ const SearchResultItem = ({
                     <div className="ml-[11px] flex flex-col items-end gap-y-1">
                         {priceData ? (
                             <p className="text-base font-medium text-[#272e4d]">
-                                ${priceData.price ? parseFloat(priceData.price?.toFixed(8)) : '--'}
+                                ${priceData.price ? truncateDecimalToBN(priceData.price, 8) : '--'}
                             </p>
                         ) : (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />

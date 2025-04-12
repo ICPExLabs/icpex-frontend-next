@@ -2,9 +2,11 @@ import { Modal, Switch } from '@douyinfe/semi-ui';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TokenInfo } from '@/canister/swap/swap.did.d';
+import { TokenBalanceInfo } from '@/hooks/useToken';
+import { useAppStore } from '@/stores/app';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
+import { truncateDecimalToBN } from '@/utils/numbers';
 import { parseLowerCaseSearch } from '@/utils/search';
 
 import Icon from '../ui/icon';
@@ -17,10 +19,11 @@ export const SelectTokenModal = ({
 }: {
     isShow: boolean;
     setIsShow: (isShow: boolean) => void;
-    selectToken: (token: TokenInfo) => void;
+    selectToken: (token: TokenBalanceInfo) => void;
 }) => {
     const { t } = useTranslation();
-    const { tokenList } = useTokenStore();
+    const { allTokenBalance } = useTokenStore();
+    const { walletMode } = useAppStore();
 
     const [isHideZeroBalance, setIsHideZeroBalance] = useState(false);
     const [sortBy, setSortBy] = useState<0 | 1 | 2>(0);
@@ -41,22 +44,24 @@ export const SelectTokenModal = ({
         });
     };
 
-    const list: TokenInfo[] | undefined = useMemo(() => {
-        if (!tokenList) {
+    const list: TokenBalanceInfo[] = useMemo(() => {
+        console.log('🚀 ~ allTokenBalance:', allTokenBalance);
+
+        if (!allTokenBalance) {
             return [];
         }
         if (searchKeyword) {
             const val = parseLowerCaseSearch(searchKeyword);
-            if (!val || !tokenList) {
+            if (!val || !allTokenBalance) {
                 return [];
             }
-            const arr = tokenList.filter(
+            const arr = allTokenBalance.filter(
                 (item) => item.canister_id.toString() === val || item.symbol.toLowerCase().includes(val),
             );
             return arr;
         }
-        return tokenList;
-    }, [searchKeyword, tokenList]);
+        return allTokenBalance;
+    }, [searchKeyword, allTokenBalance]);
 
     return (
         <Modal
@@ -119,7 +124,7 @@ export const SelectTokenModal = ({
                         </div>
                     </div>
                 </div>
-                {!tokenList || !tokenList.length ? (
+                {!allTokenBalance || !allTokenBalance.length ? (
                     <div className="flex h-[426px] flex-col items-center justify-center">
                         <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#07c160]" />
                         <p className="mt-2 text-[16px] font-semibold text-[#272e4d]">{t('swap.select.loading')}</p>
@@ -148,9 +153,16 @@ export const SelectTokenModal = ({
                                         <p className="text-sm font-medium text-[#272e4d]">{item.symbol}</p>
                                         <p className="text-xs font-medium text-[#97a0c9]">{item.name}</p>
                                     </div>
-                                    <div className="flex flex-col items-end">
-                                        <p className="text-sm font-medium text-[#272e4d]">0.5</p>
-                                        <p className="text-xs font-medium text-[#97a0c9]">$4.99</p>
+                                    <div className="flex flex-col items-end duration-75 group-hover:mr-[13px]">
+                                        <p className="text-sm font-medium text-[#272e4d]">
+                                            {walletMode === 'wallet' && truncateDecimalToBN(item.balance_wallet || 0)}
+                                            {walletMode === 'contract' &&
+                                                truncateDecimalToBN(item.balance_wallet_contract || 0)}
+                                            {item.symbol}
+                                        </p>
+                                        <p className="text-xs font-medium text-[#97a0c9]">
+                                            ${truncateDecimalToBN(item.price || 0)}
+                                        </p>
                                     </div>
                                 </div>
                             ))

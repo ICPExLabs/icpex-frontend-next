@@ -1,6 +1,7 @@
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
 import { TagType, TokenBalanceInfo } from '@/hooks/useToken';
+import { truncateDecimalToBN } from '@/utils/numbers';
 
 const ICRCTag = ({ tag }: { tag?: TagType }) => {
     const tagConfig = {
@@ -45,7 +46,7 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
 
             {tokenInfo ? (
                 <p className="text-base font-medium text-[#272e4d]">
-                    {tokenInfo?.price ? `$${parseFloat(tokenInfo?.price.toFixed(8))}` : '--'}
+                    {tokenInfo?.price ? `$${truncateDecimalToBN(tokenInfo?.price, 8)}` : '--'}
                 </p>
             ) : (
                 <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />

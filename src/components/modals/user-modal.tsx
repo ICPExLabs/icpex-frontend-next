@@ -10,6 +10,7 @@ import { TypeWalletMode, useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
+import { truncateDecimalToBN } from '@/utils/numbers';
 import { shrinkPrincipal } from '@/utils/text';
 
 import Icon from '../ui/icon';
@@ -50,7 +51,7 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TokenBalanceInfo;
                     <p className="text-sm font-medium text-black">{tokenInfo.name}</p>
                     <p className="text-xs font-medium text-[#999999]">
                         {walletMode === 'wallet' &&
-                            `${typeof tokenInfo.balance_wallet === 'number' ? parseFloat(tokenInfo.balance_wallet.toFixed(4)) : '--'}`}
+                            `${typeof tokenInfo.balance_wallet === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet) : '--'}`}
                         {walletMode === 'contract' && `${tokenInfo.balance_wallet_contract}`}
                         {tokenInfo.symbol}
                     </p>
@@ -59,13 +60,13 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TokenBalanceInfo;
             <div className="flex flex-col items-end">
                 <p className="text-sm font-medium text-black">
                     {walletMode === 'wallet' &&
-                        `$${typeof tokenInfo.usd_wallet === 'number' ? parseFloat(tokenInfo.usd_wallet.toFixed(4)) : '--'}`}
+                        `$${typeof tokenInfo.usd_wallet === 'number' ? truncateDecimalToBN(tokenInfo.usd_wallet) : '--'}`}
                     {walletMode === 'contract' && `$${tokenInfo.usd_wallet_contract}`}
                 </p>
                 <TokenPriceChangePercentage
                     value={
                         typeof tokenInfo.price_change_24h === 'number'
-                            ? parseFloat(tokenInfo.price_change_24h.toFixed(4))
+                            ? truncateDecimalToBN(tokenInfo.price_change_24h)
                             : 0
                     }
                     className=""

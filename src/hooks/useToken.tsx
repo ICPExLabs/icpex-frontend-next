@@ -133,7 +133,6 @@ export const getAllTokensAndBalance = async (
             const walletBalance = wallet_token
                 ? Number(BigNumber(wallet_token.balance || 0).div(BigNumber(10).pow(item.decimals)))
                 : 0;
-            console.log('🚀 ~ result ~ walletBalance:', walletBalance);
 
             // Calculate USD values
             const tokenUSD = item.price ? calculateValue(token?.balance, item.price, item.decimals) : 0;

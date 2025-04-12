@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+
 // Check if the number has specified precision
 export const isValidNumber = (value: string | undefined, max_decimals?: number): boolean => {
     if (value === undefined) return false;
@@ -96,4 +98,10 @@ export const thousandCommaOnlyInteger = (text_number: string): string => {
             res1.push(item);
         });
     return res1.reverse().join('') + (splits.length > 1 ? '.' + splits[1] : '');
+};
+
+export const truncateDecimalToBN = (value: number | string, decimals: number = 4): number => {
+    const multiplier = Math.pow(10, decimals);
+    const res = new BigNumber(value || 0).times(multiplier).integerValue(BigNumber.ROUND_DOWN).dividedBy(multiplier);
+    return Number(res);
 };

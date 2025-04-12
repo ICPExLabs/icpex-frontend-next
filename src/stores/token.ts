@@ -10,8 +10,8 @@ interface TokenStore {
     tokenList: TokenInfo[] | undefined;
     setTokenList: (tokenList: TokenInfo[]) => void;
 
-    allTokenBalance: TokenBalanceInfo[] | any;
-    setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[] | any) => void;
+    allTokenBalance: TokenBalanceInfo[];
+    setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[]) => void;
 
     showSendModal: boolean;
     setShowSendModal: (show: boolean) => void;
