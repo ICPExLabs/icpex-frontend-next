@@ -45,23 +45,41 @@ export const SelectTokenModal = ({
     };
 
     const list: TokenBalanceInfo[] = useMemo(() => {
-        console.log('🚀 ~ allTokenBalance:', allTokenBalance);
-
         if (!allTokenBalance) {
             return [];
         }
+
+        let filteredList = allTokenBalance;
+        if (isHideZeroBalance) {
+            filteredList = allTokenBalance.filter((item) => {
+                if (walletMode === 'wallet') {
+                    return (item.balance_wallet ?? 0) > 0;
+                } else if (walletMode === 'contract') {
+                    return (item.balance_wallet_contract ?? 0) > 0;
+                }
+                return true;
+            });
+        }
+
         if (searchKeyword) {
             const val = parseLowerCaseSearch(searchKeyword);
-            if (!val || !allTokenBalance) {
-                return [];
-            }
-            const arr = allTokenBalance.filter(
+            filteredList = filteredList.filter(
                 (item) => item.canister_id.toString() === val || item.symbol.toLowerCase().includes(val),
             );
-            return arr;
         }
-        return allTokenBalance;
-    }, [searchKeyword, allTokenBalance]);
+
+        if (sortBy === 1 || sortBy === 2) {
+            filteredList = [...filteredList].sort((a, b) => {
+                const valueA = sortBy === 1 ? Number(a.balance_wallet ?? 0) : Number(a.balance_wallet_contract ?? 0);
+
+                const valueB = sortBy === 1 ? Number(b.balance_wallet ?? 0) : Number(b.balance_wallet_contract ?? 0);
+
+                return valueB - valueA;
+            });
+        }
+
+        return filteredList;
+    }, [searchKeyword, allTokenBalance, isHideZeroBalance, walletMode, sortBy]);
 
     return (
         <Modal
