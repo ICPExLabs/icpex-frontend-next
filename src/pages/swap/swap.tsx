@@ -1,5 +1,6 @@
 import { useConnect } from '@connect2ic/react';
 import { Toast } from '@douyinfe/semi-ui';
+import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -69,7 +70,6 @@ function SwapPage() {
     };
 
     const onSwapChange = async () => {
-        console.log('contract mode swap');
         if (!connectedIdentity) return;
 
         try {
@@ -228,7 +228,6 @@ function SwapPage() {
                 >
                     <Icon name="exchange" className="h-10 w-10" />
                 </div>
-
                 <p className="mb-5 text-base font-medium text-[#666]">{t('swap.swap.receive')}</p>
                 <AmountInput
                     className="mb-5 flex justify-between"
@@ -262,9 +261,11 @@ function SwapPage() {
                         disabled: {
                             className: 'bg-[#f6f6f6] text-[#999999] cursor-not-allowed',
                             text: (() => {
-                                if (isInitializing || !payTokenBalance) return t('swap.swapBtn.init');
+                                if (isInitializing || typeof payTokenBalance === 'undefined')
+                                    return t('swap.swapBtn.init');
                                 if (!payToken || !receiveToken) return t('swap.swapBtn.select');
                                 if (!payAmount || !receiveAmount) return t('swap.swapBtn.enterAmount');
+                                if (!payTokenBalance) return t('swap.swapBtn.insufficientEmpty');
                                 if (payAmount > payTokenBalance)
                                     return t('swap.swapBtn.insufficient', { symbol: payToken });
                                 return '';
@@ -312,7 +313,7 @@ function SwapPage() {
             {payTokenInfo?.price && receiveTokenInfo?.price && (
                 <div className="mt-3 flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666]">
-                        1 {payToken} = {oneAmountOut ? Number(oneAmountOut) : truncateDecimalToBN(exchangeRate, 8)}{' '}
+                        1 {payToken} = {oneAmountOut ? Number(oneAmountOut) : truncateDecimalToBN(exchangeRate, 4)}{' '}
                         {receiveToken}
                     </p>
                     <div className="flex items-center gap-x-1">
