@@ -13,6 +13,12 @@ interface TokenStore {
     allTokenBalance: TokenBalanceInfo[];
     setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[]) => void;
 
+    totalBalance: number | undefined;
+    setTotalBalance: (totalBalance: number) => void;
+
+    contractWallet: number | undefined;
+    setContractWallet: (contractWallet: number) => void;
+
     showSendModal: boolean;
     setShowSendModal: (show: boolean) => void;
 
@@ -37,6 +43,12 @@ export const useTokenStore = create<TokenStore>()(
 
             allTokenBalance: [],
             setAllTokenBalance: (allTokenBalance) => set({ allTokenBalance }),
+
+            totalBalance: undefined,
+            setTotalBalance: (totalBalance) => set({ totalBalance }),
+
+            contractWallet: undefined,
+            setContractWallet: (contractWallet) => set({ contractWallet }),
 
             showSendModal: false,
             setShowSendModal: (show) => set({ showSendModal: show }),

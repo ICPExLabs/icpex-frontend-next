@@ -38,3 +38,5 @@ userInfo:
     receive: Receive
     transferIn: Transfer In
     transferOut: Transfer Out
+    totalBalance: Total Balance
+    contractWallet: Contract Wallet

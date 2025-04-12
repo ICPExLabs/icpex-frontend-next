@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useTokenStore } from '@/stores/token';
 
-export const TokenSendMoodal = () => {
+export const TokenSendModal = () => {
     const { t } = useTranslation();
 
     const { showSendModal, setShowSendModal } = useTokenStore();

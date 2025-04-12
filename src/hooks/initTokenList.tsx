@@ -13,8 +13,7 @@ import { getAllTokensAndBalance, getAllTokensPrice } from './useToken';
 export const InitTokenList = () => {
     const { connectedIdentity } = useIdentityStore();
 
-    const { tokenList, setTokenList, setAllTokenBalance } = useTokenStore();
-    // const { walletMode } = useAppStore();
+    const { tokenList, setTokenList, setAllTokenBalance, setTotalBalance, setContractWallet } = useTokenStore();
 
     const priceInit = useCallback(async () => {
         if (!tokenList) return;
@@ -23,17 +22,28 @@ export const InitTokenList = () => {
         try {
             const priceList = await getAllTokensPrice(tokenList);
             if (priceList) {
-                setAllTokenBalance(priceList);
+                setAllTokenBalance(priceList as any);
 
                 if (connectedIdentity) {
                     const priceListAndBalance = await getAllTokensAndBalance(priceList, connectedIdentity);
-                    setAllTokenBalance(priceListAndBalance);
+                    if (priceListAndBalance) {
+                        setAllTokenBalance(priceListAndBalance);
+
+                        let usd = 0;
+                        let usd_contract = 0;
+                        priceListAndBalance.map((item) => {
+                            usd += item.usd_wallet || 0;
+                            usd_contract += item.usd_wallet_contract || 0;
+                        });
+                        setTotalBalance(usd);
+                        setContractWallet(usd_contract);
+                    }
                 }
             }
         } catch (error) {
             console.error('Failed to fetch token data:', error);
         }
-    }, [tokenList, setAllTokenBalance, connectedIdentity]);
+    }, [tokenList, setAllTokenBalance, connectedIdentity, setTotalBalance, setContractWallet]);
 
     useEffect(() => {
         priceInit();

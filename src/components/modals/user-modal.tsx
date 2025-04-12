@@ -83,8 +83,15 @@ const UserInfoModal = () => {
     const { showInfoModal, setShowInfoModal } = useIdentityStore();
     const { principal, activeProvider, disconnect } = useConnect();
 
-    const { allTokenBalance, setShowSendModal, setShowReceiveModal, setShowTransferInModal, setShowTransferOutModal } =
-        useTokenStore();
+    const {
+        allTokenBalance,
+        totalBalance,
+        contractWallet,
+        setShowSendModal,
+        setShowReceiveModal,
+        setShowTransferInModal,
+        setShowTransferOutModal,
+    } = useTokenStore();
     const [copied, setCopied] = useState(false);
     const [currentTab, setCurrentTab] = useState<'Tokens' | 'Pools' | 'History'>('Tokens');
 
@@ -172,22 +179,28 @@ const UserInfoModal = () => {
                     </div>
                 </div>
 
+                {/* Balance Section */}
+
                 <div className="mt-[15px] w-full px-5">
-                    {/* Balance Section */}
                     <div className="mb-[15px] flex w-full items-center justify-between">
-                        <div className="text-left font-medium">
-                            <h2 className="mb-[5px] text-xs text-[#666]">Total Balance</h2>
+                        <div className="flex flex-1 flex-col items-start">
+                            <p className="text-xs font-medium text-[#666666]">{t('common.userInfo.totalBalance')}</p>
                             <div className="flex items-center">
-                                <span className="text-2xl font-medium text-[#000000]">$9,029.50</span>
-                                <TokenPriceChangePercentage value={0.23} className="ml-1" />
+                                <p className="text-2xl font-medium text-black">
+                                    ${typeof totalBalance === 'number' ? truncateDecimalToBN(totalBalance, 2) : '--'}
+                                </p>
+                                {/* <TokenPriceChangePercentage value={0.23} className="ml-1" /> */}
                             </div>
                         </div>
 
-                        <div className="text-left font-medium">
-                            <h2 className="mb-1 text-xs text-[#666]">Contract Wallet</h2>
+                        <div className="flex flex-1 flex-col items-start">
+                            <p className="text-xs font-medium text-[#666666]">{t('common.userInfo.contractWallet')}</p>
                             <div className="flex items-center">
-                                <span className="text-2xl font-medium">$2850.50</span>
-                                <TokenPriceChangePercentage value={-0.23} className="ml-1" />
+                                <p className="text-2xl font-medium text-black">
+                                    $
+                                    {typeof contractWallet === 'number' ? truncateDecimalToBN(contractWallet, 2) : '--'}
+                                </p>
+                                {/* <TokenPriceChangePercentage value={-0.23} className="ml-1" /> */}
                             </div>
                         </div>
                     </div>

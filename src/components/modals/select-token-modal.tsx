@@ -179,7 +179,7 @@ export const SelectTokenModal = ({
                                             {item.symbol}
                                         </p>
                                         <p className="text-xs font-medium text-[#999999]">
-                                            ${truncateDecimalToBN(item.price || 0)}
+                                            {truncateDecimalToBN(item.price || 0)}
                                         </p>
                                     </div>
                                 </div>
