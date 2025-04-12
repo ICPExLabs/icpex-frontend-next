@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import { useTokenStore } from '@/stores/token';
 
+import HeaderModal from '../ui/header-modal';
+
 export const TokenSendModal = () => {
     const { t } = useTranslation();
-
     const { showSendModal, setShowSendModal } = useTokenStore();
 
     return (
@@ -17,7 +18,10 @@ export const TokenSendModal = () => {
             maskClosable={true}
             onCancel={() => setShowSendModal(false)}
         >
-            <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">snbd</div>
+            <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">
+                <HeaderModal title={t('common.send.title')} closeModal={setShowSendModal} />
+                <p>TokenSendModal</p>
+            </div>
         </Modal>
     );
 };

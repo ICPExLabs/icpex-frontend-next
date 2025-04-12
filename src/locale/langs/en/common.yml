@@ -19,7 +19,6 @@ search:
     recent: Recent searches
     popular: Popular tokens
     tokens: Tokens
-
 connect:
     title: Connect Wallet
     protocol1: I have read, understand and agree to the
@@ -40,3 +39,11 @@ userInfo:
     transferOut: Transfer Out
     totalBalance: Total Balance
     contractWallet: Contract Wallet
+send:
+    title: Transfer Token
+receive:
+    title: Receive Token
+transferIn:
+    title: TokenTransfer In
+transferOut:
+    title: TokenTransfer Out

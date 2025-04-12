@@ -1,6 +1,10 @@
 import { useRef } from 'react';
 
 import LoginModal from '../modals/login-modal';
+import { TokenReceiveModal } from '../modals/receive-moodal';
+import { TokenSendModal } from '../modals/send-moodal';
+import { TokenTransferInModal } from '../modals/transfer-in-moodal';
+import { TokenTransferOutModal } from '../modals/transfer-out-moodal';
 import UserInfoModal from '../modals/user-modal';
 import Footer from './footer';
 import Header from './header';
@@ -31,6 +35,11 @@ function PageLayout({ children }: { children: React.ReactNode }) {
 
             {/* userInfo modal */}
             <UserInfoModal />
+
+            <TokenSendModal />
+            <TokenReceiveModal />
+            <TokenTransferInModal />
+            <TokenTransferOutModal />
         </>
     );
 }

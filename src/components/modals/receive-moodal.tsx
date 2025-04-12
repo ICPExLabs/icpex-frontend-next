@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useTokenStore } from '@/stores/token';
 
+import HeaderModal from '../ui/header-modal';
+
 export const TokenReceiveModal = () => {
     const { t } = useTranslation();
 
@@ -17,7 +19,11 @@ export const TokenReceiveModal = () => {
             maskClosable={true}
             onCancel={() => setShowReceiveModal(false)}
         >
-            <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">snbd</div>
+            <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">
+                <HeaderModal title={t('common.receive.title')} closeModal={setShowReceiveModal} />
+
+                <p>TokenReceiveModal</p>
+            </div>
         </Modal>
     );
 };

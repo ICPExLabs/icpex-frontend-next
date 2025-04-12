@@ -9,6 +9,7 @@ import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
 import { parseLowerCaseSearch } from '@/utils/search';
 
+import HeaderModal from '../ui/header-modal';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
 
@@ -91,14 +92,8 @@ export const SelectTokenModal = ({
             onCancel={() => setIsShow(false)}
         >
             <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">
-                <div className="flex w-full items-center justify-between">
-                    <p className="text-lg font-semibold text-[#000000]">{t('swap.select.title')}</p>
-                    <Icon
-                        onClick={() => setIsShow(false)}
-                        name="close"
-                        className="h-6 w-6 cursor-pointer text-[#BFBFBF]"
-                    />
-                </div>
+                <HeaderModal title={t('swap.select.title')} closeModal={setIsShow} />
+
                 <div className="mt-[20px] flex h-10 w-full items-center rounded-lg bg-[#F6F6F6]">
                     <Icon name="search" className="ml-3 h-[15px] w-[14px] text-[#999]" />
                     <input
