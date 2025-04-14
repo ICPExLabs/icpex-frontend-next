@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { icrc1_transfer, transfer } from '@/canister/icrc1/apis';
 import { SelectTokenModal } from '@/components/modals/select-token-modal';
 import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
-import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 import { isAccountHex } from '@/utils/account';
@@ -21,7 +20,6 @@ import { TokenLogo } from '../ui/logo';
 export const TokenSendModal = () => {
     const { t } = useTranslation();
     const { tokenList, showSendModal, setShowSendModal, allTokenBalanceForceRefresh } = useTokenStore();
-    const { walletMode } = useAppStore();
     const { connectedIdentity } = useIdentityStore();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
@@ -31,15 +29,8 @@ export const TokenSendModal = () => {
         if (!tokenInfo) {
             return undefined;
         }
-        if (walletMode === 'wallet') {
-            return tokenInfo.balance_wallet || 0;
-        }
-        if (walletMode === 'contract') {
-            return tokenInfo.balance_wallet_contract || 0;
-        }
-
-        return undefined;
-    }, [tokenInfo, walletMode]);
+        return tokenInfo.balance_wallet || 0;
+    }, [tokenInfo]);
     const fee = useMemo(() => {
         if (!tokenInfo) {
             return undefined;
@@ -47,9 +38,8 @@ export const TokenSendModal = () => {
         return Number(tokenInfo.fee) / 10 ** tokenInfo.decimals;
     }, [tokenInfo]);
     const [loading, setLoading] = useState(false);
-
-    const [address, setAddress] = useState('kd2m6-mtz3m-5ub6g-4d2b5-musrf-l3p5m-gpcsb-qobrz-e6b6z-arsyl-lqe');
-    const [amount, setAmount] = useState<number | undefined>(0.0001);
+    const [address, setAddress] = useState<string>('');
+    const [amount, setAmount] = useState<number | undefined>();
 
     const veriverification = useMemo(() => {
         if (!address) {
@@ -85,50 +75,45 @@ export const TokenSendModal = () => {
         }
 
         setLoading(true);
-        if (walletMode === 'wallet') {
-            const amount_text = new BigNumber(amount)
-                .multipliedBy(new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)))
-                .toFixed()
-                .split('.')[0];
-            console.log('🚀 ~ onTransfer ~ amount_text:', amount_text);
+        const amount_text = new BigNumber(amount)
+            .multipliedBy(new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)))
+            .toFixed()
+            .split('.')[0];
+        console.log('🚀 ~ onTransfer ~ amount_text:', amount_text);
 
-            const do_transfer = isPrincipalText(address)
-                ? async () =>
-                      icrc1_transfer(connectedIdentity, tokenInfo.canister_id.toString(), {
-                          from_subaccount: undefined,
-                          to: { owner: address, subaccount: undefined },
-                          amount: amount_text,
-                          fee: undefined,
-                          memo: undefined,
-                          created_at_time: undefined,
-                      })
-                : async () =>
-                      transfer(connectedIdentity, tokenInfo.canister_id.toString(), {
-                          from_subaccount: undefined,
-                          to: address,
-                          amount: amount_text,
-                          fee: tokenInfo.fee.toString(),
-                          memo: '0',
-                          created_at_time: undefined,
-                      });
+        const do_transfer = isPrincipalText(address)
+            ? async () =>
+                  icrc1_transfer(connectedIdentity, tokenInfo.canister_id.toString(), {
+                      from_subaccount: undefined,
+                      to: { owner: address, subaccount: undefined },
+                      amount: amount_text,
+                      fee: undefined,
+                      memo: undefined,
+                      created_at_time: undefined,
+                  })
+            : async () =>
+                  transfer(connectedIdentity, tokenInfo.canister_id.toString(), {
+                      from_subaccount: undefined,
+                      to: address,
+                      amount: amount_text,
+                      fee: tokenInfo.fee.toString(),
+                      memo: '0',
+                      created_at_time: undefined,
+                  });
 
-            try {
-                const height = await do_transfer();
-                if (tokenList && allTokenBalanceForceRefresh) {
-                    allTokenBalanceForceRefresh(tokenList);
-                }
-                setAmount(undefined);
-                setAddress('');
-                Toast.success(t('common.send.sendSuccess') + height);
-            } catch (e: string | any) {
-                console.log('🚀 ~ onTransfer ~ e:', e);
-                Toast.error(`${e}`);
-            } finally {
-                setLoading(false);
+        try {
+            const height = await do_transfer();
+            if (tokenList && allTokenBalanceForceRefresh) {
+                allTokenBalanceForceRefresh(tokenList);
             }
-        }
-        if (walletMode === 'contract') {
-            console.log(123);
+            setAmount(undefined);
+            setAddress('');
+            Toast.success(t('common.send.sendSuccess') + height);
+        } catch (e: string | any) {
+            console.log('🚀 ~ onTransfer ~ e:', e);
+            Toast.error(`${e}`);
+        } finally {
+            setLoading(false);
         }
     };
 

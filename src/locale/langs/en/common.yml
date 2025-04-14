@@ -51,9 +51,11 @@ send:
     confirming: 'Transfering...'
     insufficientFunds: Insufficient Funds
     sendSuccess: 'Do Transfer Successful:'
-
 receive:
     title: Receive Token
+    pid: Principal ID
+    aid: Account ID
+    close: Close
 transferIn:
     title: TokenTransfer In
 transferOut:

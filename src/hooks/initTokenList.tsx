@@ -74,7 +74,7 @@ export const useInitTokenList = () => {
     );
 
     useEffect(() => {
-        setForceRefreshAllTokenBalance(() => forceRefresh); // 注册到store
+        setForceRefreshAllTokenBalance(() => forceRefresh);
     }, [forceRefresh, setForceRefreshAllTokenBalance]);
 
     return {
