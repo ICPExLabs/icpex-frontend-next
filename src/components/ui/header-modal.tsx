@@ -2,13 +2,13 @@ import Icon from './icon';
 
 const HeaderModal = ({
     title,
-    isBack,
+    isBack = false,
     onBack,
     closeModal,
 }: {
     title: string;
-    isBack;
-    onBack;
+    isBack?: boolean;
+    onBack?: () => void;
     closeModal: (isShow: boolean) => void;
 }) => {
     return (
