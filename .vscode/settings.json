@@ -120,7 +120,8 @@
         "Motoko",
         "sidesheet",
         "subaccount",
-        "usehooks"
+        "usehooks",
+        "veriverification"
     ],
     "cSpell.enabled": true,
     "liveServer.settings.port": 5501,

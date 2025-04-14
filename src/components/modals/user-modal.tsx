@@ -51,9 +51,9 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TokenBalanceInfo;
                     <p className="text-sm font-medium text-black">{tokenInfo.name}</p>
                     <p className="text-xs font-medium text-[#999999]">
                         {walletMode === 'wallet' &&
-                            `${typeof tokenInfo.balance_wallet === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet) : '--'}`}
+                            `${typeof tokenInfo.balance_wallet === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet, 4) : '--'}`}
                         {walletMode === 'contract' &&
-                            `${typeof tokenInfo.balance_wallet_contract === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet_contract) : '--'}`}
+                            `${typeof tokenInfo.balance_wallet_contract === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet_contract, 4) : '--'}`}
                         {tokenInfo.symbol}
                     </p>
                 </div>

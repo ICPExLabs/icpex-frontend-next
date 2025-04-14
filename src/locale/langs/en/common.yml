@@ -41,9 +41,21 @@ userInfo:
     contractWallet: Contract Wallet
 send:
     title: Transfer Token
+    recipient: Recipient Address
+    inputPlaceholder: Canister ID, Principal ID, or Account ID
+    inputError: Invalid address format
+    amount: Amount
+    max: Max
+    amountPlaceholder: '0.00'
+    confirm: Confirm Transfer
+    confirming: 'Transfering...'
+    insufficientFunds: Insufficient Funds
+    sendSuccess: 'Do Transfer Successful:'
+
 receive:
     title: Receive Token
 transferIn:
     title: TokenTransfer In
 transferOut:
     title: TokenTransfer Out
+coming: Coming Soon...

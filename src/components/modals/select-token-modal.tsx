@@ -170,11 +170,11 @@ export const SelectTokenModal = ({
                                         <p className="text-sm font-medium text-[#000000]">
                                             {walletMode === 'wallet' && truncateDecimalToBN(item.balance_wallet || 0)}
                                             {walletMode === 'contract' &&
-                                                truncateDecimalToBN(item.balance_wallet_contract || 0)}
+                                                truncateDecimalToBN(item.balance_wallet_contract || 0)}{' '}
                                             {item.symbol}
                                         </p>
                                         <p className="text-xs font-medium text-[#999999]">
-                                            {truncateDecimalToBN(item.price || 0)}
+                                            ${truncateDecimalToBN(item.price || 0)}
                                         </p>
                                     </div>
                                 </div>

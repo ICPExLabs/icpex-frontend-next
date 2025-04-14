@@ -1,5 +1,6 @@
 html,
-body {
+body,
+* {
     font-family: "Instrument_Sans" !important;
 }
 
@@ -47,6 +48,10 @@ body {
 
 .semi-switch-checked:hover {
     background-color: #07c160;
+}
+
+.semi-input-wrapper {
+    background: transparent !important;
 }
 
 .semi-input-wrapper-focus:active {

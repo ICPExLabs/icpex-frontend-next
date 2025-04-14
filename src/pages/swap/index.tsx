@@ -1,3 +1,4 @@
+import { Toast } from '@douyinfe/semi-ui';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -20,21 +21,23 @@ function SwapTabs({ children }: { children: React.ReactNode }) {
                     <Link
                         to="/swap"
                         className={cn(
-                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-[#666]',
+                            'flex h-9 cursor-pointer items-center justify-center rounded-full px-5 text-center text-base font-semibold text-[#666]',
                             (pathname === '/' || pathname.includes('/swap')) && 'bg-[#07c160] text-white',
                         )}
                     >
                         {t('swap.swap.title')}
                     </Link>
-                    <Link
-                        to="/limit"
+                    <div
+                        onClick={() => {
+                            Toast.info(t('common.coming'));
+                        }}
                         className={cn(
-                            'flex h-9 items-center justify-center rounded-full px-5 text-center text-base font-semibold text-[#666]',
+                            'flex h-9 cursor-pointer items-center justify-center rounded-full px-5 text-center text-base font-semibold text-[#666]',
                             pathname.includes('/limit') && 'bg-[#07c160] text-white',
                         )}
                     >
                         {t('swap.limit.title')}
-                    </Link>
+                    </div>
                 </div>
 
                 <SlippageComponents />

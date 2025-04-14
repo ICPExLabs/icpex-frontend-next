@@ -40,7 +40,6 @@ const AmountInput = ({
                     <div className="text-4xl font-medium text-[#999999]">{amount ? amount : '0.00'}</div>
                 ) : (
                     <InputNumber
-                        type="text"
                         value={amount}
                         onChange={(val) => {
                             onAmountChange(val as number);

@@ -1,27 +1,238 @@
-import { Modal } from '@douyinfe/semi-ui';
+import { InputNumber, Modal, Toast } from '@douyinfe/semi-ui';
+import BigNumber from 'bignumber.js';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { icrc1_transfer, transfer } from '@/canister/icrc1/apis';
+import { SelectTokenModal } from '@/components/modals/select-token-modal';
+import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
+import { useAppStore } from '@/stores/app';
+import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
+import { isAccountHex } from '@/utils/account';
+import { cn } from '@/utils/classNames';
+import { truncateDecimalToBN } from '@/utils/numbers';
+import { isCanisterIdText, isPrincipalText } from '@/utils/principals';
 
 import HeaderModal from '../ui/header-modal';
+import Icon from '../ui/icon';
+import { TokenLogo } from '../ui/logo';
 
 export const TokenSendModal = () => {
     const { t } = useTranslation();
-    const { showSendModal, setShowSendModal } = useTokenStore();
+    const { tokenList, showSendModal, setShowSendModal, allTokenBalanceForceRefresh } = useTokenStore();
+    const { walletMode } = useAppStore();
+    const { connectedIdentity } = useIdentityStore();
+
+    const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
+    const [token, setToken] = useState<string | undefined>('ICP');
+    const tokenInfo = useTokenInfoAndBalanceBySymbol(token);
+    const balance = useMemo(() => {
+        if (!tokenInfo) {
+            return undefined;
+        }
+        if (walletMode === 'wallet') {
+            return tokenInfo.balance_wallet || 0;
+        }
+        if (walletMode === 'contract') {
+            return tokenInfo.balance_wallet_contract || 0;
+        }
+
+        return undefined;
+    }, [tokenInfo, walletMode]);
+    const fee = useMemo(() => {
+        if (!tokenInfo) {
+            return undefined;
+        }
+        return Number(tokenInfo.fee) / 10 ** tokenInfo.decimals;
+    }, [tokenInfo]);
+    const [loading, setLoading] = useState(false);
+
+    const [address, setAddress] = useState('kd2m6-mtz3m-5ub6g-4d2b5-musrf-l3p5m-gpcsb-qobrz-e6b6z-arsyl-lqe');
+    const [amount, setAmount] = useState<number | undefined>(0.0001);
+
+    const veriverification = useMemo(() => {
+        if (!address) {
+            return false;
+        }
+        if (!isPrincipalText(address) && !isAccountHex(address) && !isCanisterIdText(address)) {
+            return false;
+        }
+
+        return true;
+    }, [address]);
+
+    const onMax = () => {
+        if (!tokenInfo) return;
+        if (!balance) return;
+        if (!fee) return;
+
+        setAmount(truncateDecimalToBN(balance - fee, tokenInfo.decimals));
+    };
+
+    const onTransfer = async () => {
+        if (!tokenInfo) return;
+        if (!balance) return;
+        if (!fee) return;
+        if (!address) return;
+        if (!amount) return;
+        if (!connectedIdentity) return;
+        if (loading) return;
+
+        if (balance < amount + fee) {
+            Toast.error(t('common.send.insufficientFunds'));
+            return;
+        }
+
+        setLoading(true);
+        if (walletMode === 'wallet') {
+            const amount_text = new BigNumber(amount)
+                .multipliedBy(new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)))
+                .toFixed()
+                .split('.')[0];
+            console.log('🚀 ~ onTransfer ~ amount_text:', amount_text);
+
+            const do_transfer = isPrincipalText(address)
+                ? async () =>
+                      icrc1_transfer(connectedIdentity, tokenInfo.canister_id.toString(), {
+                          from_subaccount: undefined,
+                          to: { owner: address, subaccount: undefined },
+                          amount: amount_text,
+                          fee: undefined,
+                          memo: undefined,
+                          created_at_time: undefined,
+                      })
+                : async () =>
+                      transfer(connectedIdentity, tokenInfo.canister_id.toString(), {
+                          from_subaccount: undefined,
+                          to: address,
+                          amount: amount_text,
+                          fee: tokenInfo.fee.toString(),
+                          memo: '0',
+                          created_at_time: undefined,
+                      });
+
+            try {
+                const height = await do_transfer();
+                if (tokenList && allTokenBalanceForceRefresh) {
+                    allTokenBalanceForceRefresh(tokenList);
+                }
+                setAmount(undefined);
+                setAddress('');
+                Toast.success(t('common.send.sendSuccess') + height);
+            } catch (e: string | any) {
+                console.log('🚀 ~ onTransfer ~ e:', e);
+                Toast.error(`${e}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+        if (walletMode === 'contract') {
+            console.log(123);
+        }
+    };
 
     return (
-        <Modal
-            centered={true}
-            visible={showSendModal}
-            footer={<></>}
-            header={<></>}
-            maskClosable={true}
-            onCancel={() => setShowSendModal(false)}
-        >
-            <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">
-                <HeaderModal title={t('common.send.title')} closeModal={setShowSendModal} />
-                <p>TokenSendModal</p>
-            </div>
-        </Modal>
+        <>
+            <Modal
+                centered={true}
+                visible={showSendModal}
+                footer={<></>}
+                header={<></>}
+                maskClosable={true}
+                onCancel={() => setShowSendModal(false)}
+            >
+                <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">
+                    <HeaderModal title={t('common.send.title')} closeModal={setShowSendModal} />
+                    <p className="mt-[30px] text-[12px] leading-[12px] font-medium text-[#666666]">
+                        {t('common.send.recipient')}
+                    </p>
+                    <div
+                        className={cn(
+                            'mt-2 h-[52px] w-full rounded-[14px] border border-[#dddddd] bg-white px-[15px] duration-75',
+                            !veriverification && 'border-[#ff5457]',
+                            veriverification && 'border-[#07c160]',
+                        )}
+                    >
+                        <input
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className={cn(
+                                'h-full w-full text-sm font-medium text-[#000] outline-none placeholder:text-[#999999]',
+                            )}
+                            type="text"
+                            placeholder={t('common.send.inputPlaceholder')}
+                        />
+                    </div>
+                    {!veriverification && (
+                        <p className="w-full text-sm font-medium text-[#ff5457]">{t('common.send.inputError')}</p>
+                    )}
+                    <div className="mt-5 flex w-full flex-col">
+                        <div className="flex w-full items-center justify-between gap-x-[6px]">
+                            <p className="text-[12px] leading-[12px] font-medium text-[#666666]">
+                                {t('common.send.amount')}
+                            </p>
+                            {tokenInfo && (
+                                <div className="flex items-center gap-x-[6px]">
+                                    <Icon name="wallet" className="h-[12px] w-[14px] text-[#666666]"></Icon>
+                                    <div className="text-xs font-medium text-[#666666]">
+                                        {typeof balance === 'number' ? truncateDecimalToBN(balance) : '--'}{' '}
+                                        {tokenInfo.symbol}
+                                    </div>
+                                    <p onClick={onMax} className="cursor-pointer text-xs font-medium text-[#07c160]">
+                                        {t('common.send.max')}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="amount-input mt-2 flex h-[52px] w-full rounded-[14px] border border-[#dddddd] bg-white px-[15px]">
+                            <InputNumber
+                                hideButtons
+                                disabled={!tokenInfo}
+                                onChange={(val) => setAmount(val as number)}
+                                value={amount}
+                                className="flex h-full w-full min-w-auto text-sm font-medium !text-[#999999] outline-none"
+                                min={0}
+                                type="text"
+                                placeholder={t('common.send.amountPlaceholder')}
+                            />
+                            <div
+                                onClick={() => setShowSelectTokenModal(true)}
+                                className="flex h-full cursor-pointer items-center gap-x-[11px]"
+                            >
+                                {tokenInfo && (
+                                    <TokenLogo
+                                        canisterId={tokenInfo.canister_id.toString()}
+                                        className="h-6 w-6 flex-shrink-0"
+                                    />
+                                )}
+                                <p className="text-base font-medium text-black">{token}</p>
+                                <Icon name="arrow-down" className="h-1.5 w-[10.57px] text-[#666666]" />
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        onClick={onTransfer}
+                        className={cn(
+                            'mt-5 mb-2 flex h-[52px] w-full items-center justify-center rounded-[14px] text-base font-semibold duration-75',
+                            !veriverification || !amount || loading
+                                ? 'cursor-not-allowed bg-[#f6f6f6] text-[#999999]'
+                                : 'cursor-pointer bg-gradient-to-r from-[#08be65] to-[#2161f9] text-[#ffffff]',
+                        )}
+                    >
+                        {loading && <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin"></Icon>}
+                        {loading ? t('common.send.confirming') : t('common.send.confirm')}
+                    </div>
+                </div>
+            </Modal>
+            <SelectTokenModal
+                isShow={showSelectTokenModal}
+                setIsShow={setShowSelectTokenModal}
+                selectToken={(tokenInfo) => {
+                    setToken(tokenInfo.symbol);
+                    setShowSelectTokenModal(false);
+                }}
+            />
+        </>
     );
 };

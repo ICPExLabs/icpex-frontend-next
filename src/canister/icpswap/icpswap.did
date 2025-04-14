@@ -1,4 +1,4 @@
-type TransactionType = 
+type TransactionType =
  variant {
    addLiquidity;
    claim;
@@ -14,7 +14,7 @@ type TransactionType =
    swap;
    transferPosition: nat;
  };
-type Transaction = 
+type Transaction =
  record {
    action: TransactionType;
    amountToken0: float64;
@@ -48,12 +48,12 @@ type Transaction =
  };
 type Token = record {arbitrary_data: text;};
 type StreamingStrategy = variant {Callback: CallbackStrategy;};
-type StreamingCallbackHttpResponse = 
+type StreamingCallbackHttpResponse =
  record {
    body: blob;
    token: opt Token;
  };
-type PublicTokenOverview = 
+type PublicTokenOverview =
  record {
    address: text;
    feesUSD: float64;
@@ -69,7 +69,7 @@ type PublicTokenOverview =
    volumeUSD1d: float64;
    volumeUSD7d: float64;
  };
-type PublicPoolOverView = 
+type PublicPoolOverView =
  record {
    feeTier: nat;
    feesUSD: float64;
@@ -98,12 +98,12 @@ type PublicPoolOverView =
    volumeUSD1d: float64;
    volumeUSD7d: float64;
  };
-type NatResult = 
+type NatResult =
  variant {
    err: text;
    ok: nat;
  };
-type HttpResponse = 
+type HttpResponse =
  record {
    body: blob;
    headers: vec HeaderField;
@@ -111,19 +111,19 @@ type HttpResponse =
    streaming_strategy: opt StreamingStrategy;
    upgrade: opt bool;
  };
-type HttpRequest = 
+type HttpRequest =
  record {
    body: blob;
    headers: vec HeaderField;
    method: text;
    url: text;
  };
-type HeaderField = 
+type HeaderField =
  record {
    text;
    text;
  };
-type CallbackStrategy = 
+type CallbackStrategy =
  record {
    callback: func (Token) -> (StreamingCallbackHttpResponse) query;
    token: Token;

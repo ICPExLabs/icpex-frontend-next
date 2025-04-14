@@ -12,6 +12,8 @@ interface TokenStore {
 
     allTokenBalance: TokenBalanceInfo[];
     setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[]) => void;
+    allTokenBalanceForceRefresh: ((tokenList: TokenInfo[]) => void) | null;
+    setForceRefreshAllTokenBalance: (fn: (tokenList: TokenInfo[]) => void) => void;
 
     totalBalance: number | undefined;
     setTotalBalance: (totalBalance: number) => void;
@@ -43,6 +45,8 @@ export const useTokenStore = create<TokenStore>()(
 
             allTokenBalance: [],
             setAllTokenBalance: (allTokenBalance) => set({ allTokenBalance }),
+            allTokenBalanceForceRefresh: null,
+            setForceRefreshAllTokenBalance: (fn) => set({ allTokenBalanceForceRefresh: fn }),
 
             totalBalance: undefined,
             setTotalBalance: (totalBalance) => set({ totalBalance }),

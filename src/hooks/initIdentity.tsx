@@ -4,7 +4,7 @@ import { checkConnected } from '@/components/connect/connect';
 import { useIdentityStore } from '@/stores/identity';
 import { writeLastConnectType } from '@/utils/storage';
 
-export const InitIdentity = () => {
+export const useInitIdentity = () => {
     const { connectedIdentity, setConnectedIdentity, setShowLoginModal } = useIdentityStore();
 
     useConnect({

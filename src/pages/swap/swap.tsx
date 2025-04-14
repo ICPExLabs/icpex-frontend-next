@@ -35,7 +35,7 @@ function SwapPage() {
     const [receiveToken, setReceiveToken] = useState<string | undefined>();
     const receiveTokenInfo = useTokenInfoAndBalanceBySymbol(receiveToken);
 
-    const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('KongSwap');
+    const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('ICPEx');
     const [loading, setLoading] = useState<boolean>(false);
 
     // loading
