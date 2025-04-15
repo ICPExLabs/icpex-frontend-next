@@ -57,7 +57,12 @@ receive:
     aid: Account ID
     close: Close
 transferIn:
-    title: TokenTransfer In
+    title: Transfer In
+    confirm: Confirm
+    confirming: 'Transfering...'
+    half: Half
+    max: Max
+    transferInSuccess: 'Do Transfer Successful:'
 transferOut:
-    title: TokenTransfer Out
+    title: Transfer Out
 coming: Coming Soon...

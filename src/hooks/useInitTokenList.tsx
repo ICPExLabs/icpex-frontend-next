@@ -55,13 +55,14 @@ export const useInitTokenList = () => {
 
     useExecuteOnce(() => {
         get_tokens_query().then((tokenList: TokenInfo[]) => {
+            console.log('🚀 ~ get_tokens_query ~ tokenList:', tokenList);
             const list: TokenInfo[] = tokenList.filter((item) => {
                 if (isCanisterIdText(item.canister_id.toString())) {
                     return true;
                 }
             });
             setTokenList(list);
-            init(tokenList);
+            init(list);
         });
     });
 

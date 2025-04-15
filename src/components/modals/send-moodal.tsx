@@ -23,6 +23,7 @@ export const TokenSendModal = () => {
     const { connectedIdentity } = useIdentityStore();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
+
     const [token, setToken] = useState<string | undefined>('ICP');
     const tokenInfo = useTokenInfoAndBalanceBySymbol(token);
     const balance = useMemo(() => {
@@ -52,12 +53,12 @@ export const TokenSendModal = () => {
         return true;
     }, [address]);
 
-    const onMax = () => {
+    const onMaxChange = () => {
         if (!tokenInfo) return;
         if (!balance) return;
         if (!fee) return;
 
-        setAmount(truncateDecimalToBN(balance - fee, tokenInfo.decimals));
+        setAmount(truncateDecimalToBN(balance - fee, 4));
     };
 
     const onTransfer = async () => {
@@ -108,6 +109,7 @@ export const TokenSendModal = () => {
             }
             setAmount(undefined);
             setAddress('');
+            setShowSendModal(false);
             Toast.success(t('common.send.sendSuccess') + height);
         } catch (e: string | any) {
             console.log('🚀 ~ onTransfer ~ e:', e);
@@ -125,7 +127,10 @@ export const TokenSendModal = () => {
                 footer={<></>}
                 header={<></>}
                 maskClosable={true}
-                onCancel={() => setShowSendModal(false)}
+                onCancel={() => {
+                    if (loading) return;
+                    setShowSendModal(false);
+                }}
             >
                 <div className="flex w-[400px] flex-col rounded-[20px] bg-white p-[20px]">
                     <HeaderModal title={t('common.send.title')} closeModal={setShowSendModal} />
@@ -164,7 +169,10 @@ export const TokenSendModal = () => {
                                         {typeof balance === 'number' ? truncateDecimalToBN(balance) : '--'}{' '}
                                         {tokenInfo.symbol}
                                     </div>
-                                    <p onClick={onMax} className="cursor-pointer text-xs font-medium text-[#07c160]">
+                                    <p
+                                        onClick={onMaxChange}
+                                        className="cursor-pointer text-xs font-medium text-[#07c160]"
+                                    >
                                         {t('common.send.max')}
                                     </p>
                                 </div>
@@ -192,7 +200,10 @@ export const TokenSendModal = () => {
                                     />
                                 )}
                                 <p className="text-base font-medium text-black">{token}</p>
-                                <Icon name="arrow-down" className="h-1.5 w-[10.57px] text-[#666666]" />
+                                <Icon
+                                    name="arrow-down"
+                                    className="mr-[15px] h-[6px] w-[10px] flex-shrink-0 text-[#666666]"
+                                />
                             </div>
                         </div>
                     </div>

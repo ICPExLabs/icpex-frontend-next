@@ -7,6 +7,7 @@ import { unwrapRustResultMap } from '@/utils/common/results.ts';
 import { unwrapVariant, unwrapVariantKey } from '@/utils/common/variant.ts';
 import { hex2array } from '@/utils/hex.ts';
 
+import { icrc2_approve } from '../icrc1/apis.ts';
 import { _SERVICE, SwapV2MarketMakerView, TokenInfo } from './swap.did.d';
 import { idlFactory } from './swap.did.ts';
 
@@ -107,11 +108,19 @@ export const deposit_token_to_swap = async (
     arg: {
         token_canister_id: string;
         amount: string;
+        fee: string;
         subaccount?: string;
     },
 ) => {
     const { creator } = identity;
     const create: _SERVICE = await creator(idlFactory, canisterID);
+
+    // approve
+    await icrc2_approve(identity, arg.token_canister_id, {
+        amount: (Number(arg.amount) + Number(arg.fee)).toString(),
+        spender: SWAP_CANISTER_ID,
+    });
+
     const r = await create.token_deposit(
         {
             token: string2principal(arg.token_canister_id),
@@ -129,7 +138,7 @@ export const deposit_token_to_swap = async (
             return result;
         },
         (e) => {
-            console.error(`call pair_swap_exact_tokens_for_tokens failed`, arg, e);
+            console.log('🚀 ~ token_deposit error:', e);
             throw new Error(unwrapVariantKey(e));
         },
     );
