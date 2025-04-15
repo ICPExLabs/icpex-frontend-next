@@ -224,7 +224,7 @@ function SwapPage() {
                     </p>
                     {isConnected ? (
                         !payBalanceToken ? (
-                            <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                            <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#07c160]" />
                         ) : (
                             <div className="flex items-center">
                                 <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
@@ -342,7 +342,7 @@ function SwapPage() {
                             )}
                         >
                             {loading && (
-                                <Icon name="loading" className="mr-2 h-[24px] w-[24px] animate-spin text-[#7178FF]" />
+                                <Icon name="loading" className="mr-2 h-[24px] w-[24px] animate-spin text-[#07c160]" />
                             )}
                             <p className={cn('text-lg font-semibold', config.textClassName)}>{config.text}</p>
                         </div>

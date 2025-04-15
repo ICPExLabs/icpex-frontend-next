@@ -1,9 +1,11 @@
+import BigNumber from 'bignumber.js';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { TypeTokenPriceInfoVal } from '@/hooks/useToken';
+import { TypeTokenPriceInfoVal, updateBalance } from '@/hooks/useToken';
+import { ConnectedIdentity } from '@/types/identity';
 import { isDevMode } from '@/utils/env';
 
 export type TypeTokenBalanceVal = {
@@ -16,18 +18,17 @@ interface TokenStore {
     tokenList: TokenInfo[] | undefined;
     setTokenList: (tokenList: TokenInfo[]) => void;
 
-    allTokenPrice: TypeTokenPriceInfo | undefined;
-    setAllTokenPrice: (allTokenPrice: TypeTokenPriceInfo) => void;
+    allTokenInfo: TypeTokenPriceInfo | undefined;
+    setAllTokenInfo: (allTokenInfo: TypeTokenPriceInfo) => void;
 
     allTokenBalance: TypeTokenBalance;
     addAllTokenBalance: (canisterId: string, val: TypeTokenBalanceVal) => void;
+    updateAllTokenBalance: (connectedIdentity: ConnectedIdentity, canisterId: string) => void;
     clearAllTokenBalance: () => void;
 
     totalBalance: number | undefined;
-    computationTotalBalance: () => void;
-
-    contractWallet: number | undefined;
-    computationContractWallet: () => void;
+    totalContractBalance: number | undefined;
+    computationTotalBalanceAmount: () => void;
 
     showSendModal: boolean;
     setShowSendModal: (show: boolean) => void;
@@ -51,8 +52,8 @@ export const useTokenStore = create<TokenStore>()(
             tokenList: undefined,
             setTokenList: (tokenList) => set({ tokenList }),
 
-            allTokenPrice: undefined,
-            setAllTokenPrice: (allTokenPrice) => set({ allTokenPrice }),
+            allTokenInfo: undefined,
+            setAllTokenInfo: (allTokenInfo) => set({ allTokenInfo }),
 
             allTokenBalance: {},
             addAllTokenBalance: (canisterId, val: TypeTokenBalanceVal) => {
@@ -64,31 +65,51 @@ export const useTokenStore = create<TokenStore>()(
                     },
                 });
             },
+            updateAllTokenBalance: async (connectedIdentity: ConnectedIdentity, canisterId: string) => {
+                const { allTokenBalance, addAllTokenBalance } = get();
+                const newBalance = { ...allTokenBalance };
+                delete newBalance[canisterId];
+                set({
+                    allTokenBalance: newBalance,
+                });
+
+                const data = await updateBalance(connectedIdentity, canisterId);
+                addAllTokenBalance(canisterId, data);
+            },
             clearAllTokenBalance: () => {
                 set({ allTokenBalance: {} });
             },
 
             totalBalance: undefined,
-            computationTotalBalance: () => {
-                const { allTokenPrice, allTokenBalance } = get();
-                const totalBalance = 0;
-                Object.keys(allTokenBalance).forEach((item) => {
-                    // totalBalance += Number(item.walletBalance);
-                });
-                // console.log('🚀 ~ subscribeWithSelector ~ totalBalance:', totalBalance);
-                // set({ totalBalance });
-            },
+            totalContractBalance: undefined,
+            computationTotalBalanceAmount: () => {
+                const { allTokenInfo, allTokenBalance } = get();
+                if (!allTokenInfo) return;
 
-            contractWallet: undefined,
-            computationContractWallet: () => {
-                const { allTokenBalance } = get();
                 let totalBalance = 0;
-                Object.values(allTokenBalance).forEach((item) => {
-                    totalBalance += Number(item.contractWalletBalance);
+                let totalContractBalance = 0;
+
+                Object.keys(allTokenBalance).forEach((item) => {
+                    const info = allTokenInfo[item];
+                    totalBalance =
+                        totalBalance +
+                        Number(
+                            new BigNumber(allTokenBalance[item].walletBalance).dividedBy(
+                                new BigNumber(10).pow(new BigNumber(info.decimals)),
+                            ),
+                        );
+                    totalContractBalance =
+                        totalContractBalance +
+                        Number(
+                            new BigNumber(allTokenBalance[item].contractWalletBalance).dividedBy(
+                                new BigNumber(10).pow(new BigNumber(info.decimals)),
+                            ),
+                        );
                 });
                 console.log('🚀 ~ subscribeWithSelector ~ totalBalance:', totalBalance);
+                console.log('🚀 ~ subscribeWithSelector ~ totalContractBalance:', totalContractBalance);
 
-                set({ totalBalance });
+                set({ totalBalance: totalBalance, totalContractBalance: totalContractBalance });
             },
 
             showSendModal: false,

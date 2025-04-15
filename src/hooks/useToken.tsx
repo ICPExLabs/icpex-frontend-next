@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 
 import { get_wallet_token_balance } from '@/canister/icrc1/apis';
-import { get_tokens_balance } from '@/canister/swap/apis';
+import { get_token_balance_of, get_tokens_balance } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
 import { TypeTokenBalanceVal, useTokenStore } from '@/stores/token';
+import { ConnectedIdentity } from '@/types/identity';
 
 export type TypeTokenPriceInfoVal = TokenInfo & {
     feesUSD: number | undefined;
@@ -17,22 +18,22 @@ export type TypeTokenPriceInfoVal = TokenInfo & {
 };
 
 export const useTokenInfoByCanisterId = (canisterId: string | undefined): TypeTokenPriceInfoVal | undefined => {
-    const { allTokenPrice } = useTokenStore();
-    if (!canisterId || !allTokenPrice) return undefined;
-    return allTokenPrice[canisterId] || undefined;
+    const { allTokenInfo } = useTokenStore();
+    if (!canisterId || !allTokenInfo) return undefined;
+    return allTokenInfo[canisterId] || undefined;
 };
 
 export const useTokenInfoBySymbol = (symbol: string | undefined): TypeTokenPriceInfoVal | undefined => {
-    const { allTokenPrice, tokenList } = useTokenStore();
+    const { allTokenInfo, tokenList } = useTokenStore();
 
     return useMemo(() => {
-        if (!symbol || !tokenList || !allTokenPrice) return undefined;
+        if (!symbol || !tokenList || !allTokenInfo) return undefined;
 
         const token = tokenList.find((item) => item.symbol === symbol);
         if (!token) return undefined;
 
-        return allTokenPrice[token.canister_id.toString()] ?? undefined;
-    }, [symbol, allTokenPrice, tokenList]);
+        return allTokenInfo[token.canister_id.toString()] ?? undefined;
+    }, [symbol, allTokenInfo, tokenList]);
 };
 
 export const useTokenBalanceByCanisterId = (canisterId: string | undefined): TypeTokenBalanceVal | undefined => {
@@ -55,7 +56,7 @@ export const useTokenBalanceBySymbol = (symbol: string | undefined): TypeTokenBa
 };
 
 export const initBalance = async (connectedIdentity, tokenList) => {
-    const { addAllTokenBalance, computationTotalBalance, computationContractWallet } = useTokenStore.getState();
+    const { addAllTokenBalance, computationTotalBalanceAmount } = useTokenStore.getState();
 
     if (!connectedIdentity) return;
     if (!tokenList) return;
@@ -77,7 +78,27 @@ export const initBalance = async (connectedIdentity, tokenList) => {
             addAllTokenBalance(item.canister_id.toString(), res);
         }),
     ).finally(() => {
-        computationTotalBalance();
-        computationContractWallet();
+        console.log('🚀 ~ ).finally ~ computationTotalBalanceAmount');
+        computationTotalBalanceAmount();
     });
+};
+
+export const updateBalance = async (connectedIdentity: ConnectedIdentity, canisterId: string) => {
+    try {
+        const { principal } = connectedIdentity;
+        const [contractBalanceRes, walletBalance] = await Promise.all([
+            get_token_balance_of(connectedIdentity, {
+                canisterId: canisterId,
+                owner: principal,
+            }),
+            get_wallet_token_balance(canisterId, principal),
+        ]);
+        return {
+            walletBalance,
+            contractWalletBalance: contractBalanceRes,
+        };
+    } catch (error) {
+        console.error(`Failed to update balance for canister ${canisterId}:`, error);
+        throw error;
+    }
 };

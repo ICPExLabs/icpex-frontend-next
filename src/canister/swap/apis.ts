@@ -65,14 +65,15 @@ export const get_tokens_balance = async (
 export const get_token_balance_of = async (
     identity: ConnectedIdentity,
     arg: {
+        canisterId: string;
         owner: string;
         subaccount?: string;
     },
 ): Promise<string> => {
-    const { creator, principal } = identity;
+    const { creator } = identity;
     const create: _SERVICE = await creator(idlFactory, canisterID);
 
-    const balance = await create.token_balance_of(string2principal(principal), {
+    const balance = await create.token_balance_of(string2principal(arg.canisterId), {
         owner: string2principal(arg.owner),
         subaccount: wrapOptionMap(arg.subaccount, hex2array),
     });

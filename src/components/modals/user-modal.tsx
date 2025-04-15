@@ -70,14 +70,13 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TypeTokenPriceInf
                 <TokenLogo canisterId={tokenInfo.canister_id.toString()} className="h-8 w-8 rounded-full" />
                 <div className="ml-[10px] flex flex-col items-start">
                     <p className="text-sm font-medium text-black">{tokenInfo.name}</p>
-                    <p className="text-xs font-medium text-[#999999]">
-                        {!payBalanceToken ? (
-                            <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#7178FF]" />
-                        ) : (
-                            <>{truncateDecimalToBN(payBalance, 4)}</>
-                        )}{' '}
-                        {tokenInfo.symbol}
-                    </p>
+                    {!payBalanceToken ? (
+                        <Icon name="loading" className="mr-2 h-[12px] w-[12px] animate-spin text-[#07c160]" />
+                    ) : (
+                        <p className="text-xs font-medium text-[#999999]">
+                            {truncateDecimalToBN(payBalance, 4)} {tokenInfo.symbol}
+                        </p>
+                    )}
                 </div>
             </div>
             <div className="flex flex-col items-end">
@@ -102,9 +101,9 @@ const UserInfoModal = () => {
 
     const {
         allTokenBalance,
-        allTokenPrice,
+        allTokenInfo,
         totalBalance,
-        contractWallet,
+        totalContractBalance,
         setShowSendModal,
         setShowReceiveModal,
         setShowTransferInModal,
@@ -126,7 +125,7 @@ const UserInfoModal = () => {
 
     useEffect(() => {
         if (!showInfoModal) return;
-        let result = { ...allTokenPrice };
+        let result = { ...allTokenInfo };
         const sortedEntries = Object.entries(result).sort(([canisterIdA], [canisterIdB]) => {
             const balanceA = allTokenBalance[canisterIdA];
             const balanceB = allTokenBalance[canisterIdB];
@@ -145,7 +144,7 @@ const UserInfoModal = () => {
         });
         result = Object.fromEntries(sortedEntries);
         setTokenList(result);
-    }, [allTokenBalance, allTokenPrice, walletMode, activeTab, showInfoModal]);
+    }, [allTokenBalance, allTokenInfo, walletMode, activeTab, showInfoModal]);
 
     return (
         <SideSheet
@@ -201,7 +200,7 @@ const UserInfoModal = () => {
                                     />
                                 ) : (
                                     <p className="text-2xl font-medium text-black">
-                                        ${truncateDecimalToBN(totalBalance, 2)}
+                                        ${truncateDecimalToBN(totalBalance, 4)}
                                     </p>
                                 )}
 
@@ -212,14 +211,14 @@ const UserInfoModal = () => {
                         <div className="flex flex-1 flex-col items-start">
                             <p className="text-xs font-medium text-[#666666]">{t('common.userInfo.contractWallet')}</p>
                             <div className="flex h-8 items-center">
-                                {typeof contractWallet === 'undefined' ? (
+                                {typeof totalContractBalance === 'undefined' ? (
                                     <Icon
                                         name="loading"
                                         className="mr-2 h-[20px] w-[20px] animate-spin text-[#07c160]"
                                     />
                                 ) : (
                                     <p className="text-2xl font-medium text-black">
-                                        ${truncateDecimalToBN(contractWallet, 2)}
+                                        ${truncateDecimalToBN(totalContractBalance, 4)}
                                     </p>
                                 )}
                                 {/* <TokenPriceChangePercentage value={-0.23} className="ml-1" /> */}

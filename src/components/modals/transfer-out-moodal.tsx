@@ -27,17 +27,20 @@ export const TokenTransferOutModal = () => {
     const tokenInfo = useTokenInfoBySymbol(token);
     const balanceToken = useTokenBalanceBySymbol(token);
     const balance = useMemo(() => {
-        if (!balanceToken) {
+        if (!balanceToken || !tokenInfo) {
             return 0;
         }
-        return Number(balanceToken.contractWalletBalance) || 0;
-    }, [balanceToken]);
-
+        return Number(
+            new BigNumber(balanceToken.contractWalletBalance).dividedBy(
+                new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)),
+            ),
+        );
+    }, [balanceToken, tokenInfo]);
     const fee = useMemo(() => {
         if (!tokenInfo) {
             return undefined;
         }
-        return Number(tokenInfo.fee) / 10 ** tokenInfo.decimals;
+        return Number(new BigNumber(tokenInfo.fee).dividedBy(new BigNumber(10).pow(new BigNumber(tokenInfo.decimals))));
     }, [tokenInfo]);
     const [loading, setLoading] = useState(false);
     const [amount, setAmount] = useState<number | undefined>();

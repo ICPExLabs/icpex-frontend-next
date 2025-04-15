@@ -89,7 +89,7 @@ export const SelectTokenModal = ({
     selectToken: (token: TypeTokenPriceInfoVal) => void;
 }) => {
     const { t } = useTranslation();
-    const { allTokenPrice, allTokenBalance } = useTokenStore();
+    const { allTokenInfo, allTokenBalance } = useTokenStore();
     const { walletMode } = useAppStore();
 
     const [isHideZeroBalance, setIsHideZeroBalance] = useState(false);
@@ -112,11 +112,11 @@ export const SelectTokenModal = ({
     };
 
     const list: TypeTokenPriceInfo = useMemo(() => {
-        if (!allTokenPrice) {
+        if (!allTokenInfo) {
             return {};
         }
 
-        let result = { ...allTokenPrice };
+        let result = { ...allTokenInfo };
 
         if (isHideZeroBalance) {
             result = Object.keys(result).reduce((acc, canisterId) => {
@@ -171,7 +171,7 @@ export const SelectTokenModal = ({
         }
 
         return result;
-    }, [searchKeyword, allTokenPrice, allTokenBalance, isHideZeroBalance, walletMode, sortBy]);
+    }, [searchKeyword, allTokenInfo, allTokenBalance, isHideZeroBalance, walletMode, sortBy]);
 
     return (
         <Modal
@@ -228,7 +228,7 @@ export const SelectTokenModal = ({
                         </div>
                     </div>
                 </div>
-                {!allTokenPrice || !Object.values(list).length ? (
+                {!allTokenInfo || !Object.values(list).length ? (
                     <div className="flex h-[426px] flex-col items-center justify-center">
                         <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#07c160]" />
                         <p className="mt-2 text-[16px] font-semibold text-[#000000]">{t('swap.select.loading')}</p>

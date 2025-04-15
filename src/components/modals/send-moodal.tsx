@@ -19,7 +19,7 @@ import { TokenLogo } from '../ui/logo';
 
 export const TokenSendModal = () => {
     const { t } = useTranslation();
-    const { showSendModal, setShowSendModal } = useTokenStore();
+    const { showSendModal, setShowSendModal, updateAllTokenBalance } = useTokenStore();
     const { connectedIdentity } = useIdentityStore();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
@@ -28,16 +28,20 @@ export const TokenSendModal = () => {
     const tokenInfo = useTokenInfoBySymbol(token);
     const balanceToken = useTokenBalanceBySymbol(token);
     const balance = useMemo(() => {
-        if (!balanceToken) {
+        if (!balanceToken || !tokenInfo) {
             return 0;
         }
-        return Number(balanceToken.walletBalance) || 0;
-    }, [balanceToken]);
+        return Number(
+            new BigNumber(balanceToken.walletBalance).dividedBy(
+                new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)),
+            ),
+        );
+    }, [balanceToken, tokenInfo]);
     const fee = useMemo(() => {
         if (!tokenInfo) {
             return undefined;
         }
-        return Number(tokenInfo.fee) / 10 ** tokenInfo.decimals;
+        return Number(new BigNumber(tokenInfo.fee).dividedBy(new BigNumber(10).pow(new BigNumber(tokenInfo.decimals))));
     }, [tokenInfo]);
     const [loading, setLoading] = useState(false);
     const [address, setAddress] = useState<string>('');
@@ -107,6 +111,7 @@ export const TokenSendModal = () => {
             setAmount(undefined);
             setAddress('');
             setShowSendModal(false);
+            updateAllTokenBalance(connectedIdentity, tokenInfo.canister_id.toString());
             Toast.success(t('common.send.sendSuccess') + height);
         } catch (e: string | any) {
             console.log('🚀 ~ onTransfer ~ e:', e);
@@ -162,10 +167,20 @@ export const TokenSendModal = () => {
                             {tokenInfo && (
                                 <div className="flex items-center gap-x-[6px]">
                                     <Icon name="wallet" className="h-[12px] w-[14px] text-[#666666]"></Icon>
-                                    <div className="text-xs font-medium text-[#666666]">
+                                    {/* <div className="text-xs font-medium text-[#666666]">
                                         {typeof balance === 'number' ? truncateDecimalToBN(balance) : '--'}{' '}
                                         {tokenInfo.symbol}
-                                    </div>
+                                    </div> */}
+                                    {!balance ? (
+                                        <Icon
+                                            name="loading"
+                                            className="mr-2 h-[12px] w-[12px] animate-spin text-[#07c160]"
+                                        />
+                                    ) : (
+                                        <p className="text-xs font-medium text-[#999999]">
+                                            {truncateDecimalToBN(balance, 4)} {tokenInfo.symbol}
+                                        </p>
+                                    )}
                                     <p
                                         onClick={onMaxChange}
                                         className="cursor-pointer text-xs font-medium text-[#07c160]"

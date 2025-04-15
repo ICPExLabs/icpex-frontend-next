@@ -8,7 +8,7 @@ import { isCanisterIdText } from '@/utils/principals';
 import { useExecuteOnce } from './useExecuteOnce';
 
 export const useInitTokenList = () => {
-    const { setTokenList, setAllTokenPrice } = useTokenStore();
+    const { setTokenList, setAllTokenInfo } = useTokenStore();
 
     useExecuteOnce(() => {
         get_tokens_query().then(async (tokenList: TokenInfo[]) => {
@@ -44,7 +44,7 @@ export const useInitTokenList = () => {
                             volumeUSD7d: priceData?.volumeUSD7d || undefined,
                         };
                     });
-                    setAllTokenPrice(arr);
+                    setAllTokenInfo(arr);
                 }
             };
 
