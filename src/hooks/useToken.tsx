@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
+import { useDeepCompareMemo } from 'use-deep-compare';
 
 import { get_wallet_token_balance } from '@/canister/icrc1/apis';
 import { get_tokens_balance } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { TypeTokenBalanceVal, useTokenStore } from '@/stores/token';
+import { TypeTokenBalance, TypeTokenBalanceVal, useTokenStore } from '@/stores/token';
 
 export type TypeTokenPriceInfoVal = TokenInfo & {
     feesUSD: number | undefined;
@@ -41,7 +42,7 @@ export const useTokenBalanceByCanisterId = (canisterId: string | undefined): Typ
     return allTokenBalance[canisterId] || undefined;
 };
 
-export const useTokenBalanceBySymbol = (symbol: string | undefined) => {
+export const useTokenBalanceBySymbol = (symbol: string | undefined): TypeTokenBalanceVal | undefined => {
     const { allTokenBalance, tokenList } = useTokenStore();
 
     return useMemo(() => {

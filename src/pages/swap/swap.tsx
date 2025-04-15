@@ -222,7 +222,9 @@ function SwapPage() {
                             ? truncateDecimalToBN(payTokenInfo.priceUSD * (payAmount || 0))
                             : '0.00'}
                     </p>
-                    {typeof payBalance !== 'undefined' && (
+                    {!payBalanceToken ? (
+                        <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                    ) : (
                         <div className="flex items-center">
                             <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
                             <div className="ml-[6px] flex items-center">

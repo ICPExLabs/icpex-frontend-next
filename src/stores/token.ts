@@ -56,7 +56,12 @@ export const useTokenStore = create<TokenStore>()(
             allTokenBalance: {},
             addAllTokenBalance: (canisterId, val: TypeTokenBalanceVal) => {
                 const { allTokenBalance } = get();
-                allTokenBalance[canisterId] = val;
+                set({
+                    allTokenBalance: {
+                        ...allTokenBalance,
+                        [canisterId]: val,
+                    },
+                });
             },
 
             totalBalance: undefined,

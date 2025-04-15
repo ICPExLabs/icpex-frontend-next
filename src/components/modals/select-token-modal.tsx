@@ -155,7 +155,7 @@ export const SelectTokenModal = ({
                         ? Number(balanceB?.walletBalance || 0)
                         : Number(balanceB?.contractWalletBalance || 0);
 
-                return valueB - valueA;
+                return sortBy === 1 ? valueA - valueB : valueB - valueA;
             });
 
             result = Object.fromEntries(sortedEntries);
