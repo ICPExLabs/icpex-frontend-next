@@ -8,7 +8,6 @@ import { withdraw_token_from_swap } from '@/canister/swap/apis';
 import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
-import { ConnectedIdentity } from '@/types/identity';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
 
@@ -20,7 +19,7 @@ import { SelectTokenModal } from './select-token-modal';
 export const TokenTransferOutModal = () => {
     const { t } = useTranslation();
 
-    const { showTransferOutModal, setShowTransferOutModal } = useTokenStore();
+    const { showTransferOutModal, setShowTransferOutModal, updateAllTokenBalance } = useTokenStore();
     const { connectedIdentity } = useIdentityStore();
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
 
@@ -207,6 +206,3 @@ export const TokenTransferOutModal = () => {
         </>
     );
 };
-function updateAllTokenBalance(connectedIdentity: ConnectedIdentity, arg1: string) {
-    throw new Error('Function not implemented.');
-}
