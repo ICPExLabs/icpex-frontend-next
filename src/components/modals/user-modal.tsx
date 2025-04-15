@@ -81,7 +81,7 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TypeTokenPriceInf
             </div>
             <div className="flex flex-col items-end">
                 <p className="text-sm font-medium text-black">
-                    {tokenInfo.priceUSD ? `$${truncateDecimalToBN(tokenInfo.priceUSD || 0, 4)}` : '--'}
+                    {tokenInfo.priceUSD ? `$${truncateDecimalToBN(payBalance * tokenInfo.priceUSD || 0, 8)}` : '--'}
                 </p>
                 <TokenPriceChangePercentage
                     value={tokenInfo.priceUSDChange ? truncateDecimalToBN(tokenInfo.priceUSDChange) : 0}

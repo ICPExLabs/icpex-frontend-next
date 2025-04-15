@@ -8,6 +8,7 @@ import { deposit_token_to_swap } from '@/canister/swap/apis';
 import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
+import { ConnectedIdentity } from '@/types/identity';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
 
@@ -31,7 +32,7 @@ export const TokenTransferInModal = () => {
             return 0;
         }
         return Number(
-            new BigNumber(balanceToken.contractWalletBalance).dividedBy(
+            new BigNumber(balanceToken.walletBalance).dividedBy(
                 new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)),
             ),
         );
@@ -72,6 +73,7 @@ export const TokenTransferInModal = () => {
                 Toast.success(t('common.transferIn.transferInSuccess') + res);
                 setAmount(undefined);
                 setShowTransferInModal(false);
+                updateAllTokenBalance(connectedIdentity, tokenInfo.canister_id.toString());
             })
             .catch((error) => {
                 console.error('Failed to transfer token:', error);
@@ -220,3 +222,6 @@ export const TokenTransferInModal = () => {
         </>
     );
 };
+function updateAllTokenBalance(connectedIdentity: ConnectedIdentity, arg1: string) {
+    throw new Error('Function not implemented.');
+}
