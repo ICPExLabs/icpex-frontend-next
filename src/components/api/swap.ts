@@ -113,6 +113,7 @@ export const execute_complete_swap = async (
         await deposit_token_to_swap(identity, {
             token_canister_id: arg.from_canister_id,
             amount: arg.amount_in,
+            fee: arg.fee,
         });
 
         // swap and withdraw

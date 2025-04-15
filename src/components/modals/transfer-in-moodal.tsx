@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import transferSvg from '@/assets/svg/transfer.svg';
 import { deposit_token_to_swap } from '@/canister/swap/apis';
-import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
+import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
@@ -24,13 +24,15 @@ export const TokenTransferInModal = () => {
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
 
     const [token, setToken] = useState<string | undefined>('ICP');
-    const tokenInfo = useTokenInfoAndBalanceBySymbol(token);
+    const tokenInfo = useTokenInfoBySymbol(token);
+    const balanceToken = useTokenBalanceBySymbol(token);
     const balance = useMemo(() => {
-        if (!tokenInfo) {
-            return undefined;
+        if (!balanceToken) {
+            return 0;
         }
-        return tokenInfo.balance_wallet || 0;
-    }, [tokenInfo]);
+        return Number(balanceToken.contractWalletBalance) || 0;
+    }, [balanceToken]);
+
     const fee = useMemo(() => {
         if (!tokenInfo) {
             return undefined;
@@ -151,7 +153,7 @@ export const TokenTransferInModal = () => {
                         </div>
                         <div className="mt-[13px] flex w-full justify-between">
                             <p className="text-sm font-medium text-[#666666]">
-                                ${truncateDecimalToBN(tokenInfo?.price || 0, 4)}
+                                ${truncateDecimalToBN(tokenInfo?.priceUSD || 0, 4)}
                             </p>
 
                             {tokenInfo && (

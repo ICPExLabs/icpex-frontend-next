@@ -143,6 +143,12 @@ export const get_wallet_all_token_balance = async (
     });
 };
 
+export const get_wallet_token_balance = async (canister_id: string, principal: string): Promise<string> => {
+    return await icrc1_balance_of(anonymous, canister_id, { owner: principal }).then((balance) => {
+        return balance;
+    });
+};
+
 // wallet -> icrc2_approve
 export const icrc2_approve = async (
     identity: ConnectedIdentity,

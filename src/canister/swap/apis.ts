@@ -42,21 +42,23 @@ export const get_tokens_balance = async (
         owner: string;
         subaccount?: string;
     },
-): Promise<{ canister_id: string; balance: string }[]> => {
-    const { creator } = identity;
-    const create: _SERVICE = await creator(idlFactory, canisterID);
+): Promise<Record<string, string>> => {
+    try {
+        const { creator } = identity;
+        const service: _SERVICE = await creator(idlFactory, canisterID);
 
-    const balances = await create.tokens_balance_of({
-        owner: string2principal(arg.owner),
-        subaccount: wrapOptionMap(arg.subaccount, hex2array),
-    });
+        const balances = await service.tokens_balance_of({
+            owner: string2principal(arg.owner),
+            subaccount: wrapOptionMap(arg.subaccount, hex2array),
+        });
 
-    return balances.map((d) => {
-        return {
-            canister_id: d[0].toString(),
-            balance: bigint2string(d[1]),
-        };
-    });
+        const result = {};
+        balances.map(([canisterId, balance]) => (result[canisterId.toString()] = bigint2string(balance)));
+        return result;
+    } catch (error) {
+        console.error('Error fetching token balances:', error);
+        throw error;
+    }
 };
 
 // one token balance of

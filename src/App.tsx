@@ -7,13 +7,11 @@ import { useInitTokenList } from './hooks/useInitTokenList';
 import { setLanguage } from './locale';
 import routes from './routes/routes';
 import { useAppStore } from './stores/app';
-import { useTokenStore } from './stores/token';
 
 function App() {
     const views = useRoutes(routes);
 
     const { language, designLang, initThemeListener } = useAppStore();
-    const { tokenList } = useTokenStore();
 
     useEffect(() => setLanguage(language), [language]);
 
@@ -22,18 +20,7 @@ function App() {
     }, [initThemeListener]);
 
     useInitIdentity();
-
-    const { isInitializing, refreshing } = useInitTokenList();
-    useEffect(() => {
-        if (typeof isInitializing === 'undefined') return;
-        if (typeof isInitializing === 'boolean' && !isInitializing) {
-            setTimeout(() => {
-                refreshing(tokenList);
-                console.log('🚀 ~ App ~ Refreshing AllTokensPrice');
-            }, 10000);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isInitializing, refreshing]);
+    useInitTokenList();
 
     return <LocaleProvider locale={designLang}>{views}</LocaleProvider>;
 }

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { icrc1_transfer, transfer } from '@/canister/icrc1/apis';
 import { SelectTokenModal } from '@/components/modals/select-token-modal';
-import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
+import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 import { isAccountHex } from '@/utils/account';
@@ -19,19 +19,20 @@ import { TokenLogo } from '../ui/logo';
 
 export const TokenSendModal = () => {
     const { t } = useTranslation();
-    const { tokenList, showSendModal, setShowSendModal, allTokenBalanceForceRefresh } = useTokenStore();
+    const { showSendModal, setShowSendModal } = useTokenStore();
     const { connectedIdentity } = useIdentityStore();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
 
     const [token, setToken] = useState<string | undefined>('ICP');
-    const tokenInfo = useTokenInfoAndBalanceBySymbol(token);
+    const tokenInfo = useTokenInfoBySymbol(token);
+    const balanceToken = useTokenBalanceBySymbol(token);
     const balance = useMemo(() => {
-        if (!tokenInfo) {
-            return undefined;
+        if (!balanceToken) {
+            return 0;
         }
-        return tokenInfo.balance_wallet || 0;
-    }, [tokenInfo]);
+        return Number(balanceToken.walletBalance) || 0;
+    }, [balanceToken]);
     const fee = useMemo(() => {
         if (!tokenInfo) {
             return undefined;
@@ -80,7 +81,6 @@ export const TokenSendModal = () => {
             .multipliedBy(new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)))
             .toFixed()
             .split('.')[0];
-        console.log('🚀 ~ onTransfer ~ amount_text:', amount_text);
 
         const do_transfer = isPrincipalText(address)
             ? async () =>
@@ -104,9 +104,6 @@ export const TokenSendModal = () => {
 
         try {
             const height = await do_transfer();
-            if (tokenList && allTokenBalanceForceRefresh) {
-                allTokenBalanceForceRefresh(tokenList);
-            }
             setAmount(undefined);
             setAddress('');
             setShowSendModal(false);

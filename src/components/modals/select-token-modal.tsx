@@ -1,10 +1,11 @@
 import { Modal, Switch } from '@douyinfe/semi-ui';
+import BigNumber from 'bignumber.js';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TokenBalanceInfo } from '@/hooks/useToken';
+import { TypeTokenPriceInfoVal, useTokenBalanceByCanisterId } from '@/hooks/useToken';
 import { useAppStore } from '@/stores/app';
-import { useTokenStore } from '@/stores/token';
+import { TypeTokenPriceInfo, useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
 import { parseLowerCaseSearch } from '@/utils/search';
@@ -13,6 +14,62 @@ import HeaderModal from '../ui/header-modal';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
 
+const SelectTokenItem = ({
+    data,
+    selectToken,
+}: {
+    data: TypeTokenPriceInfoVal;
+    selectToken: (data: TypeTokenPriceInfoVal) => void;
+}) => {
+    const { walletMode } = useAppStore();
+    const tokenBalance = useTokenBalanceByCanisterId(data.canister_id.toString());
+
+    const balance = useMemo(() => {
+        if (!tokenBalance) return 0;
+        if (walletMode === 'wallet') {
+            return Number(
+                new BigNumber(tokenBalance.walletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(data.decimals)),
+                ),
+            );
+        }
+        if (walletMode === 'contract') {
+            return Number(
+                new BigNumber(tokenBalance.contractWalletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(data.decimals)),
+                ),
+            );
+        }
+        return 0;
+    }, [tokenBalance, walletMode, data.decimals]);
+
+    return (
+        <div
+            onClick={() => selectToken(data)}
+            className="group flex h-[54px] w-full flex-shrink-0 cursor-pointer items-center rounded-[10px] duration-75 hover:bg-[#f2f4ff]"
+        >
+            <TokenLogo
+                canisterId={data.canister_id.toString()}
+                className="mr-[9px] h-8 w-8 flex-shrink-0 duration-75 group-hover:ml-[13px]"
+            />
+            <div className="flex flex-1 flex-col">
+                <p className="text-sm font-medium text-[#000000]">{data.symbol}</p>
+                <p className="text-xs font-medium text-[#999999]">{data.name}</p>
+            </div>
+
+            <div className="flex flex-col items-end duration-75 group-hover:mr-[13px]">
+                {!tokenBalance && <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />}
+                {tokenBalance && (
+                    <p className="text-sm font-medium text-[#000000]">
+                        {truncateDecimalToBN(balance)} {data.symbol}
+                    </p>
+                )}
+                <p className="text-xs font-medium text-[#999999]">${truncateDecimalToBN(data.priceUSD || 0)}</p>
+            </div>
+        </div>
+    );
+};
+
 export const SelectTokenModal = ({
     isShow,
     setIsShow,
@@ -20,14 +77,14 @@ export const SelectTokenModal = ({
 }: {
     isShow: boolean;
     setIsShow: (isShow: boolean) => void;
-    selectToken: (token: TokenBalanceInfo) => void;
+    selectToken: (token: TypeTokenPriceInfoVal) => void;
 }) => {
     const { t } = useTranslation();
-    const { allTokenBalance } = useTokenStore();
+    const { allTokenPrice, allTokenBalance } = useTokenStore();
     const { walletMode } = useAppStore();
 
     const [isHideZeroBalance, setIsHideZeroBalance] = useState(false);
-    const [sortBy, setSortBy] = useState<0 | 1 | 2>(0);
+    const [sortBy, setSortBy] = useState<0 | 1 | 2>(2);
     const [searchKeyword, setSearchKeyword] = useState<string>('');
 
     const toggleSortBy = () => {
@@ -45,42 +102,67 @@ export const SelectTokenModal = ({
         });
     };
 
-    const list: TokenBalanceInfo[] = useMemo(() => {
-        if (!allTokenBalance) {
-            return [];
+    const list: TypeTokenPriceInfo = useMemo(() => {
+        if (!allTokenPrice) {
+            return {};
         }
 
-        let filteredList = allTokenBalance;
+        let result = { ...allTokenPrice };
+
         if (isHideZeroBalance) {
-            filteredList = allTokenBalance.filter((item) => {
-                if (walletMode === 'wallet') {
-                    return (item.balance_wallet ?? 0) > 0;
-                } else if (walletMode === 'contract') {
-                    return (item.balance_wallet_contract ?? 0) > 0;
+            result = Object.keys(result).reduce((acc, canisterId) => {
+                const balance = allTokenBalance[canisterId];
+
+                if (!balance) return acc;
+
+                const balanceValue =
+                    walletMode === 'wallet'
+                        ? Number(balance.walletBalance || 0)
+                        : Number(balance.contractWalletBalance || 0);
+
+                if (balanceValue !== 0) {
+                    acc[canisterId] = result[canisterId];
                 }
-                return true;
-            });
+
+                return acc;
+            }, {} as TypeTokenPriceInfo);
         }
 
         if (searchKeyword) {
-            const val = parseLowerCaseSearch(searchKeyword);
-            filteredList = filteredList.filter(
-                (item) => item.canister_id.toString() === val || item.symbol.toLowerCase().includes(val),
-            );
+            const searchTerm = parseLowerCaseSearch(searchKeyword);
+            result = Object.keys(result).reduce((acc, canisterId) => {
+                const token = result[canisterId];
+
+                if (canisterId === searchTerm || token.symbol.toLowerCase().includes(searchTerm)) {
+                    acc[canisterId] = token;
+                }
+                return acc;
+            }, {} as TypeTokenPriceInfo);
         }
 
         if (sortBy === 1 || sortBy === 2) {
-            filteredList = [...filteredList].sort((a, b) => {
-                const valueA = sortBy === 1 ? Number(a.balance_wallet ?? 0) : Number(a.balance_wallet_contract ?? 0);
+            const sortedEntries = Object.entries(result).sort(([canisterIdA], [canisterIdB]) => {
+                const balanceA = allTokenBalance[canisterIdA];
+                const balanceB = allTokenBalance[canisterIdB];
 
-                const valueB = sortBy === 1 ? Number(b.balance_wallet ?? 0) : Number(b.balance_wallet_contract ?? 0);
+                const valueA =
+                    walletMode === 'wallet'
+                        ? Number(balanceA?.walletBalance || 0)
+                        : Number(balanceA?.contractWalletBalance || 0);
+
+                const valueB =
+                    walletMode === 'wallet'
+                        ? Number(balanceB?.walletBalance || 0)
+                        : Number(balanceB?.contractWalletBalance || 0);
 
                 return valueB - valueA;
             });
+
+            result = Object.fromEntries(sortedEntries);
         }
 
-        return filteredList;
-    }, [searchKeyword, allTokenBalance, isHideZeroBalance, walletMode, sortBy]);
+        return result;
+    }, [searchKeyword, allTokenPrice, allTokenBalance, isHideZeroBalance, walletMode, sortBy]);
 
     return (
         <Modal
@@ -137,14 +219,14 @@ export const SelectTokenModal = ({
                         </div>
                     </div>
                 </div>
-                {!allTokenBalance || !allTokenBalance.length ? (
+                {!allTokenPrice || !Object.values(list).length ? (
                     <div className="flex h-[426px] flex-col items-center justify-center">
                         <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#07c160]" />
                         <p className="mt-2 text-[16px] font-semibold text-[#000000]">{t('swap.select.loading')}</p>
                     </div>
                 ) : (
                     <div className="no-scrollbar flex h-[426px] flex-col overflow-y-scroll pt-[10px]">
-                        {!list.length ? (
+                        {!Object.values(list).length ? (
                             <div className="mt-[40px] mb-[70px] flex w-full flex-col items-center justify-center">
                                 <Icon name="no" className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]" />
                                 <p className="mt-[13px] text-sm font-medium text-[#999999]">
@@ -152,32 +234,12 @@ export const SelectTokenModal = ({
                                 </p>
                             </div>
                         ) : (
-                            list.map((item) => (
-                                <div
-                                    onClick={() => selectToken(item)}
+                            Object.values(list).map((item) => (
+                                <SelectTokenItem
                                     key={item.canister_id.toString()}
-                                    className="group flex h-[54px] w-full flex-shrink-0 cursor-pointer items-center rounded-[10px] duration-75 hover:bg-[#f2f4ff]"
-                                >
-                                    <TokenLogo
-                                        canisterId={item.canister_id.toString()}
-                                        className="mr-[9px] h-8 w-8 flex-shrink-0 duration-75 group-hover:ml-[13px]"
-                                    />
-                                    <div className="flex flex-1 flex-col">
-                                        <p className="text-sm font-medium text-[#000000]">{item.symbol}</p>
-                                        <p className="text-xs font-medium text-[#999999]">{item.name}</p>
-                                    </div>
-                                    <div className="flex flex-col items-end duration-75 group-hover:mr-[13px]">
-                                        <p className="text-sm font-medium text-[#000000]">
-                                            {walletMode === 'wallet' && truncateDecimalToBN(item.balance_wallet || 0)}
-                                            {walletMode === 'contract' &&
-                                                truncateDecimalToBN(item.balance_wallet_contract || 0)}{' '}
-                                            {item.symbol}
-                                        </p>
-                                        <p className="text-xs font-medium text-[#999999]">
-                                            ${truncateDecimalToBN(item.price || 0)}
-                                        </p>
-                                    </div>
-                                </div>
+                                    selectToken={() => selectToken(item)}
+                                    data={item}
+                                />
                             ))
                         )}
                     </div>

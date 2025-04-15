@@ -1,14 +1,15 @@
 import { useConnect } from '@connect2ic/react';
 import { SideSheet, Toast } from '@douyinfe/semi-ui';
-import { useEffect, useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { useEffect, useMemo, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { TokenBalanceInfo } from '@/hooks/useToken';
+import { TypeTokenPriceInfoVal, useTokenBalanceByCanisterId } from '@/hooks/useToken';
 import { TypeWalletMode, useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
-import { useTokenStore } from '@/stores/token';
+import { TypeTokenPriceInfo, useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
 import { shrinkPrincipal } from '@/utils/text';
@@ -39,7 +40,27 @@ export const UserInfoButton = () => {
     );
 };
 
-const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TokenBalanceInfo; walletMode: TypeWalletMode }) => {
+const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TypeTokenPriceInfoVal; walletMode: TypeWalletMode }) => {
+    const payBalanceToken = useTokenBalanceByCanisterId(tokenInfo.canister_id.toString());
+    const payBalance = useMemo(() => {
+        if (!payBalanceToken) return 0;
+        if (walletMode === 'wallet') {
+            return Number(
+                new BigNumber(payBalanceToken.walletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)),
+                ),
+            );
+        }
+        if (walletMode === 'contract') {
+            return Number(
+                new BigNumber(payBalanceToken.contractWalletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(tokenInfo.decimals)),
+                ),
+            );
+        }
+        return 0;
+    }, [payBalanceToken, walletMode, tokenInfo]);
+
     return (
         <Link
             to={`/explore/${tokenInfo.canister_id.toString()}`}
@@ -50,26 +71,21 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TokenBalanceInfo;
                 <div className="ml-[10px] flex flex-col items-start">
                     <p className="text-sm font-medium text-black">{tokenInfo.name}</p>
                     <p className="text-xs font-medium text-[#999999]">
-                        {walletMode === 'wallet' &&
-                            `${typeof tokenInfo.balance_wallet === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet, 4) : '--'}`}
-                        {walletMode === 'contract' &&
-                            `${typeof tokenInfo.balance_wallet_contract === 'number' ? truncateDecimalToBN(tokenInfo.balance_wallet_contract, 4) : '--'}`}
+                        {!payBalanceToken ? (
+                            <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                        ) : (
+                            <>{truncateDecimalToBN(payBalance, 4)}</>
+                        )}{' '}
                         {tokenInfo.symbol}
                     </p>
                 </div>
             </div>
             <div className="flex flex-col items-end">
                 <p className="text-sm font-medium text-black">
-                    {walletMode === 'wallet' &&
-                        `$${typeof tokenInfo.usd_wallet === 'number' ? truncateDecimalToBN(tokenInfo.usd_wallet) : '--'}`}
-                    {walletMode === 'contract' && `$${tokenInfo.usd_wallet_contract}`}
+                    {tokenInfo.priceUSD ? `$${truncateDecimalToBN(tokenInfo.priceUSD || 0, 4)}` : '--'}
                 </p>
                 <TokenPriceChangePercentage
-                    value={
-                        typeof tokenInfo.price_change_24h === 'number'
-                            ? truncateDecimalToBN(tokenInfo.price_change_24h)
-                            : 0
-                    }
+                    value={tokenInfo.priceUSDChange ? truncateDecimalToBN(tokenInfo.priceUSDChange) : 0}
                     className=""
                 />
             </div>
@@ -86,6 +102,7 @@ const UserInfoModal = () => {
 
     const {
         allTokenBalance,
+        allTokenPrice,
         totalBalance,
         contractWallet,
         setShowSendModal,
@@ -96,7 +113,7 @@ const UserInfoModal = () => {
     const [copied, setCopied] = useState(false);
     const [currentTab, setCurrentTab] = useState<'Tokens' | 'Pools' | 'History'>('Tokens');
 
-    const [tokenList, setTokenList] = useState<TokenBalanceInfo[] | undefined>();
+    const [tokenList, setTokenList] = useState<TypeTokenPriceInfo | undefined>();
 
     useEffect(() => {
         if (copied) {
@@ -109,34 +126,26 @@ const UserInfoModal = () => {
 
     useEffect(() => {
         if (!showInfoModal) return;
+        let result = { ...allTokenPrice };
+        const sortedEntries = Object.entries(result).sort(([canisterIdA], [canisterIdB]) => {
+            const balanceA = allTokenBalance[canisterIdA];
+            const balanceB = allTokenBalance[canisterIdB];
 
-        if (allTokenBalance && activeTab === 'wallet') {
-            const sortedTokens = [...allTokenBalance].sort((a, b) => {
-                const balanceA = Number(a.balance_wallet || 0);
-                const balanceB = Number(b.balance_wallet || 0);
-                return balanceB - balanceA;
-            });
+            const valueA =
+                activeTab === 'wallet'
+                    ? Number(balanceA?.walletBalance || 0)
+                    : Number(balanceA?.contractWalletBalance || 0);
 
-            setTokenList(sortedTokens);
-        }
-        if (allTokenBalance && activeTab === 'contract') {
-            const sortedTokens = [...allTokenBalance].sort((a, b) => {
-                const balanceA = Number(a.usd_wallet_contract || 0);
-                const balanceB = Number(b.usd_wallet_contract || 0);
-                return balanceB - balanceA;
-            });
+            const valueB =
+                activeTab === 'wallet'
+                    ? Number(balanceB?.walletBalance || 0)
+                    : Number(balanceB?.contractWalletBalance || 0);
 
-            setTokenList(sortedTokens);
-        } else {
-            const sortedTokens = [...allTokenBalance].sort((a, b) => {
-                const balanceA = Number(a.usd_wallet || 0);
-                const balanceB = Number(b.usd_wallet || 0);
-                return balanceB - balanceA;
-            });
-
-            setTokenList(sortedTokens);
-        }
-    }, [allTokenBalance, activeTab, showInfoModal]);
+            return valueB - valueA;
+        });
+        result = Object.fromEntries(sortedEntries);
+        setTokenList(result);
+    }, [allTokenBalance, allTokenPrice, walletMode, activeTab, showInfoModal]);
 
     return (
         <SideSheet
@@ -179,8 +188,6 @@ const UserInfoModal = () => {
                         ></Icon>
                     </div>
                 </div>
-
-                {/* Balance Section */}
 
                 <div className="mt-[15px] w-full px-5">
                     <div className="mb-[15px] flex w-full items-center justify-between">
@@ -311,8 +318,8 @@ const UserInfoModal = () => {
                 <div className="w-full flex-1 overflow-y-auto">
                     {currentTab === 'Tokens' && (
                         <>
-                            {tokenList ? (
-                                tokenList.map((token, index) => (
+                            {tokenList && Object.values(tokenList) ? (
+                                Object.values(tokenList).map((token, index) => (
                                     <TokenListItem tokenInfo={token} key={index} walletMode={activeTab}></TokenListItem>
                                 ))
                             ) : (

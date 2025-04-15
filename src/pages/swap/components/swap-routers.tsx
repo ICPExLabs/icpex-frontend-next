@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import icpswapLogo from '@/assets/swapLogo/icpswap.png';
 import kongswapLogo from '@/assets/swapLogo/kongswap.png';
 import Icon from '@/components/ui/icon';
-import { TokenBalanceInfo } from '@/hooks/useToken';
+import { TypeTokenPriceInfoVal } from '@/hooks/useToken';
 import { cn } from '@/utils/classNames';
 
 import { TypeSwapRouter } from '../swap';
@@ -17,8 +17,8 @@ const SwapRouters = ({
 }: {
     swapRouter: TypeSwapRouter;
     selectedRouter: (swapRouter) => void;
-    payTokenInfo: TokenBalanceInfo | undefined;
-    receiveTokenInfo: TokenBalanceInfo | undefined;
+    payTokenInfo: TypeTokenPriceInfoVal | undefined;
+    receiveTokenInfo: TypeTokenPriceInfoVal | undefined;
 }) => {
     const { t } = useTranslation();
 
@@ -36,11 +36,11 @@ const SwapRouters = ({
     ];
 
     useEffect(() => {
-        console.log(payTokenInfo);
+        // payTokenInfo;
     }, [payTokenInfo]);
 
     useEffect(() => {
-        console.log(receiveTokenInfo);
+        // receiveTokenInfo;
     }, [receiveTokenInfo]);
 
     return (

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Icon from '@/components/ui/icon';
-import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
+import { useTokenInfoBySymbol } from '@/hooks/useToken';
 import { cn } from '@/utils/classNames';
 
 import AmountInput from './components/amount-input';
@@ -18,12 +18,12 @@ function LimitPage() {
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
     const [payToken, setPayToken] = useState<string | undefined>('ICP');
-    const payTokenInfo = useTokenInfoAndBalanceBySymbol(payToken);
+    const payTokenInfo = useTokenInfoBySymbol(payToken);
     const [payTokenBalance, setPayTokenBalance] = useState<number | undefined>(0.53);
 
     const [receiveAmount, setReceiveAmount] = useState<number | undefined>();
     const [receiveToken, setReceiveToken] = useState<string | undefined>();
-    const receiveTokenInfo = useTokenInfoAndBalanceBySymbol(receiveToken);
+    const receiveTokenInfo = useTokenInfoBySymbol(receiveToken);
 
     const onSwapDirectionChange = () => {
         if (!receiveToken || !receiveTokenInfo || !payToken || !payTokenInfo) {
@@ -69,7 +69,7 @@ function LimitPage() {
                 />
                 <div className="flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666666]">
-                        ${payTokenInfo?.price ? (payTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
+                        ${payTokenInfo?.priceUSD ? (payTokenInfo.priceUSD * (payAmount || 0)).toFixed(2) : '0.00'}
                     </p>
                     <div className="flex items-center">
                         <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
@@ -114,7 +114,7 @@ function LimitPage() {
                     tokenInfo={receiveTokenInfo}
                 />
                 <p className="text-sm font-medium text-[#666666]">
-                    ${receiveTokenInfo?.price ? (receiveTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
+                    ${receiveTokenInfo?.priceUSD ? (receiveTokenInfo.priceUSD * (payAmount || 0)).toFixed(2) : '0.00'}
                 </p>
             </div>
 

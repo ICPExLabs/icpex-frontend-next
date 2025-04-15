@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { useTokenInfoAndBalanceByCanisterId } from '@/hooks/useToken';
+import { useTokenInfoByCanisterId } from '@/hooks/useToken';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
@@ -40,7 +40,7 @@ const SearchResultItem = ({
         }
     }, [tokenList, token, tokenName, setTokenData]);
 
-    const priceData = useTokenInfoAndBalanceByCanisterId(tokenData?.canister_id.toString());
+    const priceData = useTokenInfoByCanisterId(tokenData?.canister_id.toString());
 
     return (
         <div className="flex h-[52px] w-full cursor-pointer items-center justify-between px-4 duration-75 hover:bg-[#f2f4ff]">
@@ -59,13 +59,13 @@ const SearchResultItem = ({
                     <div className="ml-[11px] flex flex-col items-end gap-y-1">
                         {priceData ? (
                             <p className="text-base font-medium text-[#000000]">
-                                ${priceData.price ? truncateDecimalToBN(priceData.price, 8) : '--'}
+                                ${priceData.priceUSD ? truncateDecimalToBN(priceData.priceUSD, 4) : '--'}
                             </p>
                         ) : (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
                         )}
                         {priceData ? (
-                            <TokenPriceChangePercentage value={priceData.price_change_24h || '--'} />
+                            <TokenPriceChangePercentage value={priceData.priceUSDChange || '--'} />
                         ) : (
                             <Icon name="loading" className="h-[12px] w-[12px] animate-spin text-[#96a0c8]" />
                         )}

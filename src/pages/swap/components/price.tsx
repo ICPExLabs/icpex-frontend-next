@@ -1,9 +1,9 @@
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
-import { TagType, TokenBalanceInfo } from '@/hooks/useToken';
+import { TypeTokenPriceInfoVal } from '@/hooks/useToken';
 import { truncateDecimalToBN } from '@/utils/numbers';
 
-const ICRCTag = ({ tag }: { tag?: TagType }) => {
+const ICRCTag = ({ tag }: { tag: string }) => {
     const tagConfig = {
         ICRC1: {
             text: 'ICRC-1',
@@ -30,7 +30,7 @@ const ICRCTag = ({ tag }: { tag?: TagType }) => {
     );
 };
 
-const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
+const PriceItem = ({ tokenInfo, balance }: { tokenInfo: TypeTokenPriceInfoVal; balance: number | undefined }) => {
     return (
         <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-x-[10px]">
@@ -38,15 +38,15 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
                 <div className="flex flex-col">
                     <div className="flex items-center gap-x-[7px]">
                         <p className="text-base font-medium text-[#000000]">{tokenInfo.symbol}</p>
-                        <ICRCTag tag={tokenInfo?.standard} />
+                        {tokenInfo?.standard && <ICRCTag tag={tokenInfo?.standard} />}
                     </div>
                     <p className="text-xs font-medium text-[#999999]">{tokenInfo.name}</p>
                 </div>
             </div>
 
-            {tokenInfo ? (
+            {balance && tokenInfo.priceUSD ? (
                 <p className="text-base font-medium text-[#000000]">
-                    {tokenInfo?.price ? `$${truncateDecimalToBN(tokenInfo?.price, 8)}` : '--'}
+                    ${truncateDecimalToBN(tokenInfo.priceUSD * balance, 4)}
                 </p>
             ) : (
                 <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
@@ -57,15 +57,19 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TokenBalanceInfo }) => {
 
 function PriceComponents({
     payTokenInfo,
+    payBalance,
     receiveTokenInfo,
+    receiveBalance,
 }: {
-    payTokenInfo: TokenBalanceInfo | undefined;
-    receiveTokenInfo: TokenBalanceInfo | undefined;
+    payTokenInfo: TypeTokenPriceInfoVal | undefined;
+    payBalance: number | undefined;
+    receiveTokenInfo: TypeTokenPriceInfoVal | undefined;
+    receiveBalance: number | undefined;
 }) {
     return (
         <div className="mt-[20px] flex w-full flex-col items-center justify-center gap-y-5">
-            {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} />}
-            {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} />}
+            {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} balance={payBalance} />}
+            {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} balance={receiveBalance} />}
         </div>
     );
 }

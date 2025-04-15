@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { contract_swap, execute_complete_swap } from '@/components/api/swap';
 import Icon from '@/components/ui/icon';
-import { useTokenInfoAndBalanceBySymbol } from '@/hooks/useToken';
+import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useSwapFees } from '@/hooks/useWalletSwap';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
@@ -28,12 +28,49 @@ function SwapPage() {
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
     const [payToken, setPayToken] = useState<string | undefined>('ICP');
-    const payTokenInfo = useTokenInfoAndBalanceBySymbol(payToken);
-    const [payTokenBalance, setPayTokenBalance] = useState<number | undefined>(undefined);
+    const payTokenInfo = useTokenInfoBySymbol(payToken);
+    const payBalanceToken = useTokenBalanceBySymbol(payToken);
+    const payBalance = useMemo(() => {
+        if (!payBalanceToken || !payTokenInfo) return 0;
+        if (walletMode === 'wallet') {
+            return Number(
+                new BigNumber(payBalanceToken.walletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(payTokenInfo.decimals)),
+                ),
+            );
+        }
+        if (walletMode === 'contract') {
+            return Number(
+                new BigNumber(payBalanceToken.contractWalletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(payTokenInfo.decimals)),
+                ),
+            );
+        }
+        return 0;
+    }, [payBalanceToken, walletMode, payTokenInfo]);
 
     const [receiveAmount, setReceiveAmount] = useState<number | undefined>();
     const [receiveToken, setReceiveToken] = useState<string | undefined>();
-    const receiveTokenInfo = useTokenInfoAndBalanceBySymbol(receiveToken);
+    const receiveTokenInfo = useTokenInfoBySymbol(receiveToken);
+    const receiveBalanceToken = useTokenBalanceBySymbol(receiveToken);
+    const receiveBalance = useMemo(() => {
+        if (!receiveBalanceToken || !payTokenInfo) return 0;
+        if (walletMode === 'wallet') {
+            return Number(
+                new BigNumber(receiveBalanceToken.walletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(payTokenInfo.decimals)),
+                ),
+            );
+        }
+        if (walletMode === 'contract') {
+            return Number(
+                new BigNumber(receiveBalanceToken.contractWalletBalance).dividedBy(
+                    new BigNumber(10).pow(new BigNumber(payTokenInfo.decimals)),
+                ),
+            );
+        }
+        return 0;
+    }, [receiveBalanceToken, walletMode, payTokenInfo]);
 
     const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('ICPEx');
     const [loading, setLoading] = useState<boolean>(false);
@@ -46,8 +83,8 @@ function SwapPage() {
     });
 
     const exchangeRate = useMemo(() => {
-        if (!payTokenInfo?.price || !receiveTokenInfo?.price) return 0;
-        return payTokenInfo?.price / receiveTokenInfo?.price;
+        if (!payTokenInfo?.priceUSD || !receiveTokenInfo?.priceUSD) return 0;
+        return payTokenInfo?.priceUSD / receiveTokenInfo?.priceUSD;
     }, [payTokenInfo, receiveTokenInfo]);
 
     const onSwapDirectionChange = () => {
@@ -60,13 +97,13 @@ function SwapPage() {
     };
 
     const onHalfChange = () => {
-        if (!payTokenBalance) return;
-        setPayAmount(truncateDecimalToBN(payTokenBalance / 2));
+        if (!payBalance) return;
+        setPayAmount(truncateDecimalToBN(payBalance / 2));
     };
 
     const onMaxChange = () => {
-        if (!payTokenBalance) return;
-        setPayAmount(truncateDecimalToBN(payTokenBalance));
+        if (!payBalance) return;
+        setPayAmount(truncateDecimalToBN(payBalance));
     };
 
     const onSwapChange = async () => {
@@ -152,17 +189,6 @@ function SwapPage() {
     };
 
     useEffect(() => {
-        if (!payTokenInfo) return;
-
-        if (walletMode === 'contract') {
-            setPayTokenBalance(payTokenInfo.balance_wallet_contract);
-        }
-        if (walletMode === 'wallet') {
-            setPayTokenBalance(payTokenInfo.balance_wallet);
-        }
-    }, [payTokenInfo, walletMode]);
-
-    useEffect(() => {
         if (walletMode === 'contract') {
             setSwapRouter('ICPEx');
         }
@@ -191,15 +217,16 @@ function SwapPage() {
                 />
                 <div className="flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666666]">
-                        ${payTokenInfo?.price ? (payTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
+                        $
+                        {payTokenInfo?.priceUSD
+                            ? truncateDecimalToBN(payTokenInfo.priceUSD * (payAmount || 0))
+                            : '0.00'}
                     </p>
-                    {typeof payTokenBalance !== 'undefined' && (
+                    {typeof payBalance !== 'undefined' && (
                         <div className="flex items-center">
                             <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
                             <div className="ml-[6px] flex items-center">
-                                <p className="text-xs font-medium text-[#666]">
-                                    {truncateDecimalToBN(payTokenBalance)}
-                                </p>
+                                <p className="text-xs font-medium text-[#666]">{truncateDecimalToBN(payBalance)}</p>
                                 <p className="ml-[2px] text-xs font-medium text-[#666]">{payToken}</p>
                             </div>
                             <div className="ml-2 flex items-center text-xs font-medium text-[#07c160]">
@@ -240,7 +267,7 @@ function SwapPage() {
                     disabled={true}
                 />
                 <p className="text-sm font-medium text-[#666666]">
-                    ${receiveTokenInfo?.price ? (receiveTokenInfo.price * (payAmount || 0)).toFixed(2) : '0.00'}
+                    ${receiveTokenInfo?.priceUSD ? (receiveTokenInfo.priceUSD * (payAmount || 0)).toFixed(2) : '0.00'}
                 </p>
             </div>
 
@@ -248,12 +275,12 @@ function SwapPage() {
                 {(() => {
                     const isDisabled =
                         isInitializing ||
-                        !payTokenBalance ||
+                        !payBalance ||
                         !payToken ||
                         !receiveToken ||
                         !payAmount ||
                         !receiveAmount ||
-                        payAmount > payTokenBalance ||
+                        payAmount > payBalance ||
                         loading;
                     const isNotConnected = !isInitializing && !isConnected;
 
@@ -261,13 +288,11 @@ function SwapPage() {
                         disabled: {
                             className: 'bg-[#f6f6f6] text-[#999999] cursor-not-allowed',
                             text: (() => {
-                                if (isInitializing || typeof payTokenBalance === 'undefined')
-                                    return t('swap.swapBtn.init');
+                                if (isInitializing || typeof payBalance === 'undefined') return t('swap.swapBtn.init');
                                 if (!payToken || !receiveToken) return t('swap.swapBtn.select');
                                 if (!payAmount || !receiveAmount) return t('swap.swapBtn.enterAmount');
-                                if (!payTokenBalance) return t('swap.swapBtn.insufficientEmpty');
-                                if (payAmount > payTokenBalance)
-                                    return t('swap.swapBtn.insufficient', { symbol: payToken });
+                                if (!payBalance) return t('swap.swapBtn.insufficientEmpty');
+                                if (payAmount > payBalance) return t('swap.swapBtn.insufficient', { symbol: payToken });
                                 return '';
                             })(),
                             textClassName: 'text-[#999999]',
@@ -310,7 +335,7 @@ function SwapPage() {
                 })()}
             </div>
 
-            {payTokenInfo?.price && receiveTokenInfo?.price && (
+            {payTokenInfo?.priceUSD && receiveTokenInfo?.priceUSD && (
                 <div className="mt-3 flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666]">
                         1 {payToken} = {oneAmountOut ? Number(oneAmountOut) : truncateDecimalToBN(exchangeRate, 4)}{' '}
@@ -332,7 +357,12 @@ function SwapPage() {
                 />
             )}
 
-            <PriceComponents payTokenInfo={payTokenInfo} receiveTokenInfo={receiveTokenInfo} />
+            <PriceComponents
+                payTokenInfo={payTokenInfo}
+                payBalance={payBalanceToken ? payBalance : undefined}
+                receiveTokenInfo={receiveTokenInfo}
+                receiveBalance={receiveBalanceToken ? receiveBalance : undefined}
+            />
         </div>
     );
 }

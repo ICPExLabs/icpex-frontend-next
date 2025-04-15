@@ -3,17 +3,24 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { TokenBalanceInfo } from '@/hooks/useToken';
+import { TypeTokenPriceInfoVal } from '@/hooks/useToken';
 import { isDevMode } from '@/utils/env';
 
+export type TypeTokenBalanceVal = {
+    walletBalance: string;
+    contractWalletBalance: string;
+};
+export type TypeTokenBalance = Record<string, TypeTokenBalanceVal>;
+export type TypeTokenPriceInfo = Record<string, TypeTokenPriceInfoVal>;
 interface TokenStore {
     tokenList: TokenInfo[] | undefined;
     setTokenList: (tokenList: TokenInfo[]) => void;
 
-    allTokenBalance: TokenBalanceInfo[];
-    setAllTokenBalance: (allTokenBalance: TokenBalanceInfo[]) => void;
-    allTokenBalanceForceRefresh: ((tokenList: TokenInfo[]) => void) | null;
-    setForceRefreshAllTokenBalance: (fn: (tokenList: TokenInfo[]) => void) => void;
+    allTokenPrice: TypeTokenPriceInfo | undefined;
+    setAllTokenPrice: (allTokenPrice: TypeTokenPriceInfo) => void;
+
+    allTokenBalance: TypeTokenBalance;
+    addAllTokenBalance: (canisterId: string, val: TypeTokenBalanceVal) => void;
 
     totalBalance: number | undefined;
     setTotalBalance: (totalBalance: number) => void;
@@ -39,14 +46,18 @@ const isDev = isDevMode();
 
 export const useTokenStore = create<TokenStore>()(
     devtools(
-        subscribeWithSelector((set) => ({
+        subscribeWithSelector((set, get) => ({
             tokenList: undefined,
             setTokenList: (tokenList) => set({ tokenList }),
 
-            allTokenBalance: [],
-            setAllTokenBalance: (allTokenBalance) => set({ allTokenBalance }),
-            allTokenBalanceForceRefresh: null,
-            setForceRefreshAllTokenBalance: (fn) => set({ allTokenBalanceForceRefresh: fn }),
+            allTokenPrice: undefined,
+            setAllTokenPrice: (allTokenPrice) => set({ allTokenPrice }),
+
+            allTokenBalance: {},
+            addAllTokenBalance: (canisterId, val: TypeTokenBalanceVal) => {
+                const { allTokenBalance } = get();
+                allTokenBalance[canisterId] = val;
+            },
 
             totalBalance: undefined,
             setTotalBalance: (totalBalance) => set({ totalBalance }),

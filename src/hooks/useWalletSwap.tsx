@@ -7,15 +7,15 @@ import { anonymous } from '@/components/connect/creator';
 import { useAppStore } from '@/stores/app';
 import { bigint2string } from '@/utils/common/bigint';
 
-import { TokenBalanceInfo } from './useToken';
+import { TypeTokenPriceInfoVal } from './useToken';
 
 export const useSwapFees = ({
     from,
     to,
     fromAmount,
 }: {
-    from: TokenBalanceInfo | undefined;
-    to: TokenBalanceInfo | undefined;
+    from: TypeTokenPriceInfoVal | undefined;
+    to: TypeTokenPriceInfoVal | undefined;
     fromAmount: number | undefined;
 }) => {
     const { walletMode } = useAppStore();

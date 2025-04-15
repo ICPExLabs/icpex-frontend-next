@@ -1,85 +1,59 @@
-import { useCallback, useEffect, useState } from 'react';
-
+import { get_all_tokens } from '@/canister/icpswap/apis';
+import { PublicTokenOverview } from '@/canister/icpswap/icpswap.did.d';
 import { get_tokens_query } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 import { isCanisterIdText } from '@/utils/principals';
 
 import { useExecuteOnce } from './useExecuteOnce';
-import { getAllTokensAndBalance, getAllTokensPrice, TokenBalanceInfo } from './useToken';
 
 export const useInitTokenList = () => {
-    const { connectedIdentity } = useIdentityStore();
-    const { setTokenList, setAllTokenBalance, setTotalBalance, setContractWallet, setForceRefreshAllTokenBalance } =
-        useTokenStore();
-    const [isInitializing, setIsInitializing] = useState<boolean | undefined>(undefined);
-
-    const init = useCallback(
-        async (tokenList) => {
-            if (!tokenList) return;
-            if (isInitializing) return;
-
-            setIsInitializing(true);
-            try {
-                const priceList = await getAllTokensPrice(tokenList);
-                if (!priceList) return;
-
-                let finalData: TokenBalanceInfo[] = priceList as TokenBalanceInfo[];
-
-                if (connectedIdentity) {
-                    const priceListAndBalance = await getAllTokensAndBalance(priceList, connectedIdentity);
-                    if (priceListAndBalance) {
-                        finalData = priceListAndBalance;
-
-                        let usd = 0;
-                        let usd_contract = 0;
-                        priceListAndBalance.forEach((item) => {
-                            usd += item.usd_wallet || 0;
-                            usd_contract += item.usd_wallet_contract || 0;
-                        });
-                        setTotalBalance(usd);
-                        setContractWallet(usd_contract);
-                    }
-                }
-
-                setAllTokenBalance(finalData);
-            } catch (error) {
-                console.error('Failed to fetch token data:', error);
-            } finally {
-                setIsInitializing(false);
-            }
-        },
-        [connectedIdentity, isInitializing, setAllTokenBalance, setContractWallet, setTotalBalance],
-    );
+    const { setTokenList, setAllTokenPrice } = useTokenStore();
 
     useExecuteOnce(() => {
-        get_tokens_query().then((tokenList: TokenInfo[]) => {
-            console.log('🚀 ~ get_tokens_query ~ tokenList:', tokenList);
+        get_tokens_query().then(async (tokenList: TokenInfo[]) => {
             const list: TokenInfo[] = tokenList.filter((item) => {
                 if (isCanisterIdText(item.canister_id.toString())) {
                     return true;
                 }
             });
             setTokenList(list);
-            init(list);
+
+            const updatePrices = async () => {
+                console.log('🚀 ~ updatePrices ~ updatePrices');
+                const priceList = await get_all_tokens();
+                if (priceList) {
+                    const priceListObj: Record<string, PublicTokenOverview> = {};
+
+                    priceList.forEach((priceListItem: PublicTokenOverview) => {
+                        priceListObj[priceListItem.address] = priceListItem;
+                    });
+
+                    const arr = {};
+                    list.map((tokenListItem) => {
+                        const priceData: PublicTokenOverview = priceListObj[tokenListItem.canister_id.toString()];
+                        console.log('🚀 ~ list.map ~ priceData:', priceData);
+                        arr[tokenListItem.canister_id.toString()] = {
+                            ...tokenListItem,
+                            feesUSD: priceData?.feesUSD || undefined,
+                            priceUSD: priceData?.priceUSD || undefined,
+                            priceUSDChange: priceData?.priceUSDChange || undefined,
+                            standard: priceData?.standard || undefined,
+                            totalVolumeUSD: priceData?.totalVolumeUSD || undefined,
+                            volumeUSD: priceData?.volumeUSD || undefined,
+                            volumeUSD1d: priceData?.volumeUSD1d || undefined,
+                            volumeUSD7d: priceData?.volumeUSD7d || undefined,
+                        };
+                    });
+                    setAllTokenPrice(arr);
+                }
+            };
+
+            await updatePrices();
+
+            const intervalId = setInterval(updatePrices, 10000);
+
+            return () => clearInterval(intervalId);
         });
     });
-
-    const forceRefresh = useCallback(
-        (tokenList: TokenInfo[]) => {
-            console.log('🚀 ~ forceRefresh ~:');
-            init(tokenList);
-        },
-        [init],
-    );
-
-    useEffect(() => {
-        setForceRefreshAllTokenBalance(() => forceRefresh);
-    }, [forceRefresh, setForceRefreshAllTokenBalance]);
-
-    return {
-        refreshing: init,
-        isInitializing,
-    };
 };
