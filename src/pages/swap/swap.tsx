@@ -222,30 +222,34 @@ function SwapPage() {
                             ? truncateDecimalToBN(payTokenInfo.priceUSD * (payAmount || 0))
                             : '0.00'}
                     </p>
-                    {!payBalanceToken ? (
-                        <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                    {isConnected ? (
+                        !payBalanceToken ? (
+                            <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#7178FF]" />
+                        ) : (
+                            <div className="flex items-center">
+                                <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
+                                <div className="ml-[6px] flex items-center">
+                                    <p className="text-xs font-medium text-[#666]">{truncateDecimalToBN(payBalance)}</p>
+                                    <p className="ml-[2px] text-xs font-medium text-[#666]">{payToken}</p>
+                                </div>
+                                <div className="ml-2 flex items-center text-xs font-medium text-[#07c160]">
+                                    <p
+                                        className="flex h-[20px] cursor-pointer items-center rounded-l-full border border-r-0 border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
+                                        onClick={onHalfChange}
+                                    >
+                                        {t('swap.swap.half')}
+                                    </p>
+                                    <p
+                                        className="flex h-[20px] cursor-pointer items-center rounded-r-full border border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
+                                        onClick={onMaxChange}
+                                    >
+                                        {t('swap.swap.max')}
+                                    </p>
+                                </div>
+                            </div>
+                        )
                     ) : (
-                        <div className="flex items-center">
-                            <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
-                            <div className="ml-[6px] flex items-center">
-                                <p className="text-xs font-medium text-[#666]">{truncateDecimalToBN(payBalance)}</p>
-                                <p className="ml-[2px] text-xs font-medium text-[#666]">{payToken}</p>
-                            </div>
-                            <div className="ml-2 flex items-center text-xs font-medium text-[#07c160]">
-                                <p
-                                    className="flex h-[20px] cursor-pointer items-center rounded-l-full border border-r-0 border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
-                                    onClick={onHalfChange}
-                                >
-                                    {t('swap.swap.half')}
-                                </p>
-                                <p
-                                    className="flex h-[20px] cursor-pointer items-center rounded-r-full border border-[#E4E9FF] px-2 text-xs font-medium text-[#07C160]"
-                                    onClick={onMaxChange}
-                                >
-                                    {t('swap.swap.max')}
-                                </p>
-                            </div>
-                        </div>
+                        <></>
                     )}
                 </div>
             </div>
@@ -275,16 +279,17 @@ function SwapPage() {
 
             <div className="h-[60px] w-full">
                 {(() => {
-                    const isDisabled =
-                        isInitializing ||
-                        !payBalance ||
-                        !payToken ||
-                        !receiveToken ||
-                        !payAmount ||
-                        !receiveAmount ||
-                        payAmount > payBalance ||
-                        loading;
                     const isNotConnected = !isInitializing && !isConnected;
+                    const isDisabled =
+                        !isNotConnected &&
+                        (isInitializing ||
+                            !payBalance ||
+                            !payToken ||
+                            !receiveToken ||
+                            !payAmount ||
+                            !receiveAmount ||
+                            payAmount > payBalance ||
+                            loading);
 
                     const buttonConfig = {
                         disabled: {
@@ -302,9 +307,15 @@ function SwapPage() {
                         },
                         active: {
                             className: 'bg-swap-btn text-white cursor-pointer',
-                            text: isNotConnected ? t('swap.swapBtn.connect') : t('swap.swapBtn.swap'),
+                            text: t('swap.swapBtn.swap'),
                             textClassName: 'text-[#fff]',
-                            onClick: isNotConnected ? () => setShowLoginModal(true) : onSwapChange,
+                            onClick: onSwapChange,
+                        },
+                        connect: {
+                            className: 'bg-swap-btn text-white cursor-pointer',
+                            text: t('swap.swapBtn.connect'),
+                            textClassName: 'text-[#fff]',
+                            onClick: () => setShowLoginModal(true),
                         },
                         swap: {
                             className: 'bg-swap-btn text-white cursor-pointer',
@@ -314,11 +325,13 @@ function SwapPage() {
                         },
                     };
 
-                    const config = isDisabled
-                        ? buttonConfig.disabled
-                        : walletMode === 'wallet' && swapRouter !== 'ICPEx'
-                          ? buttonConfig.swap
-                          : buttonConfig.active;
+                    const config = isNotConnected
+                        ? buttonConfig.connect
+                        : isDisabled
+                          ? buttonConfig.disabled
+                          : walletMode === 'wallet' && swapRouter !== 'ICPEx'
+                            ? buttonConfig.swap
+                            : buttonConfig.active;
 
                     return (
                         <div

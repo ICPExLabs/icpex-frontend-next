@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
-import { useDeepCompareMemo } from 'use-deep-compare';
 
 import { get_wallet_token_balance } from '@/canister/icrc1/apis';
 import { get_tokens_balance } from '@/canister/swap/apis';
 import { TokenInfo } from '@/canister/swap/swap.did.d';
-import { TypeTokenBalance, TypeTokenBalanceVal, useTokenStore } from '@/stores/token';
+import { TypeTokenBalanceVal, useTokenStore } from '@/stores/token';
 
 export type TypeTokenPriceInfoVal = TokenInfo & {
     feesUSD: number | undefined;
@@ -56,7 +55,7 @@ export const useTokenBalanceBySymbol = (symbol: string | undefined): TypeTokenBa
 };
 
 export const initBalance = async (connectedIdentity, tokenList) => {
-    const addAllTokenBalance = useTokenStore.getState().addAllTokenBalance;
+    const { addAllTokenBalance, computationTotalBalance, computationContractWallet } = useTokenStore.getState();
 
     if (!connectedIdentity) return;
     if (!tokenList) return;
@@ -66,15 +65,19 @@ export const initBalance = async (connectedIdentity, tokenList) => {
         owner: principal,
     });
 
-    // addAllTokenBalance;
-    tokenList.forEach(async (item) => {
-        const contractBalance = contractBalanceRes[item.canister_id.toString()];
-        const walletBalance = await get_wallet_token_balance(item.canister_id.toString(), principal);
+    Promise.all(
+        tokenList.map(async (item) => {
+            const contractBalance = contractBalanceRes[item.canister_id.toString()];
+            const walletBalance = await get_wallet_token_balance(item.canister_id.toString(), principal);
 
-        const res: TypeTokenBalanceVal = {
-            walletBalance: walletBalance,
-            contractWalletBalance: contractBalance,
-        };
-        addAllTokenBalance(item.canister_id.toString(), res);
+            const res: TypeTokenBalanceVal = {
+                walletBalance: walletBalance,
+                contractWalletBalance: contractBalance,
+            };
+            addAllTokenBalance(item.canister_id.toString(), res);
+        }),
+    ).finally(() => {
+        computationTotalBalance();
+        computationContractWallet();
     });
 };

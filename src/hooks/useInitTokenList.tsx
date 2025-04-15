@@ -20,7 +20,6 @@ export const useInitTokenList = () => {
             setTokenList(list);
 
             const updatePrices = async () => {
-                console.log('🚀 ~ updatePrices ~ updatePrices');
                 const priceList = await get_all_tokens();
                 if (priceList) {
                     const priceListObj: Record<string, PublicTokenOverview> = {};
@@ -32,7 +31,7 @@ export const useInitTokenList = () => {
                     const arr = {};
                     list.map((tokenListItem) => {
                         const priceData: PublicTokenOverview = priceListObj[tokenListItem.canister_id.toString()];
-                        console.log('🚀 ~ list.map ~ priceData:', priceData);
+
                         arr[tokenListItem.canister_id.toString()] = {
                             ...tokenListItem,
                             feesUSD: priceData?.feesUSD || undefined,
@@ -51,7 +50,7 @@ export const useInitTokenList = () => {
 
             await updatePrices();
 
-            const intervalId = setInterval(updatePrices, 10000);
+            const intervalId = setInterval(updatePrices, 20000);
 
             return () => clearInterval(intervalId);
         });

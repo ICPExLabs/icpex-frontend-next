@@ -1,8 +1,6 @@
 import { useConnect } from '@connect2ic/react';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
-import { get_wallet_token_balance } from '@/canister/icrc1/apis';
-import { get_tokens_balance } from '@/canister/swap/apis';
 import { checkConnected } from '@/components/connect/connect';
 import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
@@ -12,7 +10,7 @@ import { initBalance } from './useToken';
 
 export const useInitIdentity = () => {
     const { connectedIdentity, setConnectedIdentity, setShowLoginModal } = useIdentityStore();
-    const { tokenList } = useTokenStore();
+    const { tokenList, clearAllTokenBalance } = useTokenStore();
 
     const { isConnected } = useConnect({
         onConnect: (connected: any) => {
@@ -36,7 +34,10 @@ export const useInitIdentity = () => {
                 },
             );
         },
-        onDisconnect: () => setConnectedIdentity(undefined),
+        onDisconnect: () => {
+            setConnectedIdentity(undefined);
+            clearAllTokenBalance();
+        },
     });
 
     useEffect(() => {

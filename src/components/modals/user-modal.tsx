@@ -193,21 +193,35 @@ const UserInfoModal = () => {
                     <div className="mb-[15px] flex w-full items-center justify-between">
                         <div className="flex flex-1 flex-col items-start">
                             <p className="text-xs font-medium text-[#666666]">{t('common.userInfo.totalBalance')}</p>
-                            <div className="flex items-center">
-                                <p className="text-2xl font-medium text-black">
-                                    ${typeof totalBalance === 'number' ? truncateDecimalToBN(totalBalance, 2) : '--'}
-                                </p>
+                            <div className="flex h-8 items-center">
+                                {typeof totalBalance === 'undefined' ? (
+                                    <Icon
+                                        name="loading"
+                                        className="mr-2 h-[20px] w-[20px] animate-spin text-[#07c160]"
+                                    />
+                                ) : (
+                                    <p className="text-2xl font-medium text-black">
+                                        ${truncateDecimalToBN(totalBalance, 2)}
+                                    </p>
+                                )}
+
                                 {/* <TokenPriceChangePercentage value={0.23} className="ml-1" /> */}
                             </div>
                         </div>
 
                         <div className="flex flex-1 flex-col items-start">
                             <p className="text-xs font-medium text-[#666666]">{t('common.userInfo.contractWallet')}</p>
-                            <div className="flex items-center">
-                                <p className="text-2xl font-medium text-black">
-                                    $
-                                    {typeof contractWallet === 'number' ? truncateDecimalToBN(contractWallet, 2) : '--'}
-                                </p>
+                            <div className="flex h-8 items-center">
+                                {typeof contractWallet === 'undefined' ? (
+                                    <Icon
+                                        name="loading"
+                                        className="mr-2 h-[20px] w-[20px] animate-spin text-[#07c160]"
+                                    />
+                                ) : (
+                                    <p className="text-2xl font-medium text-black">
+                                        ${truncateDecimalToBN(contractWallet, 2)}
+                                    </p>
+                                )}
                                 {/* <TokenPriceChangePercentage value={-0.23} className="ml-1" /> */}
                             </div>
                         </div>

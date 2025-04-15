@@ -21,12 +21,13 @@ interface TokenStore {
 
     allTokenBalance: TypeTokenBalance;
     addAllTokenBalance: (canisterId: string, val: TypeTokenBalanceVal) => void;
+    clearAllTokenBalance: () => void;
 
     totalBalance: number | undefined;
-    setTotalBalance: (totalBalance: number) => void;
+    computationTotalBalance: () => void;
 
     contractWallet: number | undefined;
-    setContractWallet: (contractWallet: number) => void;
+    computationContractWallet: () => void;
 
     showSendModal: boolean;
     setShowSendModal: (show: boolean) => void;
@@ -63,12 +64,32 @@ export const useTokenStore = create<TokenStore>()(
                     },
                 });
             },
+            clearAllTokenBalance: () => {
+                set({ allTokenBalance: {} });
+            },
 
             totalBalance: undefined,
-            setTotalBalance: (totalBalance) => set({ totalBalance }),
+            computationTotalBalance: () => {
+                const { allTokenPrice, allTokenBalance } = get();
+                const totalBalance = 0;
+                Object.keys(allTokenBalance).forEach((item) => {
+                    // totalBalance += Number(item.walletBalance);
+                });
+                // console.log('🚀 ~ subscribeWithSelector ~ totalBalance:', totalBalance);
+                // set({ totalBalance });
+            },
 
             contractWallet: undefined,
-            setContractWallet: (contractWallet) => set({ contractWallet }),
+            computationContractWallet: () => {
+                const { allTokenBalance } = get();
+                let totalBalance = 0;
+                Object.values(allTokenBalance).forEach((item) => {
+                    totalBalance += Number(item.contractWalletBalance);
+                });
+                console.log('🚀 ~ subscribeWithSelector ~ totalBalance:', totalBalance);
+
+                set({ totalBalance });
+            },
 
             showSendModal: false,
             setShowSendModal: (show) => set({ showSendModal: show }),

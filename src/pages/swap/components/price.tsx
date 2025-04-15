@@ -1,3 +1,5 @@
+import { useConnect } from '@connect2ic/react';
+
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
 import { TypeTokenPriceInfoVal } from '@/hooks/useToken';
@@ -31,6 +33,8 @@ const ICRCTag = ({ tag }: { tag: string }) => {
 };
 
 const PriceItem = ({ tokenInfo, balance }: { tokenInfo: TypeTokenPriceInfoVal; balance: number | undefined }) => {
+    const { isConnected } = useConnect();
+
     return (
         <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-x-[10px]">
@@ -44,12 +48,18 @@ const PriceItem = ({ tokenInfo, balance }: { tokenInfo: TypeTokenPriceInfoVal; b
                 </div>
             </div>
 
-            {balance && tokenInfo.priceUSD ? (
-                <p className="text-base font-medium text-[#000000]">
-                    ${truncateDecimalToBN(tokenInfo.priceUSD * balance, 4)}
-                </p>
+            {isConnected ? (
+                <>
+                    {balance && tokenInfo.priceUSD ? (
+                        <p className="text-base font-medium text-[#000000]">
+                            ${truncateDecimalToBN(tokenInfo.priceUSD * balance, 4)}
+                        </p>
+                    ) : (
+                        <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
+                    )}
+                </>
             ) : (
-                <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
+                <></>
             )}
         </div>
     );

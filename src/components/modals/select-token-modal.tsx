@@ -1,3 +1,4 @@
+import { useConnect } from '@connect2ic/react';
 import { Modal, Switch } from '@douyinfe/semi-ui';
 import BigNumber from 'bignumber.js';
 import { useMemo, useState } from 'react';
@@ -21,6 +22,7 @@ const SelectTokenItem = ({
     data: TypeTokenPriceInfoVal;
     selectToken: (data: TypeTokenPriceInfoVal) => void;
 }) => {
+    const { isConnected } = useConnect();
     const { walletMode } = useAppStore();
     const tokenBalance = useTokenBalanceByCanisterId(data.canister_id.toString());
 
@@ -58,11 +60,18 @@ const SelectTokenItem = ({
             </div>
 
             <div className="flex flex-col items-end duration-75 group-hover:mr-[13px]">
-                {!tokenBalance && <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />}
-                {tokenBalance && (
-                    <p className="text-sm font-medium text-[#000000]">
-                        {truncateDecimalToBN(balance)} {data.symbol}
-                    </p>
+                {isConnected ? (
+                    <>
+                        {!tokenBalance ? (
+                            <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
+                        ) : (
+                            <p className="text-sm font-medium text-[#000000]">
+                                {truncateDecimalToBN(balance)} {data.symbol}
+                            </p>
+                        )}
+                    </>
+                ) : (
+                    <></>
                 )}
                 <p className="text-xs font-medium text-[#999999]">${truncateDecimalToBN(data.priceUSD || 0)}</p>
             </div>
