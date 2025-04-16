@@ -235,32 +235,32 @@ function SwapPage() {
     const initialized = useRef(false);
 
     useEffect(() => {
-        if (!tokenList) return;
+        if (!tokenList || initialized.current) return;
 
         const params = new URLSearchParams(window.location.search);
+        const inputParam = params.get('input');
+        const outputParam = params.get('output');
 
-        if (!initialized.current) {
-            const inputParam = params.get('input');
-            const outputParam = params.get('output');
+        let initialPayToken = 'ICP';
+        let initialReceiveToken: string | undefined;
 
-            let initialPayToken = 'ICP';
-            let initialReceiveToken: string | undefined = undefined;
-
-            if (inputParam) {
-                const found = tokenList.find((item) => item.canister_id.toString() === inputParam);
-                if (found) initialPayToken = found.symbol;
-            }
-
-            if (outputParam) {
-                const found = tokenList.find((item) => item.canister_id.toString() === outputParam);
-                if (found) initialReceiveToken = found.symbol;
-            }
-
-            setPayToken(initialPayToken);
-            setReceiveToken(initialReceiveToken);
-            initialized.current = true;
-            return;
+        if (inputParam) {
+            const found = tokenList.find((item) => item.canister_id.toString() === inputParam);
+            if (found) initialPayToken = found.symbol;
         }
+
+        if (outputParam) {
+            const found = tokenList.find((item) => item.canister_id.toString() === outputParam);
+            if (found) initialReceiveToken = found.symbol;
+        }
+
+        setPayToken(initialPayToken);
+        setReceiveToken(initialReceiveToken);
+        initialized.current = true;
+    }, [tokenList]);
+
+    useEffect(() => {
+        if (!initialized.current || !tokenList) return;
 
         const newParams = new URLSearchParams();
 
@@ -273,6 +273,8 @@ function SwapPage() {
         if (currentReceiveTokenInfo) {
             newParams.set('output', currentReceiveTokenInfo.canister_id.toString());
         }
+
+        window.history.replaceState({}, '', `?${newParams.toString()}`);
     }, [payToken, receiveToken, tokenList]);
 
     return (
