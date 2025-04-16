@@ -1,5 +1,6 @@
 import { useConnect } from '@connect2ic/react';
 import { Toast } from '@douyinfe/semi-ui';
+import { useInterval } from 'ahooks';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +12,7 @@ import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken'
 import { useSwapFees } from '@/hooks/useWalletSwap';
 import { useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
+import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
 
@@ -27,6 +29,7 @@ function SwapPage() {
 
     const { isConnected, isInitializing } = useConnect();
     const { connectedIdentity, setShowLoginModal } = useIdentityStore();
+    const { updateAllTokenBalance } = useTokenStore();
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
     const [payToken, setPayToken] = useState<string>(searchParams.get('input') || 'ICP');
@@ -78,11 +81,19 @@ function SwapPage() {
     const [loading, setLoading] = useState<boolean>(false);
 
     // loading
-    const { fee, amountOut, oneAmountOut } = useSwapFees({
+    const { fee, amountOut, oneAmountOut, refetchAmountOut } = useSwapFees({
         from: payTokenInfo,
         to: receiveTokenInfo,
         fromAmount: payAmount,
     });
+
+    // update amount out 3s
+    useInterval(() => {
+        if (payToken && receiveToken && payAmount && !loading) {
+            console.log('update amount out');
+            refetchAmountOut();
+        }
+    }, 3000);
 
     const exchangeRate = useMemo(() => {
         if (!payTokenInfo?.priceUSD || !receiveTokenInfo?.priceUSD) return 0;
@@ -183,6 +194,10 @@ function SwapPage() {
 
             setLoading(false);
             Toast.success('Swap successfully');
+            // update pay token balance
+            updateAllTokenBalance(connectedIdentity, payTokenInfo.canister_id.toString());
+            // update receive token balance
+            updateAllTokenBalance(connectedIdentity, receiveTokenInfo.canister_id.toString());
         } catch (error) {
             console.error('🚀 ~ onSwapChange ~ error:', error);
             setLoading(false);
@@ -234,6 +249,7 @@ function SwapPage() {
                     token={payToken}
                     onTokenChange={setPayToken}
                     tokenInfo={payTokenInfo}
+                    ignoreTokens={receiveTokenInfo ? [receiveTokenInfo.canister_id.toString()] : undefined}
                 />
                 <div className="flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666666]">
@@ -291,6 +307,7 @@ function SwapPage() {
                     onTokenChange={setReceiveToken}
                     tokenInfo={receiveTokenInfo}
                     disabled={true}
+                    ignoreTokens={payTokenInfo ? [payTokenInfo.canister_id.toString()] : undefined}
                 />
                 <div className="flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666666]"></p>
@@ -366,9 +383,11 @@ function SwapPage() {
                         ? buttonConfig.connect
                         : isDisabled
                           ? buttonConfig.disabled
-                          : walletMode === 'wallet' && swapRouter !== 'ICPEx'
+                          : walletMode === 'wallet'
                             ? buttonConfig.swap
-                            : buttonConfig.active;
+                            : walletMode === 'contract'
+                              ? buttonConfig.active
+                              : buttonConfig.disabled;
 
                     return (
                         <div

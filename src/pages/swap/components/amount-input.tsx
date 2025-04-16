@@ -1,5 +1,6 @@
 import { InputNumber } from '@douyinfe/semi-ui';
-import { useMemo, useState } from 'react';
+import _ from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
@@ -17,6 +18,7 @@ interface AmountInputProps {
     onTokenChange: (value: string) => void;
     tokenInfo?: TokenInfo | undefined;
     disabled?: boolean;
+    ignoreTokens?: string[] | undefined; // ignore token
 }
 
 const AmountInput = ({
@@ -28,16 +30,27 @@ const AmountInput = ({
     onTokenChange,
     tokenInfo,
     disabled = false,
+    ignoreTokens,
 }: AmountInputProps) => {
     const { t } = useTranslation();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
-    const ignore: string[] = useMemo(() => {
-        if (!tokenInfo) {
-            return [];
+    const [ignore, setIgnore] = useState<string[] | undefined>();
+
+    useEffect(() => {
+        if (!showSelectTokenModal) return;
+
+        const newIgnore: string[] = [];
+
+        if (tokenInfo) {
+            newIgnore.push(tokenInfo?.canister_id.toString());
         }
-        return [tokenInfo.canister_id.toString()];
-    }, [tokenInfo]);
+        if (ignoreTokens && ignoreTokens.length > 0) {
+            newIgnore.push(...ignoreTokens);
+        }
+
+        setIgnore(_.uniq(newIgnore));
+    }, [ignoreTokens, tokenInfo, showSelectTokenModal]);
 
     return (
         <>

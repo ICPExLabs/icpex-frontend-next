@@ -1,12 +1,4 @@
-import BigNumber from 'bignumber.js';
-
-import { icrc2_approve } from '@/canister/icrc1/apis';
-import {
-    deposit_token_to_swap,
-    SWAP_CANISTER_ID,
-    swap_exact_tokens_for_tokens,
-    withdraw_token_from_swap,
-} from '@/canister/swap/apis';
+import { deposit_token_to_swap, swap_exact_tokens_for_tokens, withdraw_token_from_swap } from '@/canister/swap/apis';
 import { ConnectedIdentity } from '@/types/identity';
 import { unwrapVariantKey } from '@/utils/common/variant';
 
@@ -102,13 +94,13 @@ export const execute_complete_swap = async (
 ) => {
     try {
         // transfer total amount
-        const totalAmount = BigNumber(arg.amount_in).plus(BigNumber(arg.fee)).toFixed().split('.')[0];
+        // const totalAmount = BigNumber(arg.amount_in).plus(BigNumber(arg.fee)).toFixed().split('.')[0];
 
-        // approve
-        await icrc2_approve(identity, arg.from_canister_id, {
-            amount: totalAmount.toString(),
-            spender: SWAP_CANISTER_ID, // Swap approved canister id
-        });
+        // // approve
+        // await icrc2_approve(identity, arg.from_canister_id, {
+        //     amount: totalAmount.toString(),
+        //     spender: SWAP_CANISTER_ID, // Swap approved canister id
+        // });
 
         await deposit_token_to_swap(identity, {
             token_canister_id: arg.from_canister_id,

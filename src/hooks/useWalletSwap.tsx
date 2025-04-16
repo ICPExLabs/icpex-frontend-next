@@ -149,10 +149,18 @@ export const useSwapFees = ({
         getAllFee();
     }, [fromCanisterId, getAllFee, toCanisterId]);
 
+    // refetchAmountOut
+    const refetchAmountOut = () => {
+        if (!fromCanisterId || !toCanisterId) return;
+
+        getAllFee();
+    };
+
     return {
         oneAmountOut, // 1 token out
         amountOut,
         fee: allFee,
         loading,
+        refetchAmountOut,
     };
 };
