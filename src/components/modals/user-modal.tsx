@@ -6,7 +6,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { TypeTokenPriceInfoVal, useTokenBalanceByCanisterId } from '@/hooks/useToken';
+import { initBalance, TypeTokenPriceInfoVal, useTokenBalanceByCanisterId } from '@/hooks/useToken';
 import { TypeWalletMode, useAppStore } from '@/stores/app';
 import { useIdentityStore } from '@/stores/identity';
 import { TypeTokenPriceInfo, useTokenStore } from '@/stores/token';
@@ -96,14 +96,16 @@ const UserInfoModal = () => {
     const { t } = useTranslation();
     const { walletMode } = useAppStore();
     const [activeTab, setActiveTab] = useState<TypeWalletMode>(walletMode);
-    const { showInfoModal, setShowInfoModal } = useIdentityStore();
+    const { showInfoModal, setShowInfoModal, connectedIdentity } = useIdentityStore();
     const { principal, activeProvider, disconnect } = useConnect();
 
     const {
+        tokenList,
         allTokenBalance,
         allTokenInfo,
         totalBalance,
         totalContractBalance,
+        allTokenBalanceFetching,
         setShowSendModal,
         setShowReceiveModal,
         setShowTransferInModal,
@@ -112,7 +114,7 @@ const UserInfoModal = () => {
     const [copied, setCopied] = useState(false);
     const [currentTab, setCurrentTab] = useState<'Tokens' | 'Pools' | 'History'>('Tokens');
 
-    const [tokenList, setTokenList] = useState<TypeTokenPriceInfo | undefined>();
+    const [tokenUserList, setTokenUserList] = useState<TypeTokenPriceInfo | undefined>();
 
     useEffect(() => {
         if (copied) {
@@ -143,7 +145,7 @@ const UserInfoModal = () => {
             return valueB - valueA;
         });
         result = Object.fromEntries(sortedEntries);
-        setTokenList(result);
+        setTokenUserList(result);
     }, [allTokenBalance, allTokenInfo, walletMode, activeTab, showInfoModal]);
 
     return (
@@ -325,14 +327,26 @@ const UserInfoModal = () => {
                         >
                             {t('common.userInfo.history')}
                         </div>
+                        {allTokenBalanceFetching ? (
+                            <Icon
+                                name="loading"
+                                className="ml-auto h-[14px] w-[14px] animate-spin cursor-not-allowed text-[#07c160]"
+                            />
+                        ) : (
+                            <Icon
+                                onClick={() => initBalance(connectedIdentity, tokenList)}
+                                name="refresh"
+                                className="ml-auto h-[14px] w-[14px] cursor-pointer text-[#666666]"
+                            ></Icon>
+                        )}
                     </div>
                 </div>
 
                 <div className="w-full flex-1 overflow-y-auto">
                     {currentTab === 'Tokens' && (
                         <>
-                            {tokenList && Object.values(tokenList) ? (
-                                Object.values(tokenList).map((token, index) => (
+                            {tokenUserList && Object.values(tokenUserList) ? (
+                                Object.values(tokenUserList).map((token, index) => (
                                     <TokenListItem tokenInfo={token} key={index} walletMode={activeTab}></TokenListItem>
                                 ))
                             ) : (

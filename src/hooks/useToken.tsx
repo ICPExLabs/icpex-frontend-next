@@ -55,12 +55,21 @@ export const useTokenBalanceBySymbol = (symbol: string | undefined): TypeTokenBa
     }, [symbol, allTokenBalance, tokenList]);
 };
 
-export const initBalance = async (connectedIdentity, tokenList) => {
-    const { addAllTokenBalance, computationTotalBalanceAmount } = useTokenStore.getState();
+export const initBalance = async (
+    connectedIdentity: ConnectedIdentity | undefined,
+    tokenList: TokenInfo[] | undefined,
+) => {
+    const { addAllTokenBalance, computationTotalBalanceAmount, allTokenBalanceFetching, setAllTokenBalanceFetching } =
+        useTokenStore.getState();
 
     if (!connectedIdentity) return;
     if (!tokenList) return;
 
+    if (allTokenBalanceFetching) {
+        console.log('🚀 ~ addAllTokenBalanceFetching ~ true');
+        return;
+    }
+    setAllTokenBalanceFetching(true);
     const { principal } = connectedIdentity;
     const contractBalanceRes = await get_tokens_balance(connectedIdentity, {
         owner: principal,
@@ -78,8 +87,13 @@ export const initBalance = async (connectedIdentity, tokenList) => {
             addAllTokenBalance(item.canister_id.toString(), res);
         }),
     ).finally(() => {
-        console.log('🚀 ~ ).finally ~ computationTotalBalanceAmount');
+        setAllTokenBalanceFetching(false);
         computationTotalBalanceAmount();
+
+        setTimeout(() => {
+            console.log('🚀 ~ refreshBalance ~ refreshBalance');
+            initBalance(connectedIdentity, tokenList);
+        }, 15000);
     });
 };
 

@@ -25,6 +25,8 @@ interface TokenStore {
     addAllTokenBalance: (canisterId: string, val: TypeTokenBalanceVal) => void;
     updateAllTokenBalance: (connectedIdentity: ConnectedIdentity, canisterId: string) => void;
     clearAllTokenBalance: () => void;
+    allTokenBalanceFetching: boolean;
+    setAllTokenBalanceFetching: (allTokenBalanceFetching: boolean) => void;
 
     totalBalance: number | undefined;
     totalContractBalance: number | undefined;
@@ -80,6 +82,9 @@ export const useTokenStore = create<TokenStore>()(
             clearAllTokenBalance: () => {
                 set({ allTokenBalance: {} });
             },
+            allTokenBalanceFetching: false,
+            setAllTokenBalanceFetching: (allTokenBalanceFetching) =>
+                set({ allTokenBalanceFetching: allTokenBalanceFetching }),
 
             totalBalance: undefined,
             totalContractBalance: undefined,
@@ -110,8 +115,6 @@ export const useTokenStore = create<TokenStore>()(
                         ) *
                             (info?.priceUSD || 0);
                 });
-                console.log('🚀 ~ subscribeWithSelector ~ totalBalance:', totalBalance);
-                console.log('🚀 ~ subscribeWithSelector ~ totalContractBalance:', totalContractBalance);
 
                 set({ totalBalance: totalBalance, totalContractBalance: totalContractBalance });
             },

@@ -3,6 +3,7 @@ import { Toast } from '@douyinfe/semi-ui';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import { contract_swap, execute_complete_swap } from '@/components/api/swap';
 import Icon from '@/components/ui/icon';
@@ -22,12 +23,13 @@ export type TypeSwapRouter = 'KongSwap' | 'ICPSwap' | 'ICPEx';
 function SwapPage() {
     const { t } = useTranslation();
     const { swapSlippage, walletMode } = useAppStore();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const { isConnected, isInitializing } = useConnect();
     const { connectedIdentity, setShowLoginModal } = useIdentityStore();
 
     const [payAmount, setPayAmount] = useState<number | undefined>();
-    const [payToken, setPayToken] = useState<string | undefined>('ICP');
+    const [payToken, setPayToken] = useState<string>(searchParams.get('input') || 'ICP');
     const payTokenInfo = useTokenInfoBySymbol(payToken);
     const payBalanceToken = useTokenBalanceBySymbol(payToken);
     const payBalance = useMemo(() => {
@@ -50,7 +52,7 @@ function SwapPage() {
     }, [payBalanceToken, walletMode, payTokenInfo]);
 
     const [receiveAmount, setReceiveAmount] = useState<number | undefined>();
-    const [receiveToken, setReceiveToken] = useState<string | undefined>();
+    const [receiveToken, setReceiveToken] = useState<string | undefined>(searchParams.get('output') || undefined);
     const receiveTokenInfo = useTokenInfoBySymbol(receiveToken);
     const receiveBalanceToken = useTokenBalanceBySymbol(receiveToken);
     const receiveBalance = useMemo(() => {
@@ -201,6 +203,24 @@ function SwapPage() {
             setReceiveAmount(truncateDecimalToBN(payAmount * exchangeRate));
         }
     }, [payAmount, exchangeRate]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (payToken !== undefined) {
+            params.set('input', payToken);
+        } else {
+            params.delete('input');
+        }
+
+        if (receiveToken !== undefined) {
+            params.set('output', receiveToken);
+        } else {
+            params.delete('output');
+        }
+
+        setSearchParams(params);
+    }, [payToken, receiveToken, setSearchParams]);
 
     return (
         <div className="flex w-full flex-col">
