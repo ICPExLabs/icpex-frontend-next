@@ -13,6 +13,7 @@ import { parseLowerCaseSearch } from '@/utils/search';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
 import { TokenPriceChangePercentage } from '../ui/price';
+import { PriceFormatter } from '../ui/priceFormatter';
 
 const SearchResultItem = ({
     token,
@@ -59,7 +60,7 @@ const SearchResultItem = ({
                     <div className="ml-[11px] flex flex-col items-end gap-y-1">
                         {priceData ? (
                             <p className="text-base font-medium text-[#000000]">
-                                ${priceData.priceUSD ? truncateDecimalToBN(priceData.priceUSD, 4) : '--'}
+                                {priceData.priceUSD ? <PriceFormatter price={priceData.priceUSD} /> : '--'}
                             </p>
                         ) : (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />

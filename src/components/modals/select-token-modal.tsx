@@ -14,6 +14,7 @@ import { parseLowerCaseSearch } from '@/utils/search';
 import HeaderModal from '../ui/header-modal';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
+import { PriceFormatter } from '../ui/priceFormatter';
 
 const SelectTokenItem = ({
     data,
@@ -73,7 +74,7 @@ const SelectTokenItem = ({
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
                         ) : (
                             <p className="text-sm font-medium text-[#000000]">
-                                {truncateDecimalToBN(balance)} {data.symbol}
+                                {truncateDecimalToBN(balance, 8)} {data.symbol}
                             </p>
                         )}
                     </>

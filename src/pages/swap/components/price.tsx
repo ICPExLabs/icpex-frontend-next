@@ -2,6 +2,7 @@ import { useConnect } from '@connect2ic/react';
 
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
+import { PriceFormatter } from '@/components/ui/priceFormatter';
 import { TypeTokenPriceInfoVal } from '@/hooks/useToken';
 import { truncateDecimalToBN } from '@/utils/numbers';
 
@@ -9,11 +10,11 @@ const ICRCTag = ({ tag }: { tag: string }) => {
     const tagConfig = {
         ICRC1: {
             text: 'ICRC-1',
-            bgColor: '#006732', // 绿色
+            bgColor: '#006732',
         },
         ICRC2: {
             text: 'ICRC-2',
-            bgColor: '#3f4c83', // 蓝色
+            bgColor: '#3f4c83',
         },
     };
 
@@ -52,7 +53,7 @@ const PriceItem = ({ tokenInfo }: { tokenInfo: TypeTokenPriceInfoVal }) => {
                 <>
                     {tokenInfo.priceUSD ? (
                         <p className="text-base font-medium text-[#000000]">
-                            ${truncateDecimalToBN(tokenInfo.priceUSD, 4)}
+                            <PriceFormatter price={tokenInfo.priceUSD} />
                         </p>
                     ) : (
                         <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
