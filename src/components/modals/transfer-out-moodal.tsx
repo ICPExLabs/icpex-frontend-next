@@ -197,6 +197,7 @@ export const TokenTransferOutModal = () => {
             </Modal>
             <SelectTokenModal
                 isShow={showSelectTokenModal}
+                specifyWalletMode={'contract'}
                 setIsShow={setShowSelectTokenModal}
                 selectToken={(tokenInfo) => {
                     setToken(tokenInfo.symbol);

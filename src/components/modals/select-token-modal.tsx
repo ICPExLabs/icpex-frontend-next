@@ -1,11 +1,11 @@
 import { useConnect } from '@connect2ic/react';
 import { Modal, Switch } from '@douyinfe/semi-ui';
-import BigNumber from 'bignumber.js';
+// import BigNumber from 'bignumber.js';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TypeTokenPriceInfoVal, useTokenBalanceByCanisterId } from '@/hooks/useToken';
-import { useAppStore } from '@/stores/app';
+import { TypeWalletMode, useAppStore } from '@/stores/app';
 import { TypeTokenPriceInfo, useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { truncateDecimalToBN } from '@/utils/numbers';
@@ -17,9 +17,11 @@ import { TokenLogo } from '../ui/logo';
 
 const SelectTokenItem = ({
     data,
+    specifyWalletMode,
     selectToken,
 }: {
     data: TypeTokenPriceInfoVal;
+    specifyWalletMode?: TypeWalletMode;
     selectToken: (data: TypeTokenPriceInfoVal) => void;
 }) => {
     const { isConnected } = useConnect();
@@ -27,23 +29,28 @@ const SelectTokenItem = ({
     const tokenBalance = useTokenBalanceByCanisterId(data.canister_id.toString());
 
     const balance = useMemo(() => {
-        if (!tokenBalance) return 0;
-        if (walletMode === 'wallet') {
-            return Number(
-                new BigNumber(tokenBalance.walletBalance).dividedBy(
-                    new BigNumber(10).pow(new BigNumber(data.decimals)),
-                ),
-            );
-        }
-        if (walletMode === 'contract') {
-            return Number(
-                new BigNumber(tokenBalance.contractWalletBalance).dividedBy(
-                    new BigNumber(10).pow(new BigNumber(data.decimals)),
-                ),
-            );
-        }
-        return 0;
-    }, [tokenBalance, walletMode, data.decimals]);
+        if (!tokenBalance || !data?.decimals) return 0;
+
+        // Determine which balance to use
+        const balanceSource =
+            (specifyWalletMode || walletMode) === 'contract'
+                ? tokenBalance.contractWalletBalance
+                : tokenBalance.walletBalance;
+
+        if (!balanceSource) return 0;
+
+        // Convert to BigInt for precise arithmetic
+        const balanceBigInt = BigInt(balanceSource);
+        const decimalsBigInt = BigInt(data.decimals);
+        const divisor = 10n ** decimalsBigInt;
+
+        // Calculate integer and fractional parts separately
+        const integerPart = balanceBigInt / divisor;
+        const fractionalPart = balanceBigInt % divisor;
+
+        // Combine as a number (this maintains more precision than converting the whole division)
+        return Number(integerPart) + Number(fractionalPart) / Number(divisor);
+    }, [tokenBalance, walletMode, specifyWalletMode, data.decimals]);
 
     return (
         <div
@@ -81,10 +88,14 @@ const SelectTokenItem = ({
 
 export const SelectTokenModal = ({
     isShow,
+    specifyWalletMode,
+    ignore = [],
     setIsShow,
     selectToken,
 }: {
     isShow: boolean;
+    specifyWalletMode?: TypeWalletMode;
+    ignore?: string[];
     setIsShow: (isShow: boolean) => void;
     selectToken: (token: TypeTokenPriceInfoVal) => void;
 }) => {
@@ -112,57 +123,52 @@ export const SelectTokenModal = ({
     };
 
     const list: TypeTokenPriceInfo = useMemo(() => {
-        if (!allTokenInfo) {
-            return {};
-        }
+        if (!allTokenInfo) return {};
 
-        let result = { ...allTokenInfo };
+        const currentWalletMode = specifyWalletMode || walletMode;
+        const ignoreSet = new Set(ignore); // Convert to Set for faster lookups
 
-        if (isHideZeroBalance) {
-            result = Object.keys(result).reduce((acc, canisterId) => {
+        let result = Object.entries(allTokenInfo).reduce((acc, [canisterId, token]) => {
+            // Skip ignored tokens
+            if (ignoreSet.has(canisterId)) return acc;
+
+            // Apply zero balance filter if enabled
+            if (isHideZeroBalance) {
                 const balance = allTokenBalance[canisterId];
-
                 if (!balance) return acc;
 
-                const balanceValue =
-                    walletMode === 'wallet'
-                        ? Number(balance.walletBalance || 0)
-                        : Number(balance.contractWalletBalance || 0);
+                const balanceValue = Number(
+                    currentWalletMode === 'wallet' ? balance.walletBalance || 0 : balance.contractWalletBalance || 0,
+                );
 
-                if (balanceValue !== 0) {
-                    acc[canisterId] = result[canisterId];
+                if (balanceValue === 0) return acc;
+            }
+
+            // Apply search filter if keyword exists
+            if (searchKeyword) {
+                const searchTerm = parseLowerCaseSearch(searchKeyword);
+                if (canisterId !== searchTerm && !token.symbol.toLowerCase().includes(searchTerm)) {
+                    return acc;
                 }
+            }
 
-                return acc;
-            }, {} as TypeTokenPriceInfo);
-        }
+            acc[canisterId] = token;
+            return acc;
+        }, {} as TypeTokenPriceInfo);
 
-        if (searchKeyword) {
-            const searchTerm = parseLowerCaseSearch(searchKeyword);
-            result = Object.keys(result).reduce((acc, canisterId) => {
-                const token = result[canisterId];
-
-                if (canisterId === searchTerm || token.symbol.toLowerCase().includes(searchTerm)) {
-                    acc[canisterId] = token;
-                }
-                return acc;
-            }, {} as TypeTokenPriceInfo);
-        }
-
+        // Apply sorting if needed
         if (sortBy === 1 || sortBy === 2) {
             const sortedEntries = Object.entries(result).sort(([canisterIdA], [canisterIdB]) => {
-                const balanceA = allTokenBalance[canisterIdA];
-                const balanceB = allTokenBalance[canisterIdB];
+                const balanceA = allTokenBalance[canisterIdA] || {};
+                const balanceB = allTokenBalance[canisterIdB] || {};
 
-                const valueA =
-                    walletMode === 'wallet'
-                        ? Number(balanceA?.walletBalance || 0)
-                        : Number(balanceA?.contractWalletBalance || 0);
+                const valueA = Number(
+                    currentWalletMode === 'wallet' ? balanceA.walletBalance || 0 : balanceA.contractWalletBalance || 0,
+                );
 
-                const valueB =
-                    walletMode === 'wallet'
-                        ? Number(balanceB?.walletBalance || 0)
-                        : Number(balanceB?.contractWalletBalance || 0);
+                const valueB = Number(
+                    currentWalletMode === 'wallet' ? balanceB.walletBalance || 0 : balanceB.contractWalletBalance || 0,
+                );
 
                 return sortBy === 1 ? valueA - valueB : valueB - valueA;
             });
@@ -171,7 +177,16 @@ export const SelectTokenModal = ({
         }
 
         return result;
-    }, [searchKeyword, allTokenInfo, allTokenBalance, isHideZeroBalance, walletMode, sortBy]);
+    }, [
+        searchKeyword,
+        allTokenInfo,
+        allTokenBalance,
+        specifyWalletMode,
+        isHideZeroBalance,
+        walletMode,
+        sortBy,
+        ignore,
+    ]);
 
     return (
         <Modal
@@ -246,8 +261,9 @@ export const SelectTokenModal = ({
                             Object.values(list).map((item) => (
                                 <SelectTokenItem
                                     key={item.canister_id.toString()}
-                                    selectToken={() => selectToken(item)}
                                     data={item}
+                                    specifyWalletMode={specifyWalletMode}
+                                    selectToken={() => selectToken(item)}
                                 />
                             ))
                         )}

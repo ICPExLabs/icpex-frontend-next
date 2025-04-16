@@ -26,8 +26,10 @@ connect:
     terms: Please agree to the Terms of Service.
     connect: Connect
 switchWallet:
-    contractWallet: Fast
-    wallet: Normal
+    contractWallet: Contract Wallet
+    wallet: Wallet
+    fast: Fast
+    normal: Normal
 loading: Loading...
 userInfo:
     tokens: Tokens

@@ -17,7 +17,7 @@ export const SwitchWalletButton = () => {
                     )}
                     onClick={() => setWalletMode('contract')}
                 >
-                    {t('common.switchWallet.contractWallet')}
+                    {t('common.switchWallet.fast')}
                 </div>
                 <div
                     className={cn(
@@ -26,7 +26,7 @@ export const SwitchWalletButton = () => {
                     )}
                     onClick={() => setWalletMode('wallet')}
                 >
-                    {t('common.switchWallet.wallet')}
+                    {t('common.switchWallet.normal')}
                 </div>
             </div>
         </>

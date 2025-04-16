@@ -1,5 +1,5 @@
 import { InputNumber } from '@douyinfe/semi-ui';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TokenInfo } from '@/canister/swap/swap.did.d';
@@ -32,6 +32,12 @@ const AmountInput = ({
     const { t } = useTranslation();
 
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
+    const ignore: string[] = useMemo(() => {
+        if (!tokenInfo) {
+            return [];
+        }
+        return [tokenInfo.canister_id.toString()];
+    }, [tokenInfo]);
 
     return (
         <>
@@ -81,6 +87,7 @@ const AmountInput = ({
                     onTokenChange(tokenInfo.symbol);
                     setShowSelectTokenModal(false);
                 }}
+                ignore={ignore}
             />
         </>
     );
