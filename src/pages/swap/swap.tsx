@@ -19,6 +19,8 @@ import AmountInput from './components/amount-input';
 import PriceComponents from './components/price';
 import SwapRouters from './components/swap-routers';
 
+// import { useSwap } from '@/hooks/useSwap';
+
 export type TypeSwapRouter = 'KongSwap' | 'ICPSwap' | 'ICPEx';
 
 function SwapPage() {
@@ -87,7 +89,7 @@ function SwapPage() {
 
     // update amount out 3s
     useInterval(() => {
-        if (payToken && receiveToken && payAmount && !loading) {
+        if (payToken && receiveToken && payAmount) {
             console.log('update amount out');
             refetchAmountOut();
         }
@@ -144,6 +146,7 @@ function SwapPage() {
                 fee,
                 decimals: payTokenInfo.decimals,
             };
+            console.log('🚀 ~ onSwapChange ~ params:', amountIn, '=======', amountOut, '========', params);
 
             const result = await contract_swap(connectedIdentity, params);
             console.log('🚀 ~ onSwapRouterChange ~ result:', result);
@@ -190,7 +193,9 @@ function SwapPage() {
                 amount_out_min: amountOutMin.toString(),
                 fee,
                 decimals: payTokenInfo.decimals,
+                withdraw_fee: receiveTokenInfo.fee.toString(), // withdrawFee
             };
+            console.log('🚀 ~ onSwapRouterChange ~ params:', amountIn, '=======', amountOut, '========', params);
 
             const result = await execute_complete_swap(connectedIdentity, params);
             console.log('🚀 ~ onSwapRouterChange ~ result:', result);
@@ -341,7 +346,7 @@ function SwapPage() {
                 <AmountInput
                     className="mb-5 flex justify-between"
                     placeholder="0.00"
-                    amount={amountOut ? Number(Number(amountOut).toFixed(3)) : undefined}
+                    amount={amountOut ? truncateDecimalToBN(Number(amountOut), 4) : undefined}
                     onAmountChange={() => {}}
                     token={receiveToken}
                     onTokenChange={setReceiveToken}

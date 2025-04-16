@@ -105,7 +105,7 @@ export const get_pair_info = async (
     return unwrapVariant(res[0], 'SwapV2');
 };
 
-// deposit token to swap
+// approve deposit token to swap
 export const deposit_token_to_swap = async (
     identity: ConnectedIdentity,
     arg: {
@@ -191,6 +191,42 @@ export const swap_exact_tokens_for_tokens = async (
         },
         (e) => {
             console.error(`call pair_swap_exact_tokens_for_tokens failed`, arg, e);
+            throw new Error(unwrapVariantKey(e));
+        },
+    );
+};
+
+// only deposit token to swap
+export const only_deposit_token_to_swap = async (
+    identity: ConnectedIdentity,
+    arg: {
+        token_canister_id: string;
+        amount: string;
+        fee: string;
+        subaccount?: string;
+    },
+) => {
+    const { creator } = identity;
+    const create: _SERVICE = await creator(idlFactory, canisterID);
+
+    const r = await create.token_deposit(
+        {
+            token: string2principal(arg.token_canister_id),
+            from: {
+                owner: string2principal(identity.principal),
+                subaccount: wrapOptionMap(arg.subaccount, hex2array),
+            },
+            amount_without_fee: string2bigint(arg.amount),
+        },
+        [3],
+    );
+    return unwrapRustResultMap(
+        r,
+        (result) => {
+            return result;
+        },
+        (e) => {
+            console.log('🚀 ~ token_deposit error:', e);
             throw new Error(unwrapVariantKey(e));
         },
     );
