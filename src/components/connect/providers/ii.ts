@@ -104,10 +104,11 @@ export class CustomInternetIdentity {
     async isConnected(): Promise<boolean> {
         try {
             if (!this.#client) return false;
-            if (this.#client.idleManager) {
-                this.disconnect();
-                return false;
-            }
+
+            // if (this.#client.idleManager) {
+            //     this.disconnect();
+            //     return false;
+            // }
             return await this.#client.isAuthenticated(); // Check if already authenticated
         } catch (e) {
             console.error(e);
