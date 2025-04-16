@@ -17,6 +17,7 @@ import { shrinkPrincipal } from '@/utils/text';
 import Icon from '../ui/icon';
 import { TokenLogo } from '../ui/logo';
 import { TokenPriceChangePercentage } from '../ui/price';
+import { PriceFormatter } from '../ui/priceFormatter';
 
 export const UserInfoButton = () => {
     const { principal, activeProvider } = useConnect();
@@ -80,9 +81,10 @@ const TokenListItem = ({ tokenInfo, walletMode }: { tokenInfo: TypeTokenPriceInf
                 </div>
             </div>
             <div className="flex flex-col items-end">
-                <p className="text-sm font-medium text-black">
-                    {tokenInfo.priceUSD ? `$${truncateDecimalToBN(payBalance * tokenInfo.priceUSD || 0, 4)}` : '--'}
-                </p>
+                <PriceFormatter
+                    price={payBalance * (tokenInfo.priceUSD || 0)}
+                    className="text-sm font-medium text-black"
+                />
                 <TokenPriceChangePercentage
                     value={tokenInfo.priceUSDChange ? truncateDecimalToBN(tokenInfo.priceUSDChange) : 0}
                     className=""

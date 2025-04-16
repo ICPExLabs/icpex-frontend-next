@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { contract_swap, execute_complete_swap } from '@/components/api/swap';
 import Icon from '@/components/ui/icon';
+import { PriceFormatter } from '@/components/ui/priceFormatter';
 import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useSwapFees } from '@/hooks/useWalletSwap';
 import { useAppStore } from '@/stores/app';
@@ -267,12 +268,10 @@ function SwapPage() {
                     ignoreTokens={receiveTokenInfo ? [receiveTokenInfo.canister_id.toString()] : undefined}
                 />
                 <div className="flex w-full items-center justify-between">
-                    <p className="text-sm font-medium text-[#666666]">
-                        $
-                        {payTokenInfo?.priceUSD
-                            ? truncateDecimalToBN(payTokenInfo.priceUSD * (payAmount || 0))
-                            : '0.00'}
-                    </p>
+                    <PriceFormatter
+                        price={(payTokenInfo?.priceUSD || 0) * (payAmount || 0)}
+                        className="text-sm font-medium text-[#666666]"
+                    />
                     {isConnected ? (
                         !payBalanceToken ? (
                             <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#07c160]" />
@@ -424,8 +423,8 @@ function SwapPage() {
             {payTokenInfo?.priceUSD && receiveTokenInfo?.priceUSD && (
                 <div className="mt-3 flex w-full items-center justify-between">
                     <p className="text-sm font-medium text-[#666]">
-                        1 {payToken} = {oneAmountOut ? Number(oneAmountOut) : truncateDecimalToBN(exchangeRate, 4)}{' '}
-                        {receiveToken}
+                        1 {payToken} ={' '}
+                        <PriceFormatter price={oneAmountOut ? Number(oneAmountOut) : exchangeRate} unit="" />
                     </p>
                     <div className="flex items-center gap-x-1">
                         <Icon name="gas" className="h-3 w-3 text-[#666]" />
