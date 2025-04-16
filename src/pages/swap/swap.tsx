@@ -95,7 +95,7 @@ function SwapPage() {
 
     // update amount out 3s
     useInterval(() => {
-        if (payToken && receiveToken && payAmount) {
+        if (payToken && receiveToken && payAmount && !loading) {
             console.log('update amount out');
             refetchAmountOut();
         }
