@@ -66,7 +66,7 @@ export const useTokenStore = create<TokenStore>()(
                 });
             },
             updateAllTokenBalance: async (connectedIdentity: ConnectedIdentity, canisterId: string) => {
-                const { allTokenBalance, addAllTokenBalance } = get();
+                const { allTokenBalance, addAllTokenBalance, computationTotalBalanceAmount } = get();
                 const newBalance = { ...allTokenBalance };
                 delete newBalance[canisterId];
                 set({
@@ -75,6 +75,7 @@ export const useTokenStore = create<TokenStore>()(
 
                 const data = await updateBalance(connectedIdentity, canisterId);
                 addAllTokenBalance(canisterId, data);
+                computationTotalBalanceAmount();
             },
             clearAllTokenBalance: () => {
                 set({ allTokenBalance: {} });
