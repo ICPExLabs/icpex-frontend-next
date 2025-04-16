@@ -21,12 +21,7 @@ const NavComponents = () => {
         },
         { path: '/pools', label: t('common.nav.pools') },
         { path: '/explore', label: t('common.nav.explore') },
-        { path: '/tools', label: t('common.nav.tools') },
-        {
-            path: 'https://ai.icpex.org',
-            label: t('common.nav.ai'),
-            isExternal: true,
-        },
+        // { path: '/tools', label: t('common.nav.tools') },
     ];
 
     const renderLink = (item: (typeof navItems)[0]) => {
@@ -66,7 +61,7 @@ const NavComponents = () => {
     };
 
     return (
-        <div className="ml-[40px] flex h-full w-[300px] items-center justify-center gap-x-[22px]">
+        <div className="ml-[40px] flex h-full items-center justify-center gap-x-[22px]">
             {navItems.map((item) => (
                 <div key={item.path}>{renderLink(item)}</div>
             ))}

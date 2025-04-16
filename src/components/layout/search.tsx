@@ -139,7 +139,7 @@ const SearchComponents = () => {
                 )}
             </AnimatePresence>
 
-            <div className="relative mr-[30px] ml-[72px] h-10 w-[440px] flex-shrink-0">
+            <div className="relative ml-[72px] h-10 max-w-[440px] min-w-[300px] flex-1 flex-shrink-0">
                 <div
                     className={cn(
                         'absolute z-10 flex w-full flex-col items-center rounded-[40px] border border-[#eeeeee] bg-[#fff]',
