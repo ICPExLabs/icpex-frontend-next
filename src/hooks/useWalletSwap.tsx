@@ -139,21 +139,16 @@ export const useSwapFees = ({
         calculateFeeAndAmountOut();
     }, [calculateFeeAndAmountOut, fromAmount, pair]);
 
-    const getAllFee = useCallback(() => {
+    useEffect(() => {
         if (!fromCanisterId || !toCanisterId) return;
         getSwapPairFee();
     }, [fromCanisterId, getSwapPairFee, toCanisterId]);
-
-    useEffect(() => {
-        if (!fromCanisterId || !toCanisterId) return;
-        getAllFee();
-    }, [fromCanisterId, getAllFee, toCanisterId]);
 
     // refetchAmountOut
     const refetchAmountOut = () => {
         if (!fromCanisterId || !toCanisterId) return;
 
-        getAllFee();
+        getSwapPairFee();
     };
 
     return {
