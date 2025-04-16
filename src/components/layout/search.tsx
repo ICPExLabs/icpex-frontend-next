@@ -169,55 +169,45 @@ const SearchComponents = () => {
                     </div>
 
                     {isOpenSearch && (
-                        <>
-                            <div className="no-scrollbar flex max-h-[504px] min-h-[170px] w-full flex-col overflow-y-scroll pb-[15px]">
-                                {!keyword && (
-                                    <>
-                                        <div className="mt-[10px] flex w-full items-center px-4">
-                                            <Icon name="popular" className="h-4 w-3.5 text-[#999999]"></Icon>
-                                            <p className="ml-2 text-sm font-medium text-[#000000]">
-                                                {t('common.search.popular')}
+                        <div className="no-scrollbar flex max-h-[504px] min-h-[170px] w-full flex-col overflow-y-scroll pb-[15px]">
+                            {!keyword && (
+                                <>
+                                    <div className="mt-[10px] flex w-full items-center px-4">
+                                        <Icon name="popular" className="h-4 w-3.5 text-[#999999]"></Icon>
+                                        <p className="ml-2 text-sm font-medium text-[#000000]">
+                                            {t('common.search.popular')}
+                                        </p>
+                                    </div>
+                                    <div className="mt-2 flex w-full flex-col">
+                                        {popularTokens.map((item, index) => (
+                                            <SearchResultItem key={index} tokenName={item} closeSearch={closeSearch} />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+
+                            {keyword && (
+                                <>
+                                    {!searchResult?.length ? (
+                                        <div className="mt-[40px] mb-[70px] flex w-full flex-col items-center justify-center">
+                                            <Icon
+                                                name="no"
+                                                className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]"
+                                            />
+                                            <p className="mt-[13px] text-sm font-medium text-[#999999]">
+                                                {t('common.search.noResults')}
                                             </p>
                                         </div>
-                                        <div className="mt-2 flex w-full flex-col">
-                                            {popularTokens.map((item, index) => (
-                                                <SearchResultItem
-                                                    key={index}
-                                                    tokenName={item}
-                                                    closeSearch={closeSearch}
-                                                />
+                                    ) : (
+                                        <div className="flex w-full flex-col">
+                                            {searchResult.map((item, index) => (
+                                                <SearchResultItem key={index} token={item} closeSearch={closeSearch} />
                                             ))}
                                         </div>
-                                    </>
-                                )}
-
-                                {keyword && (
-                                    <>
-                                        {!searchResult?.length ? (
-                                            <div className="mt-[40px] mb-[70px] flex w-full flex-col items-center justify-center">
-                                                <Icon
-                                                    name="no"
-                                                    className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]"
-                                                />
-                                                <p className="mt-[13px] text-sm font-medium text-[#999999]">
-                                                    {t('common.search.noResults')}
-                                                </p>
-                                            </div>
-                                        ) : (
-                                            <div className="flex w-full flex-col">
-                                                {searchResult.map((item, index) => (
-                                                    <SearchResultItem
-                                                        key={index}
-                                                        token={item}
-                                                        closeSearch={closeSearch}
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                        </>
+                                    )}
+                                </>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>

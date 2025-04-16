@@ -243,7 +243,7 @@ export const SelectTokenModal = ({
                         </div>
                     </div>
                 </div>
-                {!allTokenInfo || !Object.values(list).length ? (
+                {!allTokenInfo ? (
                     <div className="flex h-[426px] flex-col items-center justify-center">
                         <Icon name="loading" className="h-[28px] w-[28px] animate-spin text-[#07c160]" />
                         <p className="mt-2 text-[16px] font-semibold text-[#000000]">{t('swap.select.loading')}</p>
@@ -251,7 +251,7 @@ export const SelectTokenModal = ({
                 ) : (
                     <div className="no-scrollbar flex h-[426px] flex-col overflow-y-scroll pt-[10px]">
                         {!Object.values(list).length ? (
-                            <div className="mt-[40px] mb-[70px] flex w-full flex-col items-center justify-center">
+                            <div className="flex h-[426px] w-full flex-col items-center justify-center">
                                 <Icon name="no" className="h-[36px] w-[36px] flex-shrink-0 text-[#c9d1fb]" />
                                 <p className="mt-[13px] text-sm font-medium text-[#999999]">
                                     {t('common.search.noResults')}
