@@ -152,6 +152,11 @@ function SwapPage() {
 
             setLoading(false);
             Toast.success('Swap successfully');
+            updateTokenBalance();
+
+            // reset input
+            setPayAmount(undefined);
+            setReceiveAmount(undefined);
         } catch (error) {
             console.error('🚀 ~ onSwapChange ~ error:', error);
             setLoading(false);
@@ -194,15 +199,25 @@ function SwapPage() {
 
             setLoading(false);
             Toast.success('Swap successfully');
-            // update pay token balance
-            updateAllTokenBalance(connectedIdentity, payTokenInfo.canister_id.toString());
-            // update receive token balance
-            updateAllTokenBalance(connectedIdentity, receiveTokenInfo.canister_id.toString());
+
+            updateTokenBalance();
+            // reset input
+            setPayAmount(undefined);
+            setReceiveAmount(undefined);
         } catch (error) {
             console.error('🚀 ~ onSwapChange ~ error:', error);
             setLoading(false);
             Toast.error('Swap failed');
         }
+    };
+
+    const updateTokenBalance = () => {
+        if (!connectedIdentity || !payTokenInfo || !receiveTokenInfo) return;
+
+        // update pay token balance
+        updateAllTokenBalance(connectedIdentity, payTokenInfo.canister_id.toString());
+        // update receive token balance
+        updateAllTokenBalance(connectedIdentity, receiveTokenInfo.canister_id.toString());
     };
 
     useEffect(() => {
