@@ -44,7 +44,7 @@ const SwapRouters = ({
     }, [receiveTokenInfo]);
 
     return (
-        <div className="mt-[15px] flex w-full flex-col gap-y-[15px]">
+        <div className="mt-[15px] flex hidden w-full flex-col gap-y-[15px]">
             {routes.map((route) => (
                 <div
                     key={route.name}

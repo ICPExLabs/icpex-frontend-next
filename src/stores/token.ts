@@ -91,20 +91,23 @@ export const useTokenStore = create<TokenStore>()(
 
                 Object.keys(allTokenBalance).forEach((item) => {
                     const info = allTokenInfo[item];
+
                     totalBalance =
                         totalBalance +
                         Number(
                             new BigNumber(allTokenBalance[item].walletBalance).dividedBy(
                                 new BigNumber(10).pow(new BigNumber(info.decimals)),
                             ),
-                        );
+                        ) *
+                            (info?.priceUSD || 0);
                     totalContractBalance =
                         totalContractBalance +
                         Number(
                             new BigNumber(allTokenBalance[item].contractWalletBalance).dividedBy(
                                 new BigNumber(10).pow(new BigNumber(info.decimals)),
                             ),
-                        );
+                        ) *
+                            (info?.priceUSD || 0);
                 });
                 console.log('🚀 ~ subscribeWithSelector ~ totalBalance:', totalBalance);
                 console.log('🚀 ~ subscribeWithSelector ~ totalContractBalance:', totalContractBalance);

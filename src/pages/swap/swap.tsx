@@ -272,9 +272,26 @@ function SwapPage() {
                     tokenInfo={receiveTokenInfo}
                     disabled={true}
                 />
-                <p className="text-sm font-medium text-[#666666]">
-                    ${receiveTokenInfo?.priceUSD ? (receiveTokenInfo.priceUSD * (payAmount || 0)).toFixed(2) : '0.00'}
-                </p>
+                <div className="flex w-full items-center justify-between">
+                    <p className="text-sm font-medium text-[#666666]"></p>
+                    {isConnected ? (
+                        !payBalanceToken ? (
+                            <Icon name="loading" className="mr-2 h-[14px] w-[14px] animate-spin text-[#07c160]" />
+                        ) : (
+                            <div className="flex items-center">
+                                <Icon name="wallet" className="h-3 w-[14px] text-[#666]" />
+                                <div className="ml-[6px] flex items-center">
+                                    <p className="text-xs font-medium text-[#666]">
+                                        {truncateDecimalToBN(receiveBalance, 4)}
+                                    </p>
+                                    <p className="ml-[2px] text-xs font-medium text-[#666]">{receiveToken}</p>
+                                </div>
+                            </div>
+                        )
+                    ) : (
+                        <></>
+                    )}
+                </div>
             </div>
 
             <div className="h-[60px] w-full">
@@ -372,12 +389,7 @@ function SwapPage() {
                 />
             )}
 
-            <PriceComponents
-                payTokenInfo={payTokenInfo}
-                payBalance={payBalanceToken ? payBalance : undefined}
-                receiveTokenInfo={receiveTokenInfo}
-                receiveBalance={receiveBalanceToken ? receiveBalance : undefined}
-            />
+            <PriceComponents payTokenInfo={payTokenInfo} receiveTokenInfo={receiveTokenInfo} />
         </div>
     );
 }

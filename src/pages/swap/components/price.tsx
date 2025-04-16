@@ -32,7 +32,7 @@ const ICRCTag = ({ tag }: { tag: string }) => {
     );
 };
 
-const PriceItem = ({ tokenInfo, balance }: { tokenInfo: TypeTokenPriceInfoVal; balance: number | undefined }) => {
+const PriceItem = ({ tokenInfo }: { tokenInfo: TypeTokenPriceInfoVal }) => {
     const { isConnected } = useConnect();
 
     return (
@@ -50,9 +50,9 @@ const PriceItem = ({ tokenInfo, balance }: { tokenInfo: TypeTokenPriceInfoVal; b
 
             {isConnected ? (
                 <>
-                    {balance && tokenInfo.priceUSD ? (
+                    {tokenInfo.priceUSD ? (
                         <p className="text-base font-medium text-[#000000]">
-                            ${truncateDecimalToBN(tokenInfo.priceUSD * balance, 4)}
+                            ${truncateDecimalToBN(tokenInfo.priceUSD, 4)}
                         </p>
                     ) : (
                         <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
@@ -67,19 +67,15 @@ const PriceItem = ({ tokenInfo, balance }: { tokenInfo: TypeTokenPriceInfoVal; b
 
 function PriceComponents({
     payTokenInfo,
-    payBalance,
     receiveTokenInfo,
-    receiveBalance,
 }: {
     payTokenInfo: TypeTokenPriceInfoVal | undefined;
-    payBalance: number | undefined;
     receiveTokenInfo: TypeTokenPriceInfoVal | undefined;
-    receiveBalance: number | undefined;
 }) {
     return (
         <div className="mt-[20px] flex w-full flex-col items-center justify-center gap-y-5">
-            {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} balance={payBalance} />}
-            {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} balance={receiveBalance} />}
+            {payTokenInfo && <PriceItem tokenInfo={payTokenInfo} />}
+            {receiveTokenInfo && <PriceItem tokenInfo={receiveTokenInfo} />}
         </div>
     );
 }
