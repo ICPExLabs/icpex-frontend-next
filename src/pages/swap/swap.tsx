@@ -19,6 +19,8 @@ import AmountInput from './components/amount-input';
 import PriceComponents from './components/price';
 import SwapRouters from './components/swap-routers';
 
+// import { useSwap } from '@/hooks/useSwap';
+
 export type TypeSwapRouter = 'KongSwap' | 'ICPSwap' | 'ICPEx';
 
 function SwapPage() {
@@ -79,7 +81,13 @@ function SwapPage() {
     const [loading, setLoading] = useState<boolean>(false);
 
     // loading
-    const { fee, amountOut, oneAmountOut, refetchAmountOut } = useSwapFees({
+    const {
+        loading: calLoading,
+        fee,
+        amountOut,
+        oneAmountOut,
+        refetchAmountOut,
+    } = useSwapFees({
         from: payTokenInfo,
         to: receiveTokenInfo,
         fromAmount: payAmount,
@@ -144,6 +152,7 @@ function SwapPage() {
                 fee,
                 decimals: payTokenInfo.decimals,
             };
+            console.log('🚀 ~ onSwapChange ~ params:', amountIn, '=======', amountOut, '========', params);
 
             const result = await contract_swap(connectedIdentity, params);
             console.log('🚀 ~ onSwapRouterChange ~ result:', result);
@@ -190,7 +199,9 @@ function SwapPage() {
                 amount_out_min: amountOutMin.toString(),
                 fee,
                 decimals: payTokenInfo.decimals,
+                withdraw_fee: receiveTokenInfo.fee.toString(), // withdrawFee
             };
+            console.log('🚀 ~ onSwapRouterChange ~ params:', amountIn, '=======', amountOut, '========', params);
 
             const result = await execute_complete_swap(connectedIdentity, params);
             console.log('🚀 ~ onSwapRouterChange ~ result:', result);
@@ -341,7 +352,7 @@ function SwapPage() {
                 <AmountInput
                     className="mb-5 flex justify-between"
                     placeholder="0.00"
-                    amount={amountOut ? Number(Number(amountOut).toFixed(3)) : undefined}
+                    amount={amountOut ? truncateDecimalToBN(Number(amountOut), 4) : undefined}
                     onAmountChange={() => {}}
                     token={receiveToken}
                     onTokenChange={setReceiveToken}
@@ -383,6 +394,7 @@ function SwapPage() {
                             !payAmount ||
                             !receiveAmount ||
                             payAmount > payBalance ||
+                            calLoading || // loading calculate amount out
                             loading);
 
                     const buttonConfig = {
@@ -394,6 +406,8 @@ function SwapPage() {
                                 if (!payAmount || !receiveAmount) return t('swap.swapBtn.enterAmount');
                                 if (!payBalance) return t('swap.swapBtn.insufficientEmpty');
                                 if (payAmount > payBalance) return t('swap.swapBtn.insufficient', { symbol: payToken });
+                                if (calLoading)
+                                    return walletMode === 'wallet' ? 'Swap with ' + swapRouter : t('swap.swapBtn.swap');
                                 return '';
                             })(),
                             textClassName: 'text-[#999999]',
