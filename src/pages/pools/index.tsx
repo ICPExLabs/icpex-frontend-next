@@ -182,17 +182,11 @@ function PoolsPage() {
 
         try {
             let tvlAll = 0;
-            const res: [TokenPairPool, MarketMakerView][] = await get_all_pairs_info();
+            const res = await get_all_pairs_info();
             const tokenListMap = new Map(tokenList.map((token) => [token.canister_id.toString(), token]));
 
-            const resList = res.map(([, marketMaker]) => {
-                const {
-                    token0: tokenACanisterId,
-                    token1: tokenBCanisterId,
-                    reserve0,
-                    reserve1,
-                    lp,
-                } = marketMaker.swap_v2;
+            const resList = res.map(({ pair }) => {
+                const { token0: tokenACanisterId, token1: tokenBCanisterId, reserve0, reserve1, lp } = pair;
                 const tokenAInfo = tokenListMap.get(tokenACanisterId);
                 const tokenBInfo = tokenListMap.get(tokenBCanisterId);
                 const { decimals } = Object.values(lp)[0];
