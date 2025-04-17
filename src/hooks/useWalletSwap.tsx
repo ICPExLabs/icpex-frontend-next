@@ -1,12 +1,87 @@
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
 
-import { get_pair_info } from '@/canister/swap/apis';
+// get_pair_info
+import { get_all_pairs_info } from '@/canister/swap/apis';
 import type { SwapV2MarketMakerView } from '@/canister/swap/swap.did.d';
-import { anonymous } from '@/components/connect/creator';
+// import { anonymous } from '@/components/connect/creator';
 import { useAppStore } from '@/stores/app';
 
 import { TypeTokenPriceInfoVal } from './useToken';
+
+// interface DeviationType {
+//     fromReserve: string;
+//     toReserve: string;
+//     payAmount: string;
+//     payTokenInfo: TypeTokenPriceInfoVal;
+//     receiveTokenInfo: TypeTokenPriceInfoVal;
+// }
+
+// export const getPriceDeviation = ({
+//     fromReserve,
+//     toReserve,
+//     payAmount,
+//     payTokenInfo,
+//     receiveTokenInfo,
+// }: DeviationType) => {
+//     // Check if input values are valid
+//     if (
+//         !payTokenInfo.priceUSD ||
+//         !receiveTokenInfo.priceUSD ||
+//         BigNumber(payTokenInfo.priceUSD).isZero() ||
+//         BigNumber(receiveTokenInfo.priceUSD).isZero()
+//     ) {
+//         return '0';
+//     }
+
+//     try {
+//         // Token reserves in the pool
+//         const poolReserveA = BigNumber(fromReserve);
+//         const poolReserveB = BigNumber(toReserve);
+
+//         // Payment amount (considering decimals)
+//         const payAmountWithDecimals = BigNumber(payAmount);
+
+//         // Calculate pool state after transaction
+//         const newReserveA = poolReserveA.plus(payAmountWithDecimals);
+//         const k = poolReserveA.multipliedBy(poolReserveB);
+//         const newReserveB = k.dividedBy(newReserveA);
+
+//         // Calculate received token amount
+//         const amountBOut = poolReserveB.minus(newReserveB);
+
+//         // Calculate actual trading price (considering decimals)
+//         const receiveAmountNormalized = amountBOut.dividedBy(BigNumber(10).pow(receiveTokenInfo.decimals));
+//         const payAmountNormalized = BigNumber(payAmount).dividedBy(BigNumber(10).pow(payTokenInfo.decimals));
+
+//         // Actual exchange rate
+//         const actualPrice = receiveAmountNormalized.dividedBy(payAmountNormalized);
+
+//         // Calculate market price
+//         const marketPrice = BigNumber(receiveTokenInfo.priceUSD).dividedBy(BigNumber(payTokenInfo.priceUSD));
+
+//         // Calculate price deviation percentage
+//         let deviation = actualPrice.minus(marketPrice).absoluteValue().dividedBy(marketPrice).multipliedBy(100);
+
+//         // If deviation is too large, it might be a calculation error, limit maximum deviation to 10%
+//         if (deviation.isGreaterThan(10)) {
+//             console.warn('Price deviation is abnormally high, possible calculation error:', deviation.toString());
+//             // Limit maximum deviation
+//             deviation = BigNumber(10);
+//         }
+
+//         // Handle extreme cases
+//         if (deviation.isNaN() || !deviation.isFinite()) {
+//             deviation = BigNumber(0);
+//         }
+
+//         // Limit decimal places to avoid long decimals
+//         return deviation.toFixed(2);
+//     } catch (error) {
+//         console.error('Error calculating price deviation:', error);
+//         return '0';
+//     }
+// };
 
 export const useSwapFees = ({
     from,
@@ -26,7 +101,9 @@ export const useSwapFees = ({
     const [oneAmountOut] = useState<string | undefined>();
     const [amountOut, setAmountOut] = useState<string | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [isNoPool, setIsNoPool] = useState<boolean>(false);
     const [pair, setPair] = useState<SwapV2MarketMakerView>();
+    const [amm, setAmm] = useState<string>();
 
     const getAmountOut = (
         amountIn: string | number,
@@ -77,9 +154,9 @@ export const useSwapFees = ({
         if (!from || !to || !fromAmount || !pair) {
             setAmountOut(undefined);
             setAllFee('0');
-            // todo no pool return
             return;
         }
+
         const { fee_rate, token0, token1 } = pair;
         const [numerator, denominator] = fee_rate.split('/');
 
@@ -94,9 +171,25 @@ export const useSwapFees = ({
             token0 === fromCanisterId ? pair.reserve0 : token1 === fromCanisterId ? pair.reserve1 : null;
         const toReserve = token0 === toCanisterId ? pair.reserve0 : token1 === toCanisterId ? pair.reserve1 : null;
 
+        if (!fromReserve && !toReserve) {
+            setAmountOut(undefined);
+            setIsNoPool(true);
+        } else {
+            setIsNoPool(false);
+        }
+
         if (fromReserve && toReserve) {
             const amountOut = getAmountOut(finalAmount, fromReserve, toReserve, fee_rate, to.decimals);
             setAmountOut(amountOut);
+
+            // todo price deviation
+            // const deviation = getPriceDeviation({
+            //     fromReserve: fromReserve,
+            //     toReserve: toReserve,
+            //     payAmount: finalAmount,
+            //     payTokenInfo: from,
+            //     receiveTokenInfo: to,
+            // });
         }
 
         if (walletMode === 'wallet') {
@@ -114,12 +207,39 @@ export const useSwapFees = ({
             if (!fromCanisterId || !toCanisterId) return;
 
             setLoading(true);
-            const res = await get_pair_info(anonymous, {
-                from_canister_id: fromCanisterId,
-                to_canister_id: toCanisterId,
+
+            const allPairs = await get_all_pairs_info();
+
+            const pair = allPairs.find((item) => {
+                const { ammInfo, pair: itemPair } = item;
+                if (!ammInfo) return false;
+
+                if (itemPair.token0 === fromCanisterId && itemPair.token1 === toCanisterId) {
+                    return true;
+                }
+                if (itemPair.token0 === toCanisterId && itemPair.token1 === fromCanisterId) {
+                    return true;
+                }
+                return false;
             });
+            // console.log('🚀 ~ pair ~ pair:', pair);
+
+            setIsNoPool(!pair ? true : false);
             setLoading(false);
-            setPair(res);
+
+            if (!pair) {
+                setPair(undefined);
+                setAmm(undefined);
+                return;
+            }
+            // const res = await get_pair_info(anonymous, {
+            //     from_canister_id: fromCanisterId,
+            //     to_canister_id: toCanisterId,
+            // });
+            // console.log('🚀 ~ getSwapPairFee ~ res:', res);
+
+            setPair(pair?.pair);
+            setAmm(pair?.ammInfo.amm);
         } catch (error) {
             console.error('🚀 ~ getSwapPairFee ~ error:', error);
         }
@@ -146,6 +266,8 @@ export const useSwapFees = ({
     };
 
     return {
+        amm, // amm
+        isNoPool, // no pool
         oneAmountOut, // 1 token out
         amountOut,
         fee: allFee,

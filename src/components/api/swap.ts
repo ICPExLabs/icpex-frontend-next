@@ -17,6 +17,7 @@ export const contract_swap = async (
         to_canister_id: string;
         amount_in: string;
         amount_out_min: string;
+        amm: string;
         deadline?: number;
     },
 ) => {
@@ -27,6 +28,7 @@ export const contract_swap = async (
             to_canister_id: arg.to_canister_id,
             amount_in: arg.amount_in,
             amount_out_min: arg.amount_out_min,
+            amm: arg.amm,
             // deadline: arg.deadline,
         });
 
@@ -54,6 +56,7 @@ export const swap_and_withdraw = async (
         amount_in: string;
         amount_out_min: string;
         withdraw_fee: string;
+        amm: string;
         deadline?: number;
     },
 ) => {
@@ -64,6 +67,7 @@ export const swap_and_withdraw = async (
             to_canister_id: arg.to_canister_id,
             amount_in: arg.amount_in,
             amount_out_min: arg.amount_out_min,
+            amm: arg.amm,
             // deadline: arg.deadline,
         });
         console.log('🚀 ~ swapResult:', swapResult);
@@ -101,6 +105,7 @@ export const only_wallet_swap = async (
         amount_in: string;
         amount_out_min: string;
         withdraw_fee: string;
+        amm: string;
         deadline?: number;
     },
 ) => {
@@ -111,6 +116,7 @@ export const only_wallet_swap = async (
             to_canister_id: arg.to_canister_id,
             amount_in: arg.amount_in,
             amount_out_min: arg.amount_out_min,
+            amm: arg.amm,
             // deadline: arg.deadline,
         });
 
@@ -162,6 +168,7 @@ export const execute_complete_swap = async (
         fee: string;
         withdraw_fee: string;
         decimals: number; // from token decimals
+        amm: string;
         deadline?: number;
     },
 ) => {
@@ -190,6 +197,7 @@ export const execute_complete_swap = async (
             amount_in: arg.amount_in, // total amount,
             amount_out_min: arg.amount_out_min, // min amount out
             withdraw_fee: arg.withdraw_fee, // withdraw fee
+            amm: arg.amm, // amm
         });
 
         return swapResult;

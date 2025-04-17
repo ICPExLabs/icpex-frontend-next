@@ -85,7 +85,24 @@ export const get_token_balance_of = async (
 // all pairs info
 export const get_all_pairs_info = async () => {
     const create: _SERVICE = await getAnonymousActorCreatorByAgent()(idlFactory, canisterID);
-    return await create.pairs_query();
+    const result = await create.pairs_query();
+
+    if (!result || result.length === 0) {
+        return [];
+    }
+
+    return result.map((item) => {
+        const [ammInfo, pairInfo] = item;
+        const pair = unwrapVariant<SwapV2MarketMakerView>(pairInfo, 'swap_v2')!;
+        return {
+            ammInfo,
+            pair: {
+                ...pair,
+                reserve0: transReserve(pair.reserve0),
+                reserve1: transReserve(pair.reserve1),
+            },
+        };
+    });
 };
 
 // pair info
@@ -94,13 +111,13 @@ export const get_pair_info = async (
     arg: {
         from_canister_id: string;
         to_canister_id: string;
+        amm: string;
     },
 ): Promise<SwapV2MarketMakerView | undefined> => {
     const { creator } = identity;
     const create: _SERVICE = await creator(idlFactory, canisterID);
     const res = await create.pair_query({
-        // todo:
-        amm: 'swap_v2_0.3%',
+        amm: arg.amm,
         token0: string2principal(arg.from_canister_id),
         token1: string2principal(arg.to_canister_id),
     });
@@ -174,6 +191,7 @@ export const swap_exact_tokens_for_tokens = async (
         to_canister_id: string;
         amount_in: string;
         amount_out_min: string;
+        amm: string;
         deadline?: number;
     },
 ) => {
@@ -194,8 +212,7 @@ export const swap_exact_tokens_for_tokens = async (
             amount_out_min: string2bigint(arg.amount_out_min),
             path: [
                 {
-                    // todo:
-                    amm: 'swap_v2_0.3%',
+                    amm: arg.amm,
                     token: [string2principal(arg.from_canister_id), string2principal(arg.to_canister_id)],
                 },
             ],
