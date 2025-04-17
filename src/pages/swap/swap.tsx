@@ -87,6 +87,7 @@ function SwapPage() {
     // loading
     const {
         // loading: calLoading,
+        amm,
         fee,
         amountOut,
         oneAmountOut,
@@ -141,7 +142,7 @@ function SwapPage() {
             // TODO: tip warning
             if (!payTokenInfo || !receiveTokenInfo) return;
 
-            if (!payAmount || !amountOut) return;
+            if (!payAmount || !amountOut || !amm) return;
 
             setLoading(true);
 
@@ -160,6 +161,7 @@ function SwapPage() {
                 amount_out_min: amountOutMin.toString(),
                 fee,
                 decimals: payTokenInfo.decimals,
+                amm,
             };
             console.log('🚀 ~ onSwapChange ~ params:', amountIn, '=======', amountOut, '========', params);
 
@@ -189,7 +191,7 @@ function SwapPage() {
             // TODO: tip warning
             if (!payTokenInfo || !receiveTokenInfo) return;
 
-            if (!payAmount || !amountOut) return;
+            if (!payAmount || !amountOut || !amm) return;
 
             setLoading(true);
 
@@ -209,6 +211,7 @@ function SwapPage() {
                 fee,
                 decimals: payTokenInfo.decimals,
                 withdraw_fee: receiveTokenInfo.fee.toString(), // withdrawFee
+                amm: amm,
             };
             console.log('🚀 ~ onSwapRouterChange ~ params:', amountIn, '=======', amountOut, '========', params);
 

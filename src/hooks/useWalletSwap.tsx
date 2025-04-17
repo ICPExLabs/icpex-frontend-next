@@ -1,9 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
 
-import { get_pair_info } from '@/canister/swap/apis';
+// get_pair_info
+import { get_all_pairs_info } from '@/canister/swap/apis';
 import type { SwapV2MarketMakerView } from '@/canister/swap/swap.did.d';
-import { anonymous } from '@/components/connect/creator';
+// import { anonymous } from '@/components/connect/creator';
 import { useAppStore } from '@/stores/app';
 
 import { TypeTokenPriceInfoVal } from './useToken';
@@ -26,7 +27,9 @@ export const useSwapFees = ({
     const [oneAmountOut] = useState<string | undefined>();
     const [amountOut, setAmountOut] = useState<string | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [isNoPool, setIsNoPool] = useState<boolean>(false);
     const [pair, setPair] = useState<SwapV2MarketMakerView>();
+    const [amm, setAmm] = useState<string>();
 
     const getAmountOut = (
         amountIn: string | number,
@@ -77,9 +80,9 @@ export const useSwapFees = ({
         if (!from || !to || !fromAmount || !pair) {
             setAmountOut(undefined);
             setAllFee('0');
-            // todo no pool return
             return;
         }
+
         const { fee_rate, token0, token1 } = pair;
         const [numerator, denominator] = fee_rate.split('/');
 
@@ -93,6 +96,13 @@ export const useSwapFees = ({
         const fromReserve =
             token0 === fromCanisterId ? pair.reserve0 : token1 === fromCanisterId ? pair.reserve1 : null;
         const toReserve = token0 === toCanisterId ? pair.reserve0 : token1 === toCanisterId ? pair.reserve1 : null;
+
+        if (!fromReserve && !toReserve) {
+            setAmountOut(undefined);
+            setIsNoPool(true);
+        } else {
+            setIsNoPool(false);
+        }
 
         if (fromReserve && toReserve) {
             const amountOut = getAmountOut(finalAmount, fromReserve, toReserve, fee_rate, to.decimals);
@@ -114,12 +124,38 @@ export const useSwapFees = ({
             if (!fromCanisterId || !toCanisterId) return;
 
             setLoading(true);
-            const res = await get_pair_info(anonymous, {
-                from_canister_id: fromCanisterId,
-                to_canister_id: toCanisterId,
+
+            const allPairs = await get_all_pairs_info();
+
+            const pair = allPairs.find((item) => {
+                const { ammInfo, pair: itemPair } = item;
+                if (!ammInfo) return false;
+
+                if (itemPair.token0 === fromCanisterId && itemPair.token1 === toCanisterId) {
+                    return true;
+                }
+                if (itemPair.token0 === toCanisterId && itemPair.token1 === fromCanisterId) {
+                    return true;
+                }
+                return false;
             });
+
+            setIsNoPool(!pair ? true : false);
             setLoading(false);
-            setPair(res);
+
+            if (!pair) {
+                setPair(undefined);
+                setAmm(undefined);
+                return;
+            }
+            // const res = await get_pair_info(anonymous, {
+            //     from_canister_id: fromCanisterId,
+            //     to_canister_id: toCanisterId,
+            // });
+            // console.log('🚀 ~ getSwapPairFee ~ res:', res);
+
+            setPair(pair?.pair);
+            setAmm(pair?.ammInfo.amm);
         } catch (error) {
             console.error('🚀 ~ getSwapPairFee ~ error:', error);
         }
@@ -146,6 +182,8 @@ export const useSwapFees = ({
     };
 
     return {
+        amm, // amm
+        isNoPool, // no pool
         oneAmountOut, // 1 token out
         amountOut,
         fee: allFee,
