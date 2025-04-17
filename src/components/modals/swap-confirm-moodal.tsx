@@ -47,9 +47,9 @@ export const SwapDetailsItem = ({ item }: { item: DetailsItemType }) => {
         <div className="flex items-center justify-between">
             <div className="flex items-center justify-start">
                 <div className="text-xs font-medium text-[#666]">{item.label}</div>
-                <Icon name="info" className="ml-2 h-3 w-3 text-[#97A0C9]" />
+                <Icon name="info" className="ml-2 h-3 w-3 text-[#BFBFBF]" />
             </div>
-            <div className="text-xs font-medium text-[#272E4D]">
+            <div className="text-xs font-medium text-[#000000]">
                 {item.symbol ? Number(item.value) : item.value} {item.symbol || ''}
             </div>
         </div>
@@ -99,6 +99,7 @@ export const SwapConfirmModal = ({
         fee,
         amountOut,
         isNoPool,
+        deviation,
         // oneAmountOut,
         refetchAmountOut,
     } = useSwapFees({
@@ -118,10 +119,10 @@ export const SwapConfirmModal = ({
     }, [amountOut, receiveTokenInfo.decimals, swapSlippage]);
 
     const detailsItems: DetailsItemType[] = [
-        // {
-        //     label: 'Price Deviation',
-        //     value: '1.55%',
-        // },
+        {
+            label: 'Price Deviation',
+            value: `${deviation}%`,
+        },
         {
             label: 'Slippage Tolerance',
             value: `${swapSlippage}%`,
@@ -297,20 +298,20 @@ export const SwapConfirmModal = ({
                     <div className="mt-[28px] w-full">
                         <div className="flex items-center justify-between">
                             <div className="flex-col">
-                                <div className="text-xl font-medium text-[#272E4D]">
+                                <div className="text-xl font-medium text-[#000]">
                                     {payAmount} {payTokenInfo.symbol}
                                 </div>
                                 <PriceFormatter
-                                    className="text-sm font-medium text-[#97A0C9]"
+                                    className="text-sm font-medium text-[#666]"
                                     price={Number(payAmountUsd)}
                                 />
                             </div>
                             <TokenLogo
                                 canisterId={payTokenInfo.canister_id.toString()}
-                                className="h-10 w-10 flex-shrink-0 rounded-full border border-[#C9D2FC] duration-75 group-hover:ml-[13px]"
+                                className="h-10 w-10 flex-shrink-0 rounded-full border border-[#EEEEEE] duration-75 group-hover:ml-[13px]"
                             />
                         </div>
-                        <div className="relative my-[25px] border-b border-dashed border-[#7178FF]">
+                        <div className="relative my-[25px] border-b border-dashed border-[#DDDDDD]">
                             <Icon
                                 name="swap-down"
                                 className="absolute top-1/2 left-1/2 h-8 w-8 translate-x-[-50%] translate-y-[-50%]"
@@ -318,41 +319,41 @@ export const SwapConfirmModal = ({
                         </div>
                         <div className="flex items-center justify-between">
                             <div className="flex-col">
-                                <div className="text-xl font-medium text-[#272E4D]">
-                                    {truncateDecimalToBN(Number(amountOut), 4)} {receiveTokenInfo.symbol}
+                                <div className="text-xl font-medium text-[#000]">
+                                    {truncateDecimalToBN(Number(amountOut), 8)} {receiveTokenInfo.symbol}
                                 </div>
                                 <PriceFormatter
-                                    className="text-sm font-medium text-[#97A0C9]"
+                                    className="text-sm font-medium text-[#666]"
                                     price={Number(receiveAmountUsd)}
                                 />
                             </div>
                             <TokenLogo
                                 canisterId={receiveTokenInfo.canister_id.toString()}
-                                className="h-10 w-10 flex-shrink-0 rounded-full border border-[#C9D2FC] duration-75 group-hover:ml-[13px]"
+                                className="h-10 w-10 flex-shrink-0 rounded-full border border-[#EEEEEE] duration-75 group-hover:ml-[13px]"
                             />
                         </div>
 
-                        <div className="relative mt-[25px] flex w-full items-start justify-center space-x-2 rounded-2xl border border-dashed border-[#7178FF] pt-[26px] pb-[15px]">
-                            <div className="absolute top-0 left-1/2 flex h-[22px] w-[100px] translate-x-[-50%] translate-y-[-50%] items-center justify-center rounded-full bg-[#7178FF] text-sm font-medium text-white">
+                        <div className="relative mt-[25px] flex w-full items-start justify-center space-x-2 rounded-2xl border border-dashed border-[#DDDDDD] pt-[26px] pb-[15px]">
+                            <div className="absolute top-0 left-1/2 flex h-[22px] w-[100px] translate-x-[-50%] translate-y-[-50%] items-center justify-center rounded-full bg-[#EEEEEE] text-sm font-medium text-[#666666]">
                                 {t('swap.review.route')}
                             </div>
 
                             <div>
                                 <TokenLogo
                                     canisterId={payTokenInfo.canister_id.toString()}
-                                    className="h-9 w-9 flex-shrink-0 rounded-full border border-[#C9D2FC] duration-75 group-hover:ml-[13px]"
+                                    className="h-9 w-9 flex-shrink-0 rounded-full border border-[#EEEEEE] duration-75 group-hover:ml-[13px]"
                                 />
                                 <div className="mt-[8px] text-center text-xs font-medium text-[#666]">
                                     {payTokenInfo.symbol}
                                 </div>
                             </div>
                             <div className="flex h-9 w-9 items-center justify-center">
-                                <Icon name="right" className="h-[12px] w-[18px] text-[#97A0C9]" />
+                                <Icon name="right" className="h-[12px] w-[18px] text-[#999999]" />
                             </div>
                             <div>
                                 <TokenLogo
                                     canisterId={receiveTokenInfo.canister_id.toString()}
-                                    className="h-9 w-9 flex-shrink-0 rounded-full border border-[#C9D2FC] duration-75 group-hover:ml-[13px]"
+                                    className="h-9 w-9 flex-shrink-0 rounded-full border border-[#EEEEEE] duration-75 group-hover:ml-[13px]"
                                 />
                                 <div className="mt-[8px] text-center text-xs font-medium text-[#666]">
                                     {receiveTokenInfo.symbol}

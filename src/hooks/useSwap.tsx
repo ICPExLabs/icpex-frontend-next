@@ -150,8 +150,11 @@ export const useSwap = () => {
             await onWithdraw(arg, swapResult);
 
             setIsSuccess(true);
-        } catch (error) {
+        } catch (error: any) {
             console.log('🚀 ~ execute_complete_swap ~ error:', error);
+            setIsError(true);
+            setErrorMessage('Swap failed');
+            throw new Error(unwrapVariantKey(error));
         } finally {
             resetState();
         }

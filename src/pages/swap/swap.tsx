@@ -86,12 +86,13 @@ function SwapPage() {
     // loading
     const {
         // loading: calLoading,
-        amm,
         // fee,
+        amm,
         amountOut,
         oneAmountOut,
         isNoPool,
         refetchAmountOut,
+        getMaxAmountIn,
     } = useSwapFees({
         from: payTokenInfo,
         to: receiveTokenInfo,
@@ -127,7 +128,9 @@ function SwapPage() {
 
     const onMaxChange = () => {
         if (!payBalance) return;
-        setPayAmount(truncateDecimalToBN(payBalance));
+
+        const maxAmount = getMaxAmountIn(truncateDecimalToBN(payBalance, 4));
+        setPayAmount(truncateDecimalToBN(maxAmount, 4));
     };
 
     const resetAmount = () => {
@@ -146,103 +149,6 @@ function SwapPage() {
         setLoading(true);
         setShowConfirmModal(true);
     };
-
-    // const onSwapChange = async () => {
-    //     if (!connectedIdentity) return;
-
-    //     try {
-    //         // TODO: tip warning
-    //         if (!payTokenInfo || !receiveTokenInfo) return;
-
-    //         if (!payAmount || !amountOut || !amm) return;
-
-    //         setLoading(true);
-
-    //         const amountOutMin = BigNumber(amountOut)
-    //             .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
-    //             .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
-    //             .toFixed(0)
-    //             .toString();
-
-    //         const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
-
-    //         const params = {
-    //             from_canister_id: payTokenInfo.canister_id.toString(),
-    //             to_canister_id: receiveTokenInfo.canister_id.toString(),
-    //             amount_in: amountIn,
-    //             amount_out_min: amountOutMin.toString(),
-    //             fee,
-    //             decimals: payTokenInfo.decimals,
-    //             amm,
-    //         };
-    //         console.log('🚀 ~ onSwapChange ~ params:', amountIn, '=======', amountOut, '========', params);
-
-    //         const result = await contract_swap(connectedIdentity, params);
-    //         console.log('🚀 ~ onSwapRouterChange ~ result:', result);
-
-    //         setLoading(false);
-    //         Toast.success('Swap successfully');
-    //         updateTokenBalance();
-
-    //         refetchAmountOut();
-    //         // reset input
-    //         resetAmount();
-    //     } catch (error) {
-    //         console.error('🚀 ~ onSwapChange ~ error:', error);
-    //         setLoading(false);
-    //         Toast.error('Swap failed');
-    //     }
-    // };
-
-    // // swap wallet
-    // const onSwapRouterChange = async () => {
-    //     console.log('wallet mode swap');
-    //     if (!connectedIdentity) return;
-
-    //     try {
-    //         // TODO: tip warning
-    //         if (!payTokenInfo || !receiveTokenInfo) return;
-
-    //         if (!payAmount || !amountOut || !amm) return;
-
-    //         setLoading(true);
-
-    //         const amountOutMin = BigNumber(amountOut)
-    //             .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
-    //             .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
-    //             .toFixed(0)
-    //             .toString();
-
-    //         const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
-
-    //         const params = {
-    //             from_canister_id: payTokenInfo.canister_id.toString(),
-    //             to_canister_id: receiveTokenInfo.canister_id.toString(),
-    //             amount_in: amountIn,
-    //             amount_out_min: amountOutMin.toString(),
-    //             fee,
-    //             decimals: payTokenInfo.decimals,
-    //             withdraw_fee: receiveTokenInfo.fee.toString(), // withdrawFee
-    //             amm: amm,
-    //         };
-    //         console.log('🚀 ~ onSwapRouterChange ~ params:', amountIn, '=======', amountOut, '========', params);
-
-    //         const result = await execute_complete_swap(connectedIdentity, params);
-    //         console.log('🚀 ~ onSwapRouterChange ~ result:', result);
-
-    //         setLoading(false);
-    //         Toast.success('Swap successfully');
-
-    //         updateTokenBalance();
-    //         refetchAmountOut();
-    //         // reset input
-    //         resetAmount();
-    //     } catch (error) {
-    //         console.error('🚀 ~ onSwapChange ~ error:', error);
-    //         setLoading(false);
-    //         Toast.error('Swap failed');
-    //     }
-    // };
 
     const updateTokenBalance = () => {
         if (!connectedIdentity || !payTokenInfo || !receiveTokenInfo) return;
@@ -376,7 +282,7 @@ function SwapPage() {
                 <AmountInput
                     className="mb-5 flex justify-between"
                     placeholder="0.00"
-                    amount={amountOut ? truncateDecimalToBN(Number(amountOut), 4) : undefined}
+                    amount={amountOut ? truncateDecimalToBN(Number(amountOut), 8) : undefined}
                     onAmountChange={() => {}}
                     token={receiveToken}
                     onTokenChange={setReceiveToken}

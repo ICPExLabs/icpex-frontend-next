@@ -9,79 +9,66 @@ import { useAppStore } from '@/stores/app';
 
 import { TypeTokenPriceInfoVal } from './useToken';
 
-// interface DeviationType {
-//     fromReserve: string;
-//     toReserve: string;
-//     payAmount: string;
-//     payTokenInfo: TypeTokenPriceInfoVal;
-//     receiveTokenInfo: TypeTokenPriceInfoVal;
-// }
+interface DeviationType {
+    fromReserve: string;
+    toReserve: string;
+    payAmount: string;
+    feeRate: string;
+}
 
-// export const getPriceDeviation = ({
-//     fromReserve,
-//     toReserve,
-//     payAmount,
-//     payTokenInfo,
-//     receiveTokenInfo,
-// }: DeviationType) => {
-//     // Check if input values are valid
-//     if (
-//         !payTokenInfo.priceUSD ||
-//         !receiveTokenInfo.priceUSD ||
-//         BigNumber(payTokenInfo.priceUSD).isZero() ||
-//         BigNumber(receiveTokenInfo.priceUSD).isZero()
-//     ) {
-//         return '0';
-//     }
+export const getPriceDeviation = ({ fromReserve, toReserve, payAmount, feeRate }: DeviationType) => {
+    const [numerator, denominator] = feeRate.split('/');
+    const feeRatio = BigNumber(numerator).div(BigNumber(denominator));
 
-//     try {
-//         // Token reserves in the pool
-//         const poolReserveA = BigNumber(fromReserve);
-//         const poolReserveB = BigNumber(toReserve);
+    const amountInWithFee = BigNumber(payAmount).multipliedBy(BigNumber(1).minus(feeRatio));
 
-//         // Payment amount (considering decimals)
-//         const payAmountWithDecimals = BigNumber(payAmount);
+    const amountOut = BigNumber(toReserve)
+        .multipliedBy(amountInWithFee)
+        .div(BigNumber(fromReserve).plus(amountInWithFee));
 
-//         // Calculate pool state after transaction
-//         const newReserveA = poolReserveA.plus(payAmountWithDecimals);
-//         const k = poolReserveA.multipliedBy(poolReserveB);
-//         const newReserveB = k.dividedBy(newReserveA);
+    const priceMid = BigNumber(toReserve).div(BigNumber(fromReserve));
 
-//         // Calculate received token amount
-//         const amountBOut = poolReserveB.minus(newReserveB);
+    const priceExec = amountOut.div(BigNumber(payAmount));
 
-//         // Calculate actual trading price (considering decimals)
-//         const receiveAmountNormalized = amountBOut.dividedBy(BigNumber(10).pow(receiveTokenInfo.decimals));
-//         const payAmountNormalized = BigNumber(payAmount).dividedBy(BigNumber(10).pow(payTokenInfo.decimals));
+    const priceDeviation = priceMid.minus(priceExec).absoluteValue().div(priceMid);
 
-//         // Actual exchange rate
-//         const actualPrice = receiveAmountNormalized.dividedBy(payAmountNormalized);
+    // console.log('Price calculation details:', {
+    //     fromReserve: fromReserve,
+    //     toReserve: toReserve,
+    //     payAmount: payAmount,
+    //     feeRate: feeRate,
+    //     amountInWithFee: amountInWithFee.toString(),
+    //     amountOut: amountOut.toString(),
+    //     priceMid: priceMid.toString(),
+    //     priceExec: priceExec.toString(),
+    //     priceDeviation: priceDeviation.toString(),
+    // });
 
-//         // Calculate market price
-//         const marketPrice = BigNumber(receiveTokenInfo.priceUSD).dividedBy(BigNumber(payTokenInfo.priceUSD));
+    return BigNumber.min(priceDeviation.multipliedBy(100), 10).toFixed(2);
+};
 
-//         // Calculate price deviation percentage
-//         let deviation = actualPrice.minus(marketPrice).absoluteValue().dividedBy(marketPrice).multipliedBy(100);
+const getAmountOut = (
+    amountIn: string | number,
+    reserveIn: string | number,
+    reserveOut: string | number,
+    feeRate: string = '3/1000',
+    out_decimals: number | string,
+): string => {
+    const [numerator, denominator] = feeRate.split('/');
+    const feeRatio = BigNumber(1).minus(BigNumber(numerator).div(BigNumber(denominator)));
 
-//         // If deviation is too large, it might be a calculation error, limit maximum deviation to 10%
-//         if (deviation.isGreaterThan(10)) {
-//             console.warn('Price deviation is abnormally high, possible calculation error:', deviation.toString());
-//             // Limit maximum deviation
-//             deviation = BigNumber(10);
-//         }
+    //  X*(1-fee)
+    const amountInWithFee = BigNumber(amountIn).multipliedBy(feeRatio);
 
-//         // Handle extreme cases
-//         if (deviation.isNaN() || !deviation.isFinite()) {
-//             deviation = BigNumber(0);
-//         }
+    //  X*reserve1*(1-fee)
+    const numeratorBN = amountInWithFee.multipliedBy(reserveOut);
 
-//         // Limit decimal places to avoid long decimals
-//         return deviation.toFixed(2);
-//     } catch (error) {
-//         console.error('Error calculating price deviation:', error);
-//         return '0';
-//     }
-// };
+    //  reserve0 + X*(1-fee)
+    const denominatorBN = BigNumber(reserveIn).plus(amountInWithFee);
+
+    // Y = (X*reserve1*(1-fee))/(reserve0 + X*(1-fee))
+    return numeratorBN.div(denominatorBN).div(BigNumber(10).pow(out_decimals)).toString();
+};
 
 export const useSwapFees = ({
     from,
@@ -104,29 +91,7 @@ export const useSwapFees = ({
     const [isNoPool, setIsNoPool] = useState<boolean>(false);
     const [pair, setPair] = useState<SwapV2MarketMakerView>();
     const [amm, setAmm] = useState<string>();
-
-    const getAmountOut = (
-        amountIn: string | number,
-        reserveIn: string | number,
-        reserveOut: string | number,
-        feeRate: string = '3/1000',
-        out_decimals: number | string,
-    ): string => {
-        const [numerator, denominator] = feeRate.split('/');
-        const feeRatio = BigNumber(1).minus(BigNumber(numerator).div(BigNumber(denominator)));
-
-        //  X*(1-fee)
-        const amountInWithFee = BigNumber(amountIn).multipliedBy(feeRatio);
-
-        //  X*reserve1*(1-fee)
-        const numeratorBN = amountInWithFee.multipliedBy(reserveOut);
-
-        //  reserve0 + X*(1-fee)
-        const denominatorBN = BigNumber(reserveIn).plus(amountInWithFee);
-
-        // Y = (X*reserve1*(1-fee))/(reserve0 + X*(1-fee))
-        return numeratorBN.div(denominatorBN).div(BigNumber(10).pow(out_decimals)).toString();
-    };
+    const [deviation, setDeviation] = useState<string>();
 
     // const calculateOneAmountOut = useCallback(() => {
     //     if (!from || !to || !pair) {
@@ -182,14 +147,13 @@ export const useSwapFees = ({
             const amountOut = getAmountOut(finalAmount, fromReserve, toReserve, fee_rate, to.decimals);
             setAmountOut(amountOut);
 
-            // todo price deviation
-            // const deviation = getPriceDeviation({
-            //     fromReserve: fromReserve,
-            //     toReserve: toReserve,
-            //     payAmount: finalAmount,
-            //     payTokenInfo: from,
-            //     receiveTokenInfo: to,
-            // });
+            const deviation = getPriceDeviation({
+                fromReserve: fromReserve,
+                toReserve: toReserve,
+                payAmount: finalAmount,
+                feeRate: fee_rate,
+            });
+            setDeviation(deviation);
         }
 
         if (walletMode === 'wallet') {
@@ -265,7 +229,36 @@ export const useSwapFees = ({
         getSwapPairFee();
     };
 
+    // max amount in cal fee and available amount
+    const getMaxAmountIn = (balance: number) => {
+        if (!from || !pair) {
+            return 0;
+        }
+
+        const { fee_rate } = pair;
+        const [numerator, denominator] = fee_rate.split('/');
+
+        const feeRate = BigNumber(numerator).div(BigNumber(denominator));
+        const fees = BigNumber(balance || 0)
+            .multipliedBy(BigNumber(10).pow(from.decimals))
+            .multipliedBy(feeRate);
+
+        if (walletMode === 'wallet') {
+            const allFees = fees.plus(from.fee).toString();
+
+            const feeAmount = BigNumber(allFees).div(BigNumber(10).pow(from.decimals));
+            const availableAmount = BigNumber(balance).minus(feeAmount);
+
+            return availableAmount.toString();
+        }
+
+        const feeAmount = BigNumber(fees).div(BigNumber(10).pow(from.decimals));
+        const availableAmount = BigNumber(balance).minus(feeAmount);
+        return availableAmount.toString();
+    };
+
     return {
+        deviation, // price deviation
         amm, // amm
         isNoPool, // no pool
         oneAmountOut, // 1 token out
@@ -273,5 +266,6 @@ export const useSwapFees = ({
         fee: allFee,
         loading,
         refetchAmountOut,
+        getMaxAmountIn,
     };
 };
