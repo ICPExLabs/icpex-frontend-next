@@ -86,7 +86,7 @@ function SwapPage() {
 
     // loading
     const {
-        loading: calLoading,
+        // loading: calLoading,
         fee,
         amountOut,
         oneAmountOut,
@@ -403,7 +403,7 @@ function SwapPage() {
                             !payAmount ||
                             !receiveAmount ||
                             payAmount > payBalance ||
-                            calLoading || // loading calculate amount out
+                            // calLoading || // loading calculate amount out
                             loading);
 
                     const buttonConfig = {
@@ -415,8 +415,6 @@ function SwapPage() {
                                 if (!payAmount || !receiveAmount) return t('swap.swapBtn.enterAmount');
                                 if (!payBalance) return t('swap.swapBtn.insufficientEmpty');
                                 if (payAmount > payBalance) return t('swap.swapBtn.insufficient', { symbol: payToken });
-                                if (calLoading)
-                                    return walletMode === 'wallet' ? 'Swap with ' + swapRouter : t('swap.swapBtn.swap');
                                 return '';
                             })(),
                             textClassName: 'text-[#999999]',
