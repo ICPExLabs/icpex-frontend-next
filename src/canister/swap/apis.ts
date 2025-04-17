@@ -6,6 +6,7 @@ import { string2principal } from '@/utils/common/principal.ts';
 import { unwrapRustResultMap } from '@/utils/common/results.ts';
 import { unwrapVariant, unwrapVariantKey } from '@/utils/common/variant.ts';
 import { hex2array } from '@/utils/hex.ts';
+import { transReserve } from '@/utils/text.ts';
 
 import { icrc2_approve } from '../icrc1/apis.ts';
 import { _SERVICE, SwapV2MarketMakerView, TokenInfo } from './swap.did.d';
@@ -98,12 +99,23 @@ export const get_pair_info = async (
     const { creator } = identity;
     const create: _SERVICE = await creator(idlFactory, canisterID);
     const res = await create.pair_query({
+        // todo:
         amm: 'swap_v2_0.3%',
         token0: string2principal(arg.from_canister_id),
         token1: string2principal(arg.to_canister_id),
     });
 
-    return unwrapVariant(res[0], 'SwapV2');
+    if (res.length === 0) {
+        return undefined;
+    }
+
+    const result = unwrapVariant<SwapV2MarketMakerView>(res[0], 'swap_v2')!;
+
+    return {
+        ...result,
+        reserve0: transReserve(result.reserve0),
+        reserve1: transReserve(result.reserve1),
+    };
 };
 
 // approve deposit token to swap
@@ -133,10 +145,10 @@ export const deposit_token_to_swap = async (
                 subaccount: wrapOptionMap(arg.subaccount, hex2array),
             },
             deposit_amount_without_fee: string2bigint(arg.amount),
-            created: [BigInt(Date.now() * 1000000)],
+            created: [],
             memo: [],
             to: {
-                owner: string2principal(canisterID),
+                owner: string2principal(identity.principal),
                 subaccount: [],
             },
         },
@@ -182,6 +194,7 @@ export const swap_exact_tokens_for_tokens = async (
             amount_out_min: string2bigint(arg.amount_out_min),
             path: [
                 {
+                    // todo:
                     amm: 'swap_v2_0.3%',
                     token: [string2principal(arg.from_canister_id), string2principal(arg.to_canister_id)],
                 },
@@ -229,7 +242,7 @@ export const only_deposit_token_to_swap = async (
             created: [BigInt(Date.now() * 1000000)],
             memo: [],
             to: {
-                owner: string2principal(canisterID),
+                owner: string2principal(identity.principal),
                 subaccount: [],
             },
         },

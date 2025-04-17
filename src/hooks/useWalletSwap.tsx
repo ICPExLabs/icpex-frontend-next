@@ -77,6 +77,7 @@ export const useSwapFees = ({
         if (!from || !to || !fromAmount || !pair) {
             setAmountOut(undefined);
             setAllFee('0');
+            // todo no pool return
             return;
         }
         const { fee_rate, token0, token1 } = pair;

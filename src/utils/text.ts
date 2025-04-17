@@ -13,3 +13,8 @@ export const shrinkText = (text: string | undefined, prefix = 5, suffix = 5): st
 export const shrinkPrincipal = (text: string | undefined): string | undefined => shrinkText(text, 5, 3);
 // Shorten account ID
 export const shrinkAccount = (text: string | undefined): string | undefined => shrinkText(text, 4, 4);
+
+export const transReserve = (text: string): string => {
+    if (!text) return text;
+    return text.replaceAll('_', '');
+};

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { contract_swap, execute_complete_swap } from '@/components/api/swap';
+// import { SwapConfirmModal } from '@/components/modals/swap-confirm-moodal';
 import Icon from '@/components/ui/icon';
 import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useSwapFees } from '@/hooks/useWalletSwap';
@@ -80,6 +81,9 @@ function SwapPage() {
     const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('ICPEx');
     const [loading, setLoading] = useState<boolean>(false);
 
+    // setShowConfirmModal
+    const [showConfirmModal] = useState<boolean>(false);
+
     // loading
     const {
         loading: calLoading,
@@ -95,7 +99,7 @@ function SwapPage() {
 
     // update amount out 3s
     useInterval(() => {
-        if (payToken && receiveToken && payAmount && !loading) {
+        if (payToken && receiveToken && payAmount && !loading && !showConfirmModal) {
             console.log('update amount out');
             refetchAmountOut();
         }
@@ -123,6 +127,11 @@ function SwapPage() {
     const onMaxChange = () => {
         if (!payBalance) return;
         setPayAmount(truncateDecimalToBN(payBalance));
+    };
+
+    const resetAmount = () => {
+        setPayAmount(undefined);
+        setReceiveAmount(undefined);
     };
 
     const onSwapChange = async () => {
@@ -161,9 +170,9 @@ function SwapPage() {
             Toast.success('Swap successfully');
             updateTokenBalance();
 
+            refetchAmountOut();
             // reset input
-            setPayAmount(undefined);
-            setReceiveAmount(undefined);
+            resetAmount();
         } catch (error) {
             console.error('🚀 ~ onSwapChange ~ error:', error);
             setLoading(false);
@@ -210,9 +219,9 @@ function SwapPage() {
             Toast.success('Swap successfully');
 
             updateTokenBalance();
+            refetchAmountOut();
             // reset input
-            setPayAmount(undefined);
-            setReceiveAmount(undefined);
+            resetAmount();
         } catch (error) {
             console.error('🚀 ~ onSwapChange ~ error:', error);
             setLoading(false);
@@ -483,6 +492,19 @@ function SwapPage() {
             )}
 
             <PriceComponents payTokenInfo={payTokenInfo} receiveTokenInfo={receiveTokenInfo} />
+
+            {/* confirm modal */}
+            {/* {payTokenInfo && receiveTokenInfo && payAmount && (
+                <SwapConfirmModal
+                    isShow={showConfirmModal}
+                    setIsShow={setShowConfirmModal}
+                    payTokenInfo={payTokenInfo}
+                    receiveTokenInfo={receiveTokenInfo}
+                    payAmount={payAmount}
+                    resetAmount={resetAmount}
+                    updateTokenBalance={updateTokenBalance}
+                />
+            )} */}
         </div>
     );
 }
