@@ -5,7 +5,6 @@ import { get_pair_info } from '@/canister/swap/apis';
 import type { SwapV2MarketMakerView } from '@/canister/swap/swap.did.d';
 import { anonymous } from '@/components/connect/creator';
 import { useAppStore } from '@/stores/app';
-import { bigint2string } from '@/utils/common/bigint';
 
 import { TypeTokenPriceInfoVal } from './useToken';
 
@@ -95,13 +94,7 @@ export const useSwapFees = ({
         const toReserve = token0 === toCanisterId ? pair.reserve0 : token1 === toCanisterId ? pair.reserve1 : null;
 
         if (fromReserve && toReserve) {
-            const amountOut = getAmountOut(
-                finalAmount,
-                bigint2string(fromReserve),
-                bigint2string(toReserve),
-                fee_rate,
-                to.decimals,
-            );
+            const amountOut = getAmountOut(finalAmount, fromReserve, toReserve, fee_rate, to.decimals);
             setAmountOut(amountOut);
         }
 

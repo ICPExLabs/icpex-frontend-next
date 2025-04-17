@@ -99,7 +99,8 @@ export const get_pair_info = async (
     const create: _SERVICE = await creator(idlFactory, canisterID);
     const res = await create.pair_query({
         amm: 'swap_v2_0.3%',
-        pair: [string2principal(arg.from_canister_id), string2principal(arg.to_canister_id)],
+        token0: string2principal(arg.from_canister_id),
+        token1: string2principal(arg.to_canister_id),
     });
 
     return unwrapVariant(res[0], 'SwapV2');
@@ -131,7 +132,13 @@ export const deposit_token_to_swap = async (
                 owner: string2principal(identity.principal),
                 subaccount: wrapOptionMap(arg.subaccount, hex2array),
             },
-            amount_without_fee: string2bigint(arg.amount),
+            deposit_amount_without_fee: string2bigint(arg.amount),
+            created: [BigInt(Date.now() * 1000000)],
+            memo: [],
+            to: {
+                owner: string2principal(canisterID),
+                subaccount: [],
+            },
         },
         [3],
     );
@@ -176,10 +183,12 @@ export const swap_exact_tokens_for_tokens = async (
             path: [
                 {
                     amm: 'swap_v2_0.3%',
-                    pair: [string2principal(arg.from_canister_id), string2principal(arg.to_canister_id)],
+                    token: [string2principal(arg.from_canister_id), string2principal(arg.to_canister_id)],
                 },
             ],
             deadline: arg.deadline ? [BigInt(arg.deadline)] : [],
+            created: [BigInt(Date.now() * 1000000)],
+            memo: [],
         },
         [],
     );
@@ -216,7 +225,13 @@ export const only_deposit_token_to_swap = async (
                 owner: string2principal(identity.principal),
                 subaccount: wrapOptionMap(arg.subaccount, hex2array),
             },
-            amount_without_fee: string2bigint(arg.amount),
+            deposit_amount_without_fee: string2bigint(arg.amount),
+            created: [BigInt(Date.now() * 1000000)],
+            memo: [],
+            to: {
+                owner: string2principal(canisterID),
+                subaccount: [],
+            },
         },
         [3],
     );
@@ -255,7 +270,9 @@ export const withdraw_token_from_swap = async (
                 owner: string2principal(identity.principal),
                 subaccount: wrapOptionMap(arg.subaccount, hex2array),
             },
-            amount_without_fee: string2bigint(arg.amount),
+            withdraw_amount_without_fee: string2bigint(arg.amount),
+            created: [BigInt(Date.now() * 1000000)],
+            memo: [],
         },
         [],
     );
