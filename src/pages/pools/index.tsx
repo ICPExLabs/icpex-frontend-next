@@ -2,14 +2,16 @@ import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { get_all_pairs_info } from '@/canister/swap/apis';
+import { get_all_pairs_info, get_tokens_balance } from '@/canister/swap/apis';
 import { MarketMakerView, TokenPairPool } from '@/canister/swap/swap.did.d';
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
 import { useTokenInfoByCanisterId } from '@/hooks/useToken';
+import { useIdentityStore } from '@/stores/identity';
 import { useTokenStore } from '@/stores/token';
 import { cn } from '@/utils/classNames';
 import { formatNumber, truncateDecimalToBN } from '@/utils/numbers';
+import { isCanisterIdText } from '@/utils/principals';
 import { parseLowerCaseSearch } from '@/utils/search';
 import { transReserve } from '@/utils/text.ts';
 
@@ -25,6 +27,27 @@ type TypePoolsListItem = {
     tokenAReserve: number;
     tokenBReserve: number;
     tvl: number;
+};
+
+const PoolsListLoading = () => {
+    const { t } = useTranslation();
+    return (
+        <div className="flex h-full w-full flex-col items-center justify-center">
+            <Icon name="loading" className="h-[36px] w-[36px] animate-spin text-[#07c160]" />
+            <p className="mt-2 text-base font-medium text-black">{t('pools.list.loading')}</p>
+        </div>
+    );
+};
+
+const PoolsListEmpty = () => {
+    const { t } = useTranslation();
+    return (
+        <div className="flex h-full w-full flex-col items-center justify-center">
+            <Icon name="empty" className="h-[75px] w-20 text-[#bfbfbf]"></Icon>
+            <p className="mt-[15px] text-base leading-[20px] font-medium text-[#666666]">{t('pools.list.empty')}</p>
+            <p className="mt-[10px] text-sm leading-[17px] font-medium text-[#999999]">{t('pools.list.emptyTip')}</p>
+        </div>
+    );
 };
 
 const PoolsListItem = ({ data }: { data: TypePoolsListItem }) => {
@@ -52,7 +75,7 @@ const PoolsListItem = ({ data }: { data: TypePoolsListItem }) => {
                 )}
             </div>
             <div className="flex h-full flex-1 items-center text-sm font-medium text-black">
-                ${formatNumber(truncateDecimalToBN(Number(data.tvl), 4))}
+                ${formatNumber(truncateDecimalToBN(Number(data.tvl), 2))}
             </div>
             <div className="flex h-full flex-1 items-center">
                 <p onClick={onDeposit} className="cursor-pointer text-sm font-medium text-[#07c160]">
@@ -63,16 +86,8 @@ const PoolsListItem = ({ data }: { data: TypePoolsListItem }) => {
     );
 };
 
-function PoolsPage() {
+const PoolListTr = ({ tvlSort, setTvlSort }) => {
     const { t } = useTranslation();
-    const { tokenList } = useTokenStore();
-
-    // const [screeningPools, setScreeningPools] = useState<TypeOptionValue>('all');
-    const [isMyPosition, setIsMyPosition] = useState<boolean>(false);
-    const [keyword, setKeyword] = useState<string>('');
-
-    const [tvlSort, setTvlSort] = useState<0 | 1 | 2>(2);
-    const [poolList, setPoolList] = useState<TypePoolsListItem[] | undefined>(undefined);
 
     const toggleTvlSortBy = () => {
         setTvlSort((prev) => {
@@ -88,6 +103,52 @@ function PoolsPage() {
             }
         });
     };
+
+    return (
+        <div className="flex h-[50px] w-full flex-shrink-0 bg-[#eeeeee] px-[30px]">
+            <div className="flex h-full flex-4 items-center">
+                <p className="text-sm font-medium text-[#666666]">{t('pools.list.pool')}</p>
+            </div>
+            <div onClick={toggleTvlSortBy} className="flex h-full flex-1 cursor-pointer items-center">
+                <p className="mr-[9px] text-sm font-medium text-[#666666]">{t('pools.list.tvl')}</p>
+                <div className="relative flex flex-col gap-y-[2px]">
+                    <div
+                        className={cn(
+                            'h-0 w-0 border-x-[3.5px] border-b-[5px] border-x-transparent',
+                            (tvlSort === 0 || tvlSort === 2) && 'border-b-[#999]',
+                            tvlSort === 1 && 'border-b-[#07C160]',
+                        )}
+                    />
+                    <div
+                        className={cn(
+                            'h-0 w-0 border-x-[3.5px] border-t-[5px] border-x-transparent',
+                            (tvlSort === 0 || tvlSort === 1) && 'border-t-[#999]',
+                            tvlSort === 2 && 'border-t-[#07C160]',
+                        )}
+                    />
+                </div>
+            </div>
+            <div className="flex h-full flex-1 items-center">
+                <p className="mr-[9px] text-sm font-medium text-[#666666]">{t('pools.list.action')}</p>
+            </div>
+        </div>
+    );
+};
+
+function PoolsPage() {
+    const { t } = useTranslation();
+    const { tokenList } = useTokenStore();
+    const { connectedIdentity } = useIdentityStore();
+
+    // const [screeningPools, setScreeningPools] = useState<TypeOptionValue>('all');
+    const [isMyPosition, setIsMyPosition] = useState<boolean>(false);
+    const [keyword, setKeyword] = useState<string>('');
+
+    const [tvlSort, setTvlSort] = useState<0 | 1 | 2>(2);
+    const [poolList, setPoolList] = useState<TypePoolsListItem[] | undefined>(undefined);
+    const [totalTVL, setTotalTVL] = useState<number | undefined>(undefined);
+
+    const [myLp, setMyLp] = useState<Record<string, string> | undefined>(undefined);
 
     const list: TypePoolsListItem[] | undefined = useMemo(() => {
         if (!poolList) return undefined;
@@ -120,6 +181,7 @@ function PoolsPage() {
         if (!tokenList) return;
 
         try {
+            let tvlAll = 0;
             const res: [TokenPairPool, MarketMakerView][] = await get_all_pairs_info();
             const tokenListMap = new Map(tokenList.map((token) => [token.canister_id.toString(), token]));
 
@@ -142,7 +204,7 @@ function PoolsPage() {
                 const aAmount = new BigNumber(tokenAReserve).dividedBy(ONE.pow(decimals));
                 const bAmount = new BigNumber(tokenBReserve).dividedBy(ONE.pow(decimals));
                 const tvl = aAmount.plus(bAmount);
-
+                tvlAll = tvlAll + Number(tvl);
                 return {
                     tokenACanisterId,
                     tokenBCanisterId,
@@ -154,6 +216,7 @@ function PoolsPage() {
                 };
             });
 
+            setTotalTVL(tvlAll);
             setPoolList(resList);
         } catch (error) {
             console.error('Error fetching pools list:', error);
@@ -161,9 +224,38 @@ function PoolsPage() {
         }
     }, [tokenList]);
 
+    const getTokensBalance = useCallback(async () => {
+        if (!connectedIdentity) {
+            setIsMyPosition(false);
+            return;
+        }
+
+        const { principal } = connectedIdentity;
+        if (connectedIdentity) {
+            const contractBalanceRes = await get_tokens_balance(connectedIdentity, {
+                owner: principal,
+            });
+
+            const lpArr = {};
+            Object.keys(contractBalanceRes).forEach((key) => {
+                if (!isCanisterIdText(key)) {
+                    const quantity = contractBalanceRes[key];
+                    if (quantity) {
+                        lpArr[key] = contractBalanceRes[key];
+                    }
+                }
+            });
+            setMyLp(lpArr);
+        }
+    }, [connectedIdentity]);
+
     useEffect(() => {
         getPoolsList();
     }, [getPoolsList]);
+
+    useEffect(() => {
+        getTokensBalance();
+    }, [getTokensBalance, connectedIdentity]);
 
     return (
         <div className="mx-auto mt-[50px] w-full max-w-[1280px] flex-col px-[20px]">
@@ -173,64 +265,35 @@ function PoolsPage() {
                     <p className="text-sm leading-tight font-medium text-[#666666]">{t('pools.title.tip')}</p>
                 </div>
 
-                <TotalVolume />
+                <TotalVolume totalTVL={totalTVL} />
             </div>
             <div className="mt-5 flex w-full gap-x-3">
                 {/* <ScreeningPools screeningPools={screeningPools} setScreeningPools={setScreeningPools} /> */}
-                <ScreeningMyPosition isMyPosition={isMyPosition} setIsMyPosition={setIsMyPosition} />
+                {connectedIdentity && (
+                    <ScreeningMyPosition isMyPosition={isMyPosition} setIsMyPosition={setIsMyPosition} />
+                )}
                 <ScreeningSearch keyword={keyword} setKeyword={setKeyword} />
             </div>
             <div className="mt-[18px] flex h-[calc(100vh-280px)] w-full flex-col overflow-hidden rounded-xl border border-[#dddddd]">
-                {!list ? (
-                    <div className="flex h-full w-full flex-col items-center justify-center">
-                        <Icon name="loading" className="h-[36px] w-[36px] animate-spin text-[#07c160]" />
-                        <p className="mt-2 text-base font-medium text-black">{t('pools.list.loading')}</p>
-                    </div>
-                ) : list.length ? (
-                    <>
-                        <div className="flex h-[50px] w-full flex-shrink-0 bg-[#eeeeee] px-[30px]">
-                            <div className="flex h-full flex-4 items-center">
-                                <p className="text-sm font-medium text-[#666666]">{t('pools.list.pool')}</p>
-                            </div>
-                            <div onClick={toggleTvlSortBy} className="flex h-full flex-1 cursor-pointer items-center">
-                                <p className="mr-[9px] text-sm font-medium text-[#666666]">{t('pools.list.tvl')}</p>
-                                <div className="relative flex flex-col gap-y-[2px]">
-                                    <div
-                                        className={cn(
-                                            'h-0 w-0 border-x-[3.5px] border-b-[5px] border-x-transparent',
-                                            (tvlSort === 0 || tvlSort === 2) && 'border-b-[#999]',
-                                            tvlSort === 1 && 'border-b-[#07C160]',
-                                        )}
-                                    />
-                                    <div
-                                        className={cn(
-                                            'h-0 w-0 border-x-[3.5px] border-t-[5px] border-x-transparent',
-                                            (tvlSort === 0 || tvlSort === 1) && 'border-t-[#999]',
-                                            tvlSort === 2 && 'border-t-[#07C160]',
-                                        )}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex h-full flex-1 items-center">
-                                <p className="mr-[9px] text-sm font-medium text-[#666666]">{t('pools.list.action')}</p>
-                            </div>
-                        </div>
-                        <div className="no-scrollbar flex flex-1 flex-col overflow-y-scroll">
-                            {list!.map((item, index) => (
-                                <PoolsListItem data={item} key={index} />
-                            ))}
-                        </div>
-                    </>
+                {isMyPosition ? (
+                    <>{}</>
                 ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center">
-                        <Icon name="empty" className="h-[75px] w-20 text-[#bfbfbf]"></Icon>
-                        <p className="mt-[15px] text-base leading-[20px] font-medium text-[#666666]">
-                            {t('pools.list.empty')}
-                        </p>
-                        <p className="mt-[10px] text-sm leading-[17px] font-medium text-[#999999]">
-                            {t('pools.list.emptyTip')}
-                        </p>
-                    </div>
+                    <>
+                        {!list ? (
+                            <PoolsListLoading />
+                        ) : list.length ? (
+                            <>
+                                <PoolListTr tvlSort={tvlSort} setTvlSort={setTvlSort} />
+                                <div className="no-scrollbar flex flex-1 flex-col overflow-y-scroll">
+                                    {list!.map((item, index) => (
+                                        <PoolsListItem data={item} key={index} />
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <PoolsListEmpty />
+                        )}
+                    </>
                 )}
             </div>
         </div>
