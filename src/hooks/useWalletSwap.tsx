@@ -9,6 +9,80 @@ import { useAppStore } from '@/stores/app';
 
 import { TypeTokenPriceInfoVal } from './useToken';
 
+// interface DeviationType {
+//     fromReserve: string;
+//     toReserve: string;
+//     payAmount: string;
+//     payTokenInfo: TypeTokenPriceInfoVal;
+//     receiveTokenInfo: TypeTokenPriceInfoVal;
+// }
+
+// export const getPriceDeviation = ({
+//     fromReserve,
+//     toReserve,
+//     payAmount,
+//     payTokenInfo,
+//     receiveTokenInfo,
+// }: DeviationType) => {
+//     // Check if input values are valid
+//     if (
+//         !payTokenInfo.priceUSD ||
+//         !receiveTokenInfo.priceUSD ||
+//         BigNumber(payTokenInfo.priceUSD).isZero() ||
+//         BigNumber(receiveTokenInfo.priceUSD).isZero()
+//     ) {
+//         return '0';
+//     }
+
+//     try {
+//         // Token reserves in the pool
+//         const poolReserveA = BigNumber(fromReserve);
+//         const poolReserveB = BigNumber(toReserve);
+
+//         // Payment amount (considering decimals)
+//         const payAmountWithDecimals = BigNumber(payAmount);
+
+//         // Calculate pool state after transaction
+//         const newReserveA = poolReserveA.plus(payAmountWithDecimals);
+//         const k = poolReserveA.multipliedBy(poolReserveB);
+//         const newReserveB = k.dividedBy(newReserveA);
+
+//         // Calculate received token amount
+//         const amountBOut = poolReserveB.minus(newReserveB);
+
+//         // Calculate actual trading price (considering decimals)
+//         const receiveAmountNormalized = amountBOut.dividedBy(BigNumber(10).pow(receiveTokenInfo.decimals));
+//         const payAmountNormalized = BigNumber(payAmount).dividedBy(BigNumber(10).pow(payTokenInfo.decimals));
+
+//         // Actual exchange rate
+//         const actualPrice = receiveAmountNormalized.dividedBy(payAmountNormalized);
+
+//         // Calculate market price
+//         const marketPrice = BigNumber(receiveTokenInfo.priceUSD).dividedBy(BigNumber(payTokenInfo.priceUSD));
+
+//         // Calculate price deviation percentage
+//         let deviation = actualPrice.minus(marketPrice).absoluteValue().dividedBy(marketPrice).multipliedBy(100);
+
+//         // If deviation is too large, it might be a calculation error, limit maximum deviation to 10%
+//         if (deviation.isGreaterThan(10)) {
+//             console.warn('Price deviation is abnormally high, possible calculation error:', deviation.toString());
+//             // Limit maximum deviation
+//             deviation = BigNumber(10);
+//         }
+
+//         // Handle extreme cases
+//         if (deviation.isNaN() || !deviation.isFinite()) {
+//             deviation = BigNumber(0);
+//         }
+
+//         // Limit decimal places to avoid long decimals
+//         return deviation.toFixed(2);
+//     } catch (error) {
+//         console.error('Error calculating price deviation:', error);
+//         return '0';
+//     }
+// };
+
 export const useSwapFees = ({
     from,
     to,
@@ -107,6 +181,15 @@ export const useSwapFees = ({
         if (fromReserve && toReserve) {
             const amountOut = getAmountOut(finalAmount, fromReserve, toReserve, fee_rate, to.decimals);
             setAmountOut(amountOut);
+
+            // todo price deviation
+            // const deviation = getPriceDeviation({
+            //     fromReserve: fromReserve,
+            //     toReserve: toReserve,
+            //     payAmount: finalAmount,
+            //     payTokenInfo: from,
+            //     receiveTokenInfo: to,
+            // });
         }
 
         if (walletMode === 'wallet') {
@@ -139,6 +222,7 @@ export const useSwapFees = ({
                 }
                 return false;
             });
+            // console.log('🚀 ~ pair ~ pair:', pair);
 
             setIsNoPool(!pair ? true : false);
             setLoading(false);

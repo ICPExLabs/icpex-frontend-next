@@ -15,6 +15,9 @@ swapBtn:
     select: Select Token
     swap: Swap
     insufficientEmpty: Empty Balance
+    confirmSwap: Confirm Swap
+    noPool: No Pool
+    tryAgain: Try it again
 limit:
     title: Limit
     limitTip1: When 1
@@ -41,3 +44,6 @@ select:
 router:
     tip:
         Using external routing may result in transaction failure with funds temporarily remaining in external contracts.
+review:
+    title: Review Swap
+    route: Swap Route

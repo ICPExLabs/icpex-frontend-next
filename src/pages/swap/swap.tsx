@@ -1,12 +1,12 @@
 import { useConnect } from '@connect2ic/react';
-import { Toast } from '@douyinfe/semi-ui';
+// import { Toast } from '@douyinfe/semi-ui';
 import { useInterval } from 'ahooks';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { contract_swap, execute_complete_swap } from '@/components/api/swap';
-// import { SwapConfirmModal } from '@/components/modals/swap-confirm-moodal';
+// import { contract_swap, execute_complete_swap } from '@/components/api/swap';
+import { SwapConfirmModal } from '@/components/modals/swap-confirm-moodal';
 import Icon from '@/components/ui/icon';
 import { useTokenBalanceBySymbol, useTokenInfoBySymbol } from '@/hooks/useToken';
 import { useSwapFees } from '@/hooks/useWalletSwap';
@@ -26,7 +26,8 @@ export type TypeSwapRouter = 'KongSwap' | 'ICPSwap' | 'ICPEx';
 
 function SwapPage() {
     const { t } = useTranslation();
-    const { swapSlippage, walletMode } = useAppStore();
+    // swapSlippage,
+    const { walletMode } = useAppStore();
 
     const { isConnected, isInitializing } = useConnect();
     const { connectedIdentity, setShowLoginModal } = useIdentityStore();
@@ -80,17 +81,16 @@ function SwapPage() {
 
     const [swapRouter, setSwapRouter] = useState<TypeSwapRouter>('ICPEx');
     const [loading, setLoading] = useState<boolean>(false);
-
-    // setShowConfirmModal
-    const [showConfirmModal] = useState<boolean>(false);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
     // loading
     const {
         // loading: calLoading,
         amm,
-        fee,
+        // fee,
         amountOut,
         oneAmountOut,
+        isNoPool,
         refetchAmountOut,
     } = useSwapFees({
         from: payTokenInfo,
@@ -135,102 +135,114 @@ function SwapPage() {
         setReceiveAmount(undefined);
     };
 
-    const onSwapChange = async () => {
+    const onSwapConfirm = () => {
         if (!connectedIdentity) return;
 
-        try {
-            // TODO: tip warning
-            if (!payTokenInfo || !receiveTokenInfo) return;
+        // TODO: tip warning
+        if (!payTokenInfo || !receiveTokenInfo) return;
 
-            if (!payAmount || !amountOut || !amm) return;
+        if (!payAmount || !amountOut || !amm) return;
 
-            setLoading(true);
-
-            const amountOutMin = BigNumber(amountOut)
-                .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
-                .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
-                .toFixed(0)
-                .toString();
-
-            const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
-
-            const params = {
-                from_canister_id: payTokenInfo.canister_id.toString(),
-                to_canister_id: receiveTokenInfo.canister_id.toString(),
-                amount_in: amountIn,
-                amount_out_min: amountOutMin.toString(),
-                fee,
-                decimals: payTokenInfo.decimals,
-                amm,
-            };
-            console.log('🚀 ~ onSwapChange ~ params:', amountIn, '=======', amountOut, '========', params);
-
-            const result = await contract_swap(connectedIdentity, params);
-            console.log('🚀 ~ onSwapRouterChange ~ result:', result);
-
-            setLoading(false);
-            Toast.success('Swap successfully');
-            updateTokenBalance();
-
-            refetchAmountOut();
-            // reset input
-            resetAmount();
-        } catch (error) {
-            console.error('🚀 ~ onSwapChange ~ error:', error);
-            setLoading(false);
-            Toast.error('Swap failed');
-        }
+        setLoading(true);
+        setShowConfirmModal(true);
     };
 
-    // swap wallet
-    const onSwapRouterChange = async () => {
-        console.log('wallet mode swap');
-        if (!connectedIdentity) return;
+    // const onSwapChange = async () => {
+    //     if (!connectedIdentity) return;
 
-        try {
-            // TODO: tip warning
-            if (!payTokenInfo || !receiveTokenInfo) return;
+    //     try {
+    //         // TODO: tip warning
+    //         if (!payTokenInfo || !receiveTokenInfo) return;
 
-            if (!payAmount || !amountOut || !amm) return;
+    //         if (!payAmount || !amountOut || !amm) return;
 
-            setLoading(true);
+    //         setLoading(true);
 
-            const amountOutMin = BigNumber(amountOut)
-                .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
-                .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
-                .toFixed(0)
-                .toString();
+    //         const amountOutMin = BigNumber(amountOut)
+    //             .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
+    //             .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
+    //             .toFixed(0)
+    //             .toString();
 
-            const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
+    //         const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
 
-            const params = {
-                from_canister_id: payTokenInfo.canister_id.toString(),
-                to_canister_id: receiveTokenInfo.canister_id.toString(),
-                amount_in: amountIn,
-                amount_out_min: amountOutMin.toString(),
-                fee,
-                decimals: payTokenInfo.decimals,
-                withdraw_fee: receiveTokenInfo.fee.toString(), // withdrawFee
-                amm: amm,
-            };
-            console.log('🚀 ~ onSwapRouterChange ~ params:', amountIn, '=======', amountOut, '========', params);
+    //         const params = {
+    //             from_canister_id: payTokenInfo.canister_id.toString(),
+    //             to_canister_id: receiveTokenInfo.canister_id.toString(),
+    //             amount_in: amountIn,
+    //             amount_out_min: amountOutMin.toString(),
+    //             fee,
+    //             decimals: payTokenInfo.decimals,
+    //             amm,
+    //         };
+    //         console.log('🚀 ~ onSwapChange ~ params:', amountIn, '=======', amountOut, '========', params);
 
-            const result = await execute_complete_swap(connectedIdentity, params);
-            console.log('🚀 ~ onSwapRouterChange ~ result:', result);
+    //         const result = await contract_swap(connectedIdentity, params);
+    //         console.log('🚀 ~ onSwapRouterChange ~ result:', result);
 
-            setLoading(false);
-            Toast.success('Swap successfully');
+    //         setLoading(false);
+    //         Toast.success('Swap successfully');
+    //         updateTokenBalance();
 
-            updateTokenBalance();
-            refetchAmountOut();
-            // reset input
-            resetAmount();
-        } catch (error) {
-            console.error('🚀 ~ onSwapChange ~ error:', error);
-            setLoading(false);
-            Toast.error('Swap failed');
-        }
-    };
+    //         refetchAmountOut();
+    //         // reset input
+    //         resetAmount();
+    //     } catch (error) {
+    //         console.error('🚀 ~ onSwapChange ~ error:', error);
+    //         setLoading(false);
+    //         Toast.error('Swap failed');
+    //     }
+    // };
+
+    // // swap wallet
+    // const onSwapRouterChange = async () => {
+    //     console.log('wallet mode swap');
+    //     if (!connectedIdentity) return;
+
+    //     try {
+    //         // TODO: tip warning
+    //         if (!payTokenInfo || !receiveTokenInfo) return;
+
+    //         if (!payAmount || !amountOut || !amm) return;
+
+    //         setLoading(true);
+
+    //         const amountOutMin = BigNumber(amountOut)
+    //             .multipliedBy(BigNumber(100).minus(swapSlippage).dividedBy(100))
+    //             .multipliedBy(BigNumber(10).pow(receiveTokenInfo.decimals))
+    //             .toFixed(0)
+    //             .toString();
+
+    //         const amountIn = BigNumber(payAmount).multipliedBy(BigNumber(10).pow(payTokenInfo.decimals)).toString();
+
+    //         const params = {
+    //             from_canister_id: payTokenInfo.canister_id.toString(),
+    //             to_canister_id: receiveTokenInfo.canister_id.toString(),
+    //             amount_in: amountIn,
+    //             amount_out_min: amountOutMin.toString(),
+    //             fee,
+    //             decimals: payTokenInfo.decimals,
+    //             withdraw_fee: receiveTokenInfo.fee.toString(), // withdrawFee
+    //             amm: amm,
+    //         };
+    //         console.log('🚀 ~ onSwapRouterChange ~ params:', amountIn, '=======', amountOut, '========', params);
+
+    //         const result = await execute_complete_swap(connectedIdentity, params);
+    //         console.log('🚀 ~ onSwapRouterChange ~ result:', result);
+
+    //         setLoading(false);
+    //         Toast.success('Swap successfully');
+
+    //         updateTokenBalance();
+    //         refetchAmountOut();
+    //         // reset input
+    //         resetAmount();
+    //     } catch (error) {
+    //         console.error('🚀 ~ onSwapChange ~ error:', error);
+    //         setLoading(false);
+    //         Toast.error('Swap failed');
+    //     }
+    // };
 
     const updateTokenBalance = () => {
         if (!connectedIdentity || !payTokenInfo || !receiveTokenInfo) return;
@@ -404,9 +416,9 @@ function SwapPage() {
                             !payToken ||
                             !receiveToken ||
                             !payAmount ||
+                            isNoPool ||
                             !receiveAmount ||
                             payAmount > payBalance ||
-                            // calLoading || // loading calculate amount out
                             loading);
 
                     const buttonConfig = {
@@ -417,6 +429,7 @@ function SwapPage() {
                                 if (!payToken || !receiveToken) return t('swap.swapBtn.select');
                                 if (!payAmount || !receiveAmount) return t('swap.swapBtn.enterAmount');
                                 if (!payBalance) return t('swap.swapBtn.insufficientEmpty');
+                                if (isNoPool) return t('swap.swapBtn.noPool');
                                 if (payAmount > payBalance) return t('swap.swapBtn.insufficient', { symbol: payToken });
                                 return '';
                             })(),
@@ -427,7 +440,8 @@ function SwapPage() {
                             className: 'bg-swap-btn text-white cursor-pointer',
                             text: t('swap.swapBtn.swap'),
                             textClassName: 'text-[#fff]',
-                            onClick: onSwapChange,
+                            // onClick: onSwapChange,
+                            onClick: () => onSwapConfirm(),
                         },
                         connect: {
                             className: 'bg-swap-btn text-white cursor-pointer',
@@ -439,7 +453,8 @@ function SwapPage() {
                             className: 'bg-swap-btn text-white cursor-pointer',
                             text: 'Swap with ' + swapRouter,
                             textClassName: 'text-[#fff]',
-                            onClick: onSwapRouterChange,
+                            // onClick: onSwapRouterChange,
+                            onClick: () => onSwapConfirm(),
                         },
                     };
 
@@ -495,17 +510,20 @@ function SwapPage() {
             <PriceComponents payTokenInfo={payTokenInfo} receiveTokenInfo={receiveTokenInfo} />
 
             {/* confirm modal */}
-            {/* {payTokenInfo && receiveTokenInfo && payAmount && (
+            {payTokenInfo && receiveTokenInfo && (
                 <SwapConfirmModal
                     isShow={showConfirmModal}
                     setIsShow={setShowConfirmModal}
                     payTokenInfo={payTokenInfo}
                     receiveTokenInfo={receiveTokenInfo}
                     payAmount={payAmount}
+                    swapRouter={swapRouter}
                     resetAmount={resetAmount}
+                    setLoading={setLoading}
+                    payBalance={payBalance}
                     updateTokenBalance={updateTokenBalance}
                 />
-            )} */}
+            )}
         </div>
     );
 }
