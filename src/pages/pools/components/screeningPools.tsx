@@ -24,7 +24,7 @@ const ScreeningPools = ({
 
     return (
         <Select
-            className="!h-11 w-[120px] !rounded-[10px] !border !border-[#dddddd] !bg-white !text-[#666666]"
+            className="!h-11 w-[120px] !rounded-[10px] !border !border-[#dddddd] !bg-white !font-medium !text-[#666666]"
             defaultValue={screeningPools}
             onChange={(e) => setScreeningPools(e as TypeOptionValue)}
             optionList={optionList}

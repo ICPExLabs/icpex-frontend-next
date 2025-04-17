@@ -11,3 +11,11 @@ screening:
     anchored: Anchored Pool
     position: My Position
     searchPlaceholder: Search Tokens or Canister id...
+list:
+    empty: No pools yet
+    emptyTip: Open a new position or create a pool to get started.
+    loading: Loading...
+    deposit: + Deposit
+    pool: Pool
+    tvl: TVL
+    action: Action

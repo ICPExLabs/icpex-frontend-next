@@ -138,7 +138,7 @@ const ScreeningSearch = ({ keyword, setKeyword }: { keyword: string; setKeyword:
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed top-0 left-0 z-[999] h-screen w-screen bg-[#000]/0"
+                        className="fixed top-0 left-0 h-screen w-screen bg-[#000]/0"
                         onClick={() => {
                             setIsOpenSearch(false);
                         }}

@@ -40,16 +40,13 @@ const SelectTokenItem = ({
 
         if (!balanceSource) return 0;
 
-        // Convert to BigInt for precise arithmetic
         const balanceBigInt = BigInt(balanceSource);
         const decimalsBigInt = BigInt(data.decimals);
         const divisor = 10n ** decimalsBigInt;
 
-        // Calculate integer and fractional parts separately
         const integerPart = balanceBigInt / divisor;
         const fractionalPart = balanceBigInt % divisor;
 
-        // Combine as a number (this maintains more precision than converting the whole division)
         return Number(integerPart) + Number(fractionalPart) / Number(divisor);
     }, [tokenBalance, walletMode, specifyWalletMode, data.decimals]);
 
@@ -73,23 +70,15 @@ const SelectTokenItem = ({
                         {!tokenBalance ? (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
                         ) : (
-                            <>
-                                <PriceFormatter
-                                    className="text-sm font-medium text-[#000000]"
-                                    price={balance}
-                                    symbol={data.symbol}
-                                />
-                                {/* {data.symbol} */}
-                                {/* <p className="text-sm font-medium text-[#000000]">
-                                    {truncateDecimalToBN(balance, 8)} {data.symbol}
-                                </p> */}
-                            </>
+                            <p className="text-sm font-medium text-[#000000]">
+                                {truncateDecimalToBN(balance, 6)} {data.symbol}
+                            </p>
                         )}
                     </>
                 ) : (
                     <></>
                 )}
-                <p className="text-xs font-medium text-[#999999]">${truncateDecimalToBN(data.priceUSD || 0)}</p>
+                <PriceFormatter className="text-xs font-medium text-[#999999]" price={data.priceUSD || 0} />
             </div>
         </div>
     );
@@ -135,13 +124,12 @@ export const SelectTokenModal = ({
         if (!allTokenInfo) return {};
 
         const currentWalletMode = specifyWalletMode || walletMode;
-        const ignoreSet = new Set(ignore); // Convert to Set for faster lookups
+        const ignoreSet = new Set(ignore);
+        const searchTerm = searchKeyword ? parseLowerCaseSearch(searchKeyword) : null;
 
         let result = Object.entries(allTokenInfo).reduce((acc, [canisterId, token]) => {
-            // Skip ignored tokens
             if (ignoreSet.has(canisterId)) return acc;
 
-            // Apply zero balance filter if enabled
             if (isHideZeroBalance) {
                 const balance = allTokenBalance[canisterId];
                 if (!balance) return acc;
@@ -153,12 +141,10 @@ export const SelectTokenModal = ({
                 if (balanceValue === 0) return acc;
             }
 
-            // Apply search filter if keyword exists
-            if (searchKeyword) {
-                const searchTerm = parseLowerCaseSearch(searchKeyword);
-                if (canisterId !== searchTerm && !token.symbol.toLowerCase().includes(searchTerm)) {
-                    return acc;
-                }
+            if (searchTerm) {
+                const isMatch = canisterId === searchTerm || token.symbol.toLowerCase().includes(searchTerm);
+
+                if (!isMatch) return acc;
             }
 
             acc[canisterId] = token;

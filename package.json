@@ -31,6 +31,7 @@
         "clsx": "^2.1.1",
         "dayjs": "^1.11.13",
         "framer-motion": "^12.4.11",
+        "humanize-number": "^0.0.2",
         "i18next": "^24.2.3",
         "lodash": "^4.17.21",
         "neverthrow": "^8.2.0",

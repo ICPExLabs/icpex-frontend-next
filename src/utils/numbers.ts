@@ -105,3 +105,16 @@ export const truncateDecimalToBN = (value: number | string, decimals: number = 4
     const res = new BigNumber(value || 0).times(multiplier).integerValue(BigNumber.ROUND_DOWN).dividedBy(multiplier);
     return Number(res);
 };
+
+export const formatNumber = (num) => {
+    if (num >= 1000000000) {
+        return (num / 1000000000).toFixed(1) + 'B';
+    }
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+};
