@@ -145,7 +145,7 @@ const ScreeningSearch = ({ keyword, setKeyword }: { keyword: string; setKeyword:
                     ></motion.div>
                 )}
             </AnimatePresence>
-            <div className="relative z-[10000]">
+            <div className="relative">
                 <div className="flex h-11 w-[372px] items-center rounded-xl border border-[#dddddd] bg-white px-3">
                     <Icon name="search" className="h-[15px] w-[14px] text-[#999]" />
                     <input

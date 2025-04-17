@@ -73,9 +73,17 @@ const SelectTokenItem = ({
                         {!tokenBalance ? (
                             <Icon name="loading" className="h-[14px] w-[14px] animate-spin text-[#07c160]" />
                         ) : (
-                            <p className="text-sm font-medium text-[#000000]">
-                                {truncateDecimalToBN(balance, 8)} {data.symbol}
-                            </p>
+                            <>
+                                <PriceFormatter
+                                    className="text-sm font-medium text-[#000000]"
+                                    price={balance}
+                                    symbol={data.symbol}
+                                />
+                                {/* {data.symbol} */}
+                                {/* <p className="text-sm font-medium text-[#000000]">
+                                    {truncateDecimalToBN(balance, 8)} {data.symbol}
+                                </p> */}
+                            </>
                         )}
                     </>
                 ) : (

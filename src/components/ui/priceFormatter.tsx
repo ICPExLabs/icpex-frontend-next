@@ -5,9 +5,15 @@ interface PriceFormatterProps {
     className?: string;
     style?: React.CSSProperties;
     unit?: string;
+    symbol?: string;
 }
 
-export const PriceFormatter: React.FC<PriceFormatterProps> = ({ price, className = '', unit = '$' }) => {
+export const PriceFormatter: React.FC<PriceFormatterProps> = ({
+    price,
+    className = '',
+    unit = '$',
+    symbol = '',
+}: PriceFormatterProps) => {
     const formatPrice = (rawPrice: number): React.ReactNode => {
         const numericPrice = parseFloat(rawPrice.toString()).toFixed(20);
         const [intPart, decPartFull] = numericPrice.split('.');
@@ -45,6 +51,7 @@ export const PriceFormatter: React.FC<PriceFormatterProps> = ({ price, className
         <span className={className}>
             {unit}
             {!price ? 0 : formatPrice(price)}
+            {symbol ? ` ${symbol}` : ''}
         </span>
     );
 };
