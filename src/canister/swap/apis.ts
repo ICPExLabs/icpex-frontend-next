@@ -1,3 +1,5 @@
+import { Principal } from '@dfinity/principal';
+
 import { getAnonymousActorCreatorByAgent } from '@/components/connect/creator';
 import { ConnectedIdentity } from '@/types/identity.js';
 import { bigint2string, string2bigint } from '@/utils/common/bigint.ts';
@@ -168,6 +170,7 @@ export const deposit_token_to_swap = async (
                 owner: string2principal(identity.principal),
                 subaccount: [],
             },
+            fee: [],
         },
         [3],
     );
@@ -262,6 +265,7 @@ export const only_deposit_token_to_swap = async (
                 owner: string2principal(identity.principal),
                 subaccount: [],
             },
+            fee: [],
         },
         [3],
     );
@@ -303,6 +307,7 @@ export const withdraw_token_from_swap = async (
             withdraw_amount_without_fee: string2bigint(arg.amount),
             created: [BigInt(Date.now() * 1000000)],
             memo: [],
+            fee: [],
         },
         [],
     );
@@ -311,6 +316,58 @@ export const withdraw_token_from_swap = async (
         r,
         (result) => {
             return bigint2string(result);
+        },
+        (e) => {
+            console.error(`call token_withdraw failed`, arg, e);
+            throw new Error(unwrapVariantKey(e));
+        },
+    );
+};
+
+export const add_liquidity_to_swap = async (
+    identity: ConnectedIdentity,
+    arg: {
+        owner: string;
+        amm: string;
+        token0: Principal;
+        token1: Principal;
+        amount: string;
+        amount_out: string;
+        slippage: number;
+    },
+) => {
+    const { creator } = identity;
+    const create: _SERVICE = await creator(idlFactory, canisterID);
+    const amountMinToken0 = (BigInt(arg.amount) * BigInt(10000 - arg.slippage * 10000)) / 10000n;
+    const amountMinToken1 = (BigInt(arg.amount_out) * BigInt(10000 - arg.slippage * 10000)) / 10000n;
+
+    const r = await create.pair_liquidity_add(
+        {
+            from: {
+                owner: string2principal(identity.principal),
+                subaccount: [],
+            },
+            to: {
+                owner: string2principal(identity.principal),
+                subaccount: [],
+            },
+            created: [BigInt(Date.now() * 1000000)],
+            memo: [],
+            deadline: [],
+            amount_desired: [BigInt(arg.amount), BigInt(arg.amount_out)],
+            amount_min: [amountMinToken0, amountMinToken1],
+            swap_pair: {
+                amm: arg.amm,
+                token: [arg.token0, arg.token1],
+            },
+        },
+        [],
+    );
+
+    return unwrapRustResultMap(
+        r,
+        (result) => {
+            return result;
         },
         (e) => {
             console.error(`call token_withdraw failed`, arg, e);

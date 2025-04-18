@@ -1,9 +1,12 @@
+import { Principal } from '@dfinity/principal';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { get_all_pairs_info, get_tokens_balance } from '@/canister/swap/apis';
-import { MarketMakerView, TokenPairPool } from '@/canister/swap/swap.did.d';
+import { TokenPairPool } from '@/canister/swap/swap.did.d';
+import { AddLiquidityModal } from '@/components/modals/add-liquidity';
+import { RiskAlertModal } from '@/components/modals/risk-alert';
 import Icon from '@/components/ui/icon';
 import { TokenLogo } from '@/components/ui/logo';
 import { useTokenInfoByCanisterId } from '@/hooks/useToken';
@@ -19,7 +22,14 @@ import ScreeningMyPosition from './components/screeningMyPosition';
 import ScreeningSearch from './components/ScreeningSearch';
 import TotalVolume from './components/totalVolume';
 
-type TypePoolsListItem = {
+type TypeLp = {
+    fee: bigint;
+    decimals: number;
+    dummy_canister_id?: Principal;
+    minimum_liquidity: bigint;
+    total_supply: bigint;
+};
+export type TypePoolsListItem = {
     tokenACanisterId: string;
     tokenBCanisterId: string;
     tokenASymbol: string;
@@ -27,6 +37,16 @@ type TypePoolsListItem = {
     tokenAReserve: number;
     tokenBReserve: number;
     tvl: number;
+    fee_rate: string;
+    k_last: string;
+    lp: TypeLp;
+    dummy_canister_id: string;
+    subaccount: string;
+    protocol_fee: string[];
+    price0_cumulative_last: string;
+    price1_cumulative_last: string;
+    liquidityProportion: number;
+    ammInfo: TokenPairPool;
 };
 
 const PoolsListLoading = () => {
@@ -52,37 +72,88 @@ const PoolsListEmpty = () => {
 
 const PoolsListItem = ({ data }: { data: TypePoolsListItem }) => {
     const { t } = useTranslation();
+    const { connectedIdentity, setShowLoginModal } = useIdentityStore();
+
+    const [isShowRiskAlertModal, setIsShowRiskAlertModal] = useState(false);
+    const [isShowAddLiquidityModal, setIsShowAddLiquidityModal] = useState(false);
 
     const tokenAInfo = useTokenInfoByCanisterId(data.tokenACanisterId);
     const tokenBInfo = useTokenInfoByCanisterId(data.tokenBCanisterId);
 
     const onDeposit = () => {
-        console.log('onDeposit');
+        if (!connectedIdentity) {
+            setShowLoginModal(true);
+            return;
+        }
+        setIsShowRiskAlertModal(true);
+    };
+
+    const closeModal = () => {
+        setIsShowRiskAlertModal(false);
+        setIsShowAddLiquidityModal(false);
+    };
+
+    const onAgree = () => {
+        setIsShowRiskAlertModal(false);
+        setIsShowAddLiquidityModal(true);
+        console.log('🚀 ~ onAgree ~ log:', data);
     };
 
     return (
-        <div className="flex h-[67px] flex-shrink-0 border-b border-[#dddddd] px-[30px]">
-            <div className="flex h-full flex-4 items-center">
-                <TokenLogo canisterId={data.tokenACanisterId} className="h-8 w-8 overflow-hidden rounded-full" />
-                <TokenLogo
-                    canisterId={data.tokenBCanisterId}
-                    className="relative left-[-8px] h-8 w-8 overflow-hidden rounded-full"
-                />
-                {tokenAInfo && tokenBInfo && (
-                    <p className="ml-2 text-base font-medium text-black">
-                        {tokenAInfo?.symbol}/{tokenBInfo?.symbol}
+        <>
+            <div className="flex h-[67px] flex-shrink-0 border-b border-[#dddddd] px-[30px]">
+                <div className="flex h-full flex-4 items-center">
+                    <TokenLogo canisterId={data.tokenACanisterId} className="h-8 w-8 overflow-hidden rounded-full" />
+                    <TokenLogo
+                        canisterId={data.tokenBCanisterId}
+                        className="relative left-[-8px] h-8 w-8 overflow-hidden rounded-full"
+                    />
+                    {tokenAInfo && tokenBInfo && (
+                        <p className="ml-2 text-base font-medium text-black">
+                            {tokenAInfo?.symbol}/{tokenBInfo?.symbol}
+                        </p>
+                    )}
+                </div>
+                <div className="flex h-full flex-1 items-center text-sm font-medium text-black">
+                    ${formatNumber(truncateDecimalToBN(Number(data.tvl), 4))}
+                </div>
+                <div className="flex h-full flex-1 items-center">
+                    <p onClick={onDeposit} className="cursor-pointer text-sm font-medium text-[#07c160]">
+                        {t('pools.list.deposit')}
                     </p>
-                )}
+                </div>
             </div>
-            <div className="flex h-full flex-1 items-center text-sm font-medium text-black">
-                ${formatNumber(truncateDecimalToBN(Number(data.tvl), 2))}
+            <RiskAlertModal isShow={isShowRiskAlertModal} closeModal={closeModal} onAgree={onAgree}></RiskAlertModal>
+            <AddLiquidityModal isShow={isShowAddLiquidityModal} closeModal={closeModal} data={data}></AddLiquidityModal>
+        </>
+    );
+};
+
+const PoolsLpListItem = ({ data }: { data: TypePoolsListItem }) => {
+    const tokenAInfo = useTokenInfoByCanisterId(data.tokenACanisterId);
+    const tokenBInfo = useTokenInfoByCanisterId(data.tokenBCanisterId);
+
+    return (
+        <>
+            <div className="flex h-[67px] flex-shrink-0 border-b border-[#dddddd] px-[30px]">
+                <div className="flex h-full flex-4 items-center">
+                    <TokenLogo canisterId={data.tokenACanisterId} className="h-8 w-8 overflow-hidden rounded-full" />
+                    <TokenLogo
+                        canisterId={data.tokenBCanisterId}
+                        className="relative left-[-8px] h-8 w-8 overflow-hidden rounded-full"
+                    />
+                    {tokenAInfo && tokenBInfo && (
+                        <p className="ml-2 text-base font-medium text-black">
+                            {tokenAInfo?.symbol}/{tokenBInfo?.symbol}
+                        </p>
+                    )}
+                </div>
+                <div className="flex h-full flex-1 items-center text-sm font-medium text-black">
+                    ${formatNumber(truncateDecimalToBN(Number(data.tvl), 2))}
+                </div>
+                <div className="flex h-full flex-1 items-center">123</div>
             </div>
-            <div className="flex h-full flex-1 items-center">
-                <p onClick={onDeposit} className="cursor-pointer text-sm font-medium text-[#07c160]">
-                    {t('pools.list.deposit')}
-                </p>
-            </div>
-        </div>
+        </>
     );
 };
 
@@ -137,7 +208,7 @@ const PoolListTr = ({ tvlSort, setTvlSort }) => {
 
 function PoolsPage() {
     const { t } = useTranslation();
-    const { tokenList } = useTokenStore();
+    const { allTokenInfo } = useTokenStore();
     const { connectedIdentity } = useIdentityStore();
 
     // const [screeningPools, setScreeningPools] = useState<TypeOptionValue>('all');
@@ -148,7 +219,7 @@ function PoolsPage() {
     const [poolList, setPoolList] = useState<TypePoolsListItem[] | undefined>(undefined);
     const [totalTVL, setTotalTVL] = useState<number | undefined>(undefined);
 
-    const [myLp, setMyLp] = useState<Record<string, string> | undefined>(undefined);
+    const [myLpList, setMyLpList] = useState<Record<string, string> | undefined>(undefined);
 
     const list: TypePoolsListItem[] | undefined = useMemo(() => {
         if (!poolList) return undefined;
@@ -177,36 +248,76 @@ function PoolsPage() {
         return sortedPools;
     }, [poolList, tvlSort, keyword]);
 
+    const lpList = useMemo(() => {
+        if (!myLpList) return undefined;
+        return myLpList;
+    }, [myLpList]);
+
     const getPoolsList = useCallback(async () => {
-        if (!tokenList) return;
+        if (!allTokenInfo) {
+            return;
+        }
 
         try {
-            let tvlAll = 0;
             const res = await get_all_pairs_info();
-            const tokenListMap = new Map(tokenList.map((token) => [token.canister_id.toString(), token]));
+            const ONE = new BigNumber(10);
 
-            const resList = res.map(({ pair }) => {
-                const { token0: tokenACanisterId, token1: tokenBCanisterId, reserve0, reserve1, lp } = pair;
-                const tokenAInfo = tokenListMap.get(tokenACanisterId);
-                const tokenBInfo = tokenListMap.get(tokenBCanisterId);
-                const { decimals } = Object.values(lp)[0];
+            let tvlAll = 0;
+            const resList = res.map(({ ammInfo, pair }) => {
+                const {
+                    token0: tokenACanisterId,
+                    token1: tokenBCanisterId,
+                    reserve0,
+                    reserve1,
+                    lp,
+                    fee_rate,
+                    k_last,
+                    subaccount,
+                    protocol_fee,
+                    price0_cumulative_last,
+                    price1_cumulative_last,
+                } = pair;
 
-                const ONE = new BigNumber(10);
+                const tokenAInfo = allTokenInfo[tokenACanisterId] || {};
+                const tokenBInfo = allTokenInfo[tokenBCanisterId] || {};
+                const lpData: TypeLp = Object.values(lp)[0];
+
                 const tokenAReserve = Number(transReserve(reserve0));
                 const tokenBReserve = Number(transReserve(reserve1));
 
-                const aAmount = new BigNumber(tokenAReserve).dividedBy(ONE.pow(decimals));
-                const bAmount = new BigNumber(tokenBReserve).dividedBy(ONE.pow(decimals));
-                const tvl = aAmount.plus(bAmount);
-                tvlAll = tvlAll + Number(tvl);
+                const aAmount = new BigNumber(tokenAReserve)
+                    .dividedBy(ONE.pow(lpData.decimals))
+                    .multipliedBy(tokenAInfo.priceUSD || 0)
+                    .toNumber();
+
+                const bAmount = new BigNumber(tokenBReserve)
+                    .dividedBy(ONE.pow(lpData.decimals))
+                    .multipliedBy(tokenBInfo.priceUSD || 0)
+                    .toNumber();
+
+                const liquidityProportion = new BigNumber(tokenBReserve).dividedBy(tokenAReserve).toNumber();
+
+                const tvl = aAmount + bAmount;
+                tvlAll += tvl;
+
                 return {
                     tokenACanisterId,
                     tokenBCanisterId,
-                    tokenASymbol: tokenAInfo?.symbol || '',
-                    tokenBSymbol: tokenBInfo?.symbol || '',
+                    tokenASymbol: tokenAInfo.symbol || '',
+                    tokenBSymbol: tokenBInfo.symbol || '',
                     tokenAReserve,
                     tokenBReserve,
-                    tvl: Number(tvl),
+                    tvl,
+                    fee_rate,
+                    k_last,
+                    lp: lpData,
+                    dummy_canister_id: lpData.dummy_canister_id?.toString() || '',
+                    subaccount,
+                    protocol_fee,
+                    price0_cumulative_last,
+                    price1_cumulative_last,
+                    liquidityProportion,
+                    ammInfo: ammInfo,
                 };
             });
 
@@ -216,7 +327,7 @@ function PoolsPage() {
             console.error('Error fetching pools list:', error);
             setPoolList(undefined);
         }
-    }, [tokenList]);
+    }, [allTokenInfo]);
 
     const getTokensBalance = useCallback(async () => {
         if (!connectedIdentity) {
@@ -239,7 +350,7 @@ function PoolsPage() {
                     }
                 }
             });
-            setMyLp(lpArr);
+            setMyLpList(lpArr);
         }
     }, [connectedIdentity]);
 
@@ -270,7 +381,22 @@ function PoolsPage() {
             </div>
             <div className="mt-[18px] flex h-[calc(100vh-280px)] w-full flex-col overflow-hidden rounded-xl border border-[#dddddd]">
                 {isMyPosition ? (
-                    <>{}</>
+                    <>
+                        {!lpList ? (
+                            <PoolsListLoading />
+                        ) : lpList.length ? (
+                            <>
+                                <PoolListTr tvlSort={tvlSort} setTvlSort={setTvlSort} />
+                                <div className="no-scrollbar flex flex-1 flex-col overflow-y-scroll">
+                                    {list!.map((item, index) => (
+                                        <PoolsLpListItem data={item} key={index} />
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <PoolsListEmpty />
+                        )}
+                    </>
                 ) : (
                     <>
                         {!list ? (

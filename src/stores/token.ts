@@ -40,6 +40,8 @@ interface TokenStore {
 
     showTransferInModal: boolean;
     setShowTransferInModal: (show: boolean) => void;
+    transferInDefaultToken: string;
+    setTransferInDefaultToken: (token: string) => void;
 
     showTransferOutModal: boolean;
     setShowTransferOutModal: (show: boolean) => void;
@@ -127,6 +129,8 @@ export const useTokenStore = create<TokenStore>()(
 
             showTransferInModal: false,
             setShowTransferInModal: (show) => set({ showTransferInModal: show }),
+            transferInDefaultToken: 'ICP',
+            setTransferInDefaultToken: (token) => set({ transferInDefaultToken: token }),
 
             showTransferOutModal: false,
             setShowTransferOutModal: (show) => set({ showTransferOutModal: show }),

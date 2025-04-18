@@ -1,4 +1,5 @@
 import { useConnect } from '@connect2ic/react';
+import { useInterval } from 'ahooks';
 import { useEffect } from 'react';
 
 import { checkConnected } from '@/components/connect/connect';

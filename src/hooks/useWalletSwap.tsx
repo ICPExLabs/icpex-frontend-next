@@ -32,18 +32,6 @@ export const getPriceDeviation = ({ fromReserve, toReserve, payAmount, feeRate }
 
     const priceDeviation = priceMid.minus(priceExec).absoluteValue().div(priceMid);
 
-    // console.log('Price calculation details:', {
-    //     fromReserve: fromReserve,
-    //     toReserve: toReserve,
-    //     payAmount: payAmount,
-    //     feeRate: feeRate,
-    //     amountInWithFee: amountInWithFee.toString(),
-    //     amountOut: amountOut.toString(),
-    //     priceMid: priceMid.toString(),
-    //     priceExec: priceExec.toString(),
-    //     priceDeviation: priceDeviation.toString(),
-    // });
-
     return BigNumber.min(priceDeviation.multipliedBy(100), 10).toFixed(2);
 };
 
@@ -92,28 +80,6 @@ export const useSwapFees = ({
     const [pair, setPair] = useState<SwapV2MarketMakerView>();
     const [amm, setAmm] = useState<string>();
     const [deviation, setDeviation] = useState<string>();
-
-    // const calculateOneAmountOut = useCallback(() => {
-    //     if (!from || !to || !pair) {
-    //         setOneAmountOut(undefined);
-    //         return;
-    //     }
-    //     const { fee_rate } = pair;
-    //     const [numerator, denominator] = fee_rate.split('/');
-    //     const feeRate = BigNumber(numerator).div(BigNumber(denominator));
-    //     const fees = BigNumber(1).multipliedBy(BigNumber(10).pow(from.decimals)).multipliedBy(feeRate);
-
-    //     const finalAmount = BigNumber(1).multipliedBy(BigNumber(10).pow(from.decimals)).minus(fees).toString();
-    //     const amountOut = getAmountOut(
-    //         finalAmount,
-    //         bigint2string(pair.reserve0),
-    //         bigint2string(pair.reserve1),
-    //         fee_rate,
-    //         to.decimals,
-    //     );
-    //     console.log('🚀 ~ calculateOneAmountOut ~ amountOut:', pair, finalAmount, amountOut);
-    //     setOneAmountOut(amountOut);
-    // }, [from, pair, to]);
 
     const calculateFeeAndAmountOut = useCallback(() => {
         if (!from || !to || !fromAmount || !pair) {

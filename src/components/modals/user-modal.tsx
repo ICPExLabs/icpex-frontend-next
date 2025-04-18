@@ -156,7 +156,8 @@ const UserInfoModal = () => {
             className="userInfo-modal"
             closeOnEsc={true}
         >
-            <div className="relative mt-[77px] flex h-[calc(100vh-100px)] w-full flex-col items-center justify-start overflow-hidden rounded-[20px] border border-[#e4e9ff] bg-white py-5 text-center">
+            <div onClick={() => setShowInfoModal(false)} className="h-[80px]"></div>
+            <div className="relative flex h-[calc(100vh-100px)] w-full flex-col items-center justify-start overflow-hidden rounded-[20px] border border-[#e4e9ff] bg-white py-5 text-center">
                 <div className="flex w-full items-center justify-baseline px-5">
                     <div className="flex flex-1 items-center">
                         {activeProvider?.meta.id === 'plug' && (

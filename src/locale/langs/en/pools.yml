@@ -1,21 +1,33 @@
-title:
-    title: Pools
-    tip: Provide liquidity, earn yield.
-totalVolume:
-    tvl: TVL
-    volume: 24H Volume
-    fees: 24H Fees
-screening:
-    all: All Pools
-    public: Public Pool
-    anchored: Anchored Pool
-    position: My Position
-    searchPlaceholder: Search Tokens or Canister id...
+addLiquidity:
+    confirm: Confirm
+    deposit: Deposit Amount
+    proportion: 'Proportion:'
+    success: Add Liquidity Success
+    title: Add Liquidity
 list:
+    action: Action
+    deposit: + Deposit
     empty: No pools yet
     emptyTip: Open a new position or create a pool to get started.
     loading: Loading...
-    deposit: + Deposit
     pool: Pool
     tvl: TVL
-    action: Action
+riskAlert:
+    tip: >-
+        Adding assets to a liquidity pool and becoming a liquidity provider is not risk-free. When the market price of
+        the token fluctuates greatly, the income ofadding assets may be lower than the income of ordinary holding the
+        token,and may even cause losses.
+    title: Risk alert
+screening:
+    all: All Pools
+    anchored: Anchored Pool
+    position: My Position
+    public: Public Pool
+    searchPlaceholder: Search Tokens or Canister id...
+title:
+    tip: Provide liquidity, earn yield.
+    title: Pools
+totalVolume:
+    fees: 24H Fees
+    tvl: TVL
+    volume: 24H Volume

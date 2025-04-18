@@ -182,8 +182,8 @@ function SwapPage() {
         const inputParam = params.get('input');
         const outputParam = params.get('output');
 
-        let initialPayToken = 'ICP';
-        let initialReceiveToken: string | undefined;
+        let initialPayToken: string = 'ICP';
+        let initialReceiveToken: string = 'ICX';
 
         if (inputParam) {
             const found = tokenList.find((item) => item.canister_id.toString() === inputParam);

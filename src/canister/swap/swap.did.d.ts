@@ -7,26 +7,40 @@ export interface Account {
     subaccount: [] | [Uint8Array | number[]];
 }
 export type Amm = { 'swap_v2_1%': null } | { 'swap_v2_0.05%': null } | { 'swap_v2_0.3%': null };
+export interface ArchivedBlocks {
+    canister_id: Principal;
+    length: bigint;
+    block_height_offset: bigint;
+}
+export interface BlockChainView {
+    current_archiving: [] | [CurrentArchiving];
+    latest_block_hash: Uint8Array | number[];
+    archive_config: NextArchiveCanisterConfig;
+    next_block_index: bigint;
+    archived: Array<ArchivedBlocks>;
+}
 export type BusinessError =
     | { InvalidTokenPair: [Principal, Principal] }
-    | { TokenBlockChainLocked: null }
+    | { SwapBlockChainAppendLocked: null }
     | { TransferError: TransferError }
     | { NotSupportedToken: Principal }
     | { Swap: string }
     | { TokenPairAmmNotExist: TokenPairAmm }
     | { TokenAccountsLocked: Array<TokenAccount> }
+    | { SystemError: string }
     | { MemoTooLong: null }
     | { InsufficientBalance: { token: Principal; balance: bigint } }
     | { TokenPairAmmExist: TokenPairAmm }
     | { RequestTraceLocked: string }
+    | { TokenBlockChainAppendLocked: null }
     | { InvalidCreated: { created: bigint; system: bigint } }
     | { InvalidAmm: string }
     | { InvalidTransferFee: { fee: bigint; token: Principal } }
-    | { SwapBlockChainLocked: null }
     | { TokenBlockChainError: string }
     | { TransferFromError: TransferFromError }
     | { TokenAccountsUnlocked: Array<TokenAccount> }
     | { NotOwner: Principal }
+    | { BadTransferFee: { expected_fee: bigint } }
     | { SwapBlockChainError: string }
     | { CallCanisterError: [RejectionCode, string] }
     | { Liquidity: string }
@@ -47,6 +61,12 @@ export interface CanisterStatusResponse {
     reserved_cycles: bigint;
 }
 export type CanisterStatusType = { stopped: null } | { stopping: null } | { running: null };
+export interface CurrentArchiving {
+    canister_id: Principal;
+    length: bigint;
+    max_length: bigint;
+    block_height_offset: bigint;
+}
 export interface DefiniteCanisterSettings {
     freezing_threshold: bigint;
     controllers: Array<Principal>;
@@ -83,6 +103,12 @@ export interface MigratedRecords {
     records: Array<Record>;
     next_id: bigint;
     removed: bigint;
+}
+export interface NextArchiveCanisterConfig {
+    maintainers: [] | [Array<Principal>];
+    wasm: [] | [Uint8Array | number[]];
+    max_memory_size_bytes: [] | [bigint];
+    max_length: bigint;
 }
 export interface OuterLP {
     fee: bigint;
@@ -223,12 +249,17 @@ export type RequestArgs =
     | { token_withdraw: TokenDepositArgWithMeta };
 export interface RequestTrace {
     args: RequestArgs;
-    done: [] | [[bigint, Result]];
+    done: [] | [RequestTraceDone];
     traces: Array<[bigint, string]>;
     locks: BusinessLocks;
     index: bigint;
 }
-export type Result = { Ok: string } | { Err: string };
+export interface RequestTraceDone {
+    result: RequestTraceResult;
+    done: bigint;
+}
+export type RequestTraceResult = { ok: string } | { err: string };
+export type Result = { Ok: null } | { Err: BusinessError };
 export interface SwapBlock {
     transaction: SwapTransaction;
     timestamp: bigint;
@@ -300,6 +331,7 @@ export interface TokenDepositArgWithMeta {
 }
 export interface TokenDepositArgs {
     to: Account;
+    fee: [] | [bigint];
     created: [] | [bigint];
     token: Principal;
     from: Account;
@@ -452,6 +484,18 @@ export type TokenPairSwapTokensResult = { Ok: TokenPairSwapTokensSuccess } | { E
 export interface TokenPairSwapTokensSuccess {
     amounts: Array<bigint>;
 }
+export interface TokenPairSwapWithDepositAndWithdrawArgs {
+    to: Account;
+    created: [] | [bigint];
+    amount_out_min: bigint;
+    from: Account;
+    memo: [] | [Uint8Array | number[]];
+    path: Array<SwapTokenPair>;
+    deadline: [] | [bigint];
+    deposit_amount_without_fee: bigint;
+    withdraw_fee: [] | [bigint];
+    deposit_fee: [] | [bigint];
+}
 export interface TokenTransaction {
     created: [] | [bigint];
     memo: [] | [Uint8Array | number[]];
@@ -475,6 +519,7 @@ export interface TokenTransferArgs {
 }
 export interface TokenWithdrawArgs {
     to: Account;
+    fee: [] | [bigint];
     created: [] | [bigint];
     token: Principal;
     from: Account;
@@ -536,6 +581,12 @@ export interface _SERVICE {
     canister_status: ActorMethod<[], CanisterStatusResponse>;
     config_fee_to_query: ActorMethod<[], [] | [Account]>;
     config_fee_to_replace: ActorMethod<[[] | [Account]], [] | [Account]>;
+    config_swap_blocks_push: ActorMethod<[], undefined>;
+    config_token_archive_config_replace: ActorMethod<[NextArchiveCanisterConfig], NextArchiveCanisterConfig>;
+    config_token_archive_max_length_replace: ActorMethod<[bigint], [] | [CurrentArchiving]>;
+    config_token_archived_canister_maintainers_set: ActorMethod<[Principal, [] | [Array<Principal>]], Result>;
+    config_token_block_chain: ActorMethod<[], BlockChainView>;
+    config_token_blocks_push: ActorMethod<[], Result>;
     pair_create: ActorMethod<[TokenPairCreateArgs], TokenPairCreateResult>;
     pair_liquidity_add: ActorMethod<[TokenPairLiquidityAddArgs, [] | [number]], TokenPairLiquidityAddResult>;
     pair_liquidity_remove: ActorMethod<[TokenPairLiquidityRemoveArgs, [] | [number]], TokenPairLiquidityRemoveResult>;
@@ -548,6 +599,10 @@ export interface _SERVICE {
     pair_swap_tokens_for_exact_tokens: ActorMethod<
         [TokenPairSwapTokensForExactTokensArgs, [] | [number]],
         TokenPairSwapTokensResult
+    >;
+    pair_swap_with_deposit_and_withdraw: ActorMethod<
+        [TokenPairSwapWithDepositAndWithdrawArgs],
+        [TokenChangedResult, [] | [TokenPairSwapTokensResult], [] | [TokenChangedResult]]
     >;
     pairs_query: ActorMethod<[], Array<[TokenPairPool, MarketMakerView]>>;
     pause_query: ActorMethod<[], boolean>;
@@ -571,6 +626,7 @@ export interface _SERVICE {
     schedule_find: ActorMethod<[], [] | [bigint]>;
     schedule_replace: ActorMethod<[[] | [bigint]], undefined>;
     schedule_trigger: ActorMethod<[], undefined>;
+    test_config_token_current_archiving_replace: ActorMethod<[CurrentArchiving], [] | [CurrentArchiving]>;
     test_withdraw_all_tokens: ActorMethod<[Array<Principal>], Array<string>>;
     token_balance: ActorMethod<[Principal, [] | [Uint8Array | number[]]], bigint>;
     token_balance_by: ActorMethod<[Principal, Account], bigint>;
@@ -583,6 +639,7 @@ export interface _SERVICE {
     tokens_balance_by: ActorMethod<[Account], Array<[Principal, bigint]>>;
     tokens_balance_of: ActorMethod<[Account], Array<[Principal, bigint]>>;
     tokens_query: ActorMethod<[], Array<TokenInfo>>;
+    updated: ActorMethod<[], bigint>;
     version: ActorMethod<[], number>;
     wallet_balance: ActorMethod<[], bigint>;
     wallet_receive: ActorMethod<[], bigint>;

@@ -90,10 +90,10 @@ export const initBalance = async (
         setAllTokenBalanceFetching(false);
         computationTotalBalanceAmount();
 
-        setTimeout(() => {
-            console.log('🚀 ~ refreshBalance ~ refreshBalance');
-            initBalance(connectedIdentity, tokenList);
-        }, 15000);
+        // setTimeout(() => {
+        //     console.log('🚀 ~ refreshBalance ~ refreshBalance');
+        //     initBalance(connectedIdentity, tokenList);
+        // }, 15000);
     });
 };
 

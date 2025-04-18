@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import Icon from '@/components/ui/icon';
-import { formatNumber } from '@/utils/numbers';
+import { formatNumber, truncateDecimalToBN } from '@/utils/numbers';
 
 function TotalVolume({ totalTVL }: { totalTVL: number | undefined }) {
     const { t } = useTranslation();
@@ -13,7 +13,9 @@ function TotalVolume({ totalTVL }: { totalTVL: number | undefined }) {
                 {typeof totalTVL === 'undefined' ? (
                     <Icon name="loading" className="mt-2 h-[20px] w-[20px] animate-spin text-[#07c160]" />
                 ) : (
-                    <p className="mt-2 text-[20px] font-medium text-black">${formatNumber(totalTVL)}</p>
+                    <p className="mt-2 text-[20px] font-medium text-black">
+                        ${formatNumber(truncateDecimalToBN(totalTVL, 4))}
+                    </p>
                 )}
             </div>
             {/* <div className="flex flex-col">

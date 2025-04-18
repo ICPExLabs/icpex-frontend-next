@@ -150,47 +150,18 @@ export const idlFactory = ({ IDL }) => {
         module_hash: IDL.Opt(IDL.Vec(IDL.Nat8)),
         reserved_cycles: IDL.Nat,
     });
-    const TokenPairPool = IDL.Record({
-        amm: IDL.Text,
-        token0: IDL.Principal,
-        token1: IDL.Principal,
+    const NextArchiveCanisterConfig = IDL.Record({
+        maintainers: IDL.Opt(IDL.Vec(IDL.Principal)),
+        wasm: IDL.Opt(IDL.Vec(IDL.Nat8)),
+        max_memory_size_bytes: IDL.Opt(IDL.Nat64),
+        max_length: IDL.Nat64,
     });
-    const TokenPairCreateArgs = IDL.Record({
-        created: IDL.Opt(IDL.Nat64),
-        memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-        pool: TokenPairPool,
+    const CurrentArchiving = IDL.Record({
+        canister_id: IDL.Principal,
+        length: IDL.Nat64,
+        max_length: IDL.Nat64,
+        block_height_offset: IDL.Nat64,
     });
-    const OuterLP = IDL.Record({
-        fee: IDL.Nat,
-        decimals: IDL.Nat8,
-        token_canister_id: IDL.Principal,
-        minimum_liquidity: IDL.Nat,
-        total_supply: IDL.Nat,
-    });
-    const InnerLP = IDL.Record({
-        fee: IDL.Nat,
-        decimals: IDL.Nat8,
-        dummy_canister_id: IDL.Principal,
-        minimum_liquidity: IDL.Nat,
-        total_supply: IDL.Nat,
-    });
-    const PoolLp = IDL.Variant({ outer: OuterLP, inner: InnerLP });
-    const SwapV2MarketMakerView = IDL.Record({
-        lp: PoolLp,
-        price_cumulative_exponent: IDL.Nat8,
-        block_timestamp_last: IDL.Nat64,
-        reserve0: IDL.Text,
-        reserve1: IDL.Text,
-        subaccount: IDL.Text,
-        price1_cumulative_last: IDL.Text,
-        token0: IDL.Text,
-        token1: IDL.Text,
-        fee_rate: IDL.Text,
-        k_last: IDL.Text,
-        protocol_fee: IDL.Opt(IDL.Text),
-        price0_cumulative_last: IDL.Text,
-    });
-    const MarketMakerView = IDL.Variant({ swap_v2: SwapV2MarketMakerView });
     const TransferError = IDL.Variant({
         GenericError: IDL.Record({
             message: IDL.Text,
@@ -233,12 +204,13 @@ export const idlFactory = ({ IDL }) => {
     });
     const BusinessError = IDL.Variant({
         InvalidTokenPair: IDL.Tuple(IDL.Principal, IDL.Principal),
-        TokenBlockChainLocked: IDL.Null,
+        SwapBlockChainAppendLocked: IDL.Null,
         TransferError: TransferError,
         NotSupportedToken: IDL.Principal,
         Swap: IDL.Text,
         TokenPairAmmNotExist: TokenPairAmm,
         TokenAccountsLocked: IDL.Vec(TokenAccount),
+        SystemError: IDL.Text,
         MemoTooLong: IDL.Null,
         InsufficientBalance: IDL.Record({
             token: IDL.Principal,
@@ -246,6 +218,7 @@ export const idlFactory = ({ IDL }) => {
         }),
         TokenPairAmmExist: TokenPairAmm,
         RequestTraceLocked: IDL.Text,
+        TokenBlockChainAppendLocked: IDL.Null,
         InvalidCreated: IDL.Record({
             created: IDL.Nat64,
             system: IDL.Nat64,
@@ -255,16 +228,70 @@ export const idlFactory = ({ IDL }) => {
             fee: IDL.Nat,
             token: IDL.Principal,
         }),
-        SwapBlockChainLocked: IDL.Null,
         TokenBlockChainError: IDL.Text,
         TransferFromError: TransferFromError,
         TokenAccountsUnlocked: IDL.Vec(TokenAccount),
         NotOwner: IDL.Principal,
+        BadTransferFee: IDL.Record({ expected_fee: IDL.Nat }),
         SwapBlockChainError: IDL.Text,
         CallCanisterError: IDL.Tuple(RejectionCode, IDL.Text),
         Liquidity: IDL.Text,
         Expired: IDL.Record({ deadline: IDL.Nat64, system: IDL.Nat64 }),
     });
+    const Result = IDL.Variant({ Ok: IDL.Null, Err: BusinessError });
+    const ArchivedBlocks = IDL.Record({
+        canister_id: IDL.Principal,
+        length: IDL.Nat64,
+        block_height_offset: IDL.Nat64,
+    });
+    const BlockChainView = IDL.Record({
+        current_archiving: IDL.Opt(CurrentArchiving),
+        latest_block_hash: IDL.Vec(IDL.Nat8),
+        archive_config: NextArchiveCanisterConfig,
+        next_block_index: IDL.Nat64,
+        archived: IDL.Vec(ArchivedBlocks),
+    });
+    const TokenPairPool = IDL.Record({
+        amm: IDL.Text,
+        token0: IDL.Principal,
+        token1: IDL.Principal,
+    });
+    const TokenPairCreateArgs = IDL.Record({
+        created: IDL.Opt(IDL.Nat64),
+        memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+        pool: TokenPairPool,
+    });
+    const OuterLP = IDL.Record({
+        fee: IDL.Nat,
+        decimals: IDL.Nat8,
+        token_canister_id: IDL.Principal,
+        minimum_liquidity: IDL.Nat,
+        total_supply: IDL.Nat,
+    });
+    const InnerLP = IDL.Record({
+        fee: IDL.Nat,
+        decimals: IDL.Nat8,
+        dummy_canister_id: IDL.Principal,
+        minimum_liquidity: IDL.Nat,
+        total_supply: IDL.Nat,
+    });
+    const PoolLp = IDL.Variant({ outer: OuterLP, inner: InnerLP });
+    const SwapV2MarketMakerView = IDL.Record({
+        lp: PoolLp,
+        price_cumulative_exponent: IDL.Nat8,
+        block_timestamp_last: IDL.Nat64,
+        reserve0: IDL.Text,
+        reserve1: IDL.Text,
+        subaccount: IDL.Text,
+        price1_cumulative_last: IDL.Text,
+        token0: IDL.Text,
+        token1: IDL.Text,
+        fee_rate: IDL.Text,
+        k_last: IDL.Text,
+        protocol_fee: IDL.Opt(IDL.Text),
+        price0_cumulative_last: IDL.Text,
+    });
+    const MarketMakerView = IDL.Variant({ swap_v2: SwapV2MarketMakerView });
     const TokenPairCreateResult = IDL.Variant({
         Ok: MarketMakerView,
         Err: BusinessError,
@@ -343,6 +370,22 @@ export const idlFactory = ({ IDL }) => {
         deadline: IDL.Opt(IDL.Nat64),
         amount_out: IDL.Nat,
         amount_in_max: IDL.Nat,
+    });
+    const TokenPairSwapWithDepositAndWithdrawArgs = IDL.Record({
+        to: Account,
+        created: IDL.Opt(IDL.Nat64),
+        amount_out_min: IDL.Nat,
+        from: Account,
+        memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+        path: IDL.Vec(SwapTokenPair),
+        deadline: IDL.Opt(IDL.Nat64),
+        deposit_amount_without_fee: IDL.Nat,
+        withdraw_fee: IDL.Opt(IDL.Nat),
+        deposit_fee: IDL.Opt(IDL.Nat),
+    });
+    const TokenChangedResult = IDL.Variant({
+        Ok: IDL.Nat,
+        Err: BusinessError,
     });
     const PauseReason = IDL.Record({
         timestamp_nanos: IDL.Int,
@@ -500,7 +543,11 @@ export const idlFactory = ({ IDL }) => {
         pair_swap_tokens_for_exact_tokens: PairSwapTokensForExactTokensArgWithMeta,
         token_withdraw: TokenDepositArgWithMeta,
     });
-    const Result = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
+    const RequestTraceResult = IDL.Variant({ ok: IDL.Text, err: IDL.Text });
+    const RequestTraceDone = IDL.Record({
+        result: RequestTraceResult,
+        done: IDL.Nat64,
+    });
     const BusinessLocks = IDL.Record({
         token: IDL.Opt(IDL.Bool),
         swap: IDL.Opt(IDL.Bool),
@@ -508,22 +555,19 @@ export const idlFactory = ({ IDL }) => {
     });
     const RequestTrace = IDL.Record({
         args: RequestArgs,
-        done: IDL.Opt(IDL.Tuple(IDL.Nat64, Result)),
+        done: IDL.Opt(RequestTraceDone),
         traces: IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Text)),
         locks: BusinessLocks,
         index: IDL.Nat64,
     });
     const TokenDepositArgs = IDL.Record({
         to: Account,
+        fee: IDL.Opt(IDL.Nat),
         created: IDL.Opt(IDL.Nat64),
         token: IDL.Principal,
         from: Account,
         memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
         deposit_amount_without_fee: IDL.Nat,
-    });
-    const TokenChangedResult = IDL.Variant({
-        Ok: IDL.Nat,
-        Err: BusinessError,
     });
     const TokenInfo = IDL.Record({
         fee: IDL.Nat,
@@ -543,6 +587,7 @@ export const idlFactory = ({ IDL }) => {
     });
     const TokenWithdrawArgs = IDL.Record({
         to: Account,
+        fee: IDL.Opt(IDL.Nat),
         created: IDL.Opt(IDL.Nat64),
         token: IDL.Principal,
         from: Account,
@@ -570,6 +615,16 @@ export const idlFactory = ({ IDL }) => {
         canister_status: IDL.Func([], [CanisterStatusResponse], []),
         config_fee_to_query: IDL.Func([], [IDL.Opt(Account)], []),
         config_fee_to_replace: IDL.Func([IDL.Opt(Account)], [IDL.Opt(Account)], []),
+        config_swap_blocks_push: IDL.Func([], [], []),
+        config_token_archive_config_replace: IDL.Func([NextArchiveCanisterConfig], [NextArchiveCanisterConfig], []),
+        config_token_archive_max_length_replace: IDL.Func([IDL.Nat64], [IDL.Opt(CurrentArchiving)], []),
+        config_token_archived_canister_maintainers_set: IDL.Func(
+            [IDL.Principal, IDL.Opt(IDL.Vec(IDL.Principal))],
+            [Result],
+            [],
+        ),
+        config_token_block_chain: IDL.Func([], [BlockChainView], []),
+        config_token_blocks_push: IDL.Func([], [Result], []),
         pair_create: IDL.Func([TokenPairCreateArgs], [TokenPairCreateResult], []),
         pair_liquidity_add: IDL.Func([TokenPairLiquidityAddArgs, IDL.Opt(IDL.Nat8)], [TokenPairLiquidityAddResult], []),
         pair_liquidity_remove: IDL.Func(
@@ -587,6 +642,11 @@ export const idlFactory = ({ IDL }) => {
         pair_swap_tokens_for_exact_tokens: IDL.Func(
             [TokenPairSwapTokensForExactTokensArgs, IDL.Opt(IDL.Nat8)],
             [TokenPairSwapTokensResult],
+            [],
+        ),
+        pair_swap_with_deposit_and_withdraw: IDL.Func(
+            [TokenPairSwapWithDepositAndWithdrawArgs],
+            [TokenChangedResult, IDL.Opt(TokenPairSwapTokensResult), IDL.Opt(TokenChangedResult)],
             [],
         ),
         pairs_query: IDL.Func([], [IDL.Vec(IDL.Tuple(TokenPairPool, MarketMakerView))], ['query']),
@@ -611,6 +671,7 @@ export const idlFactory = ({ IDL }) => {
         schedule_find: IDL.Func([], [IDL.Opt(IDL.Nat64)], ['query']),
         schedule_replace: IDL.Func([IDL.Opt(IDL.Nat64)], [], []),
         schedule_trigger: IDL.Func([], [], []),
+        test_config_token_current_archiving_replace: IDL.Func([CurrentArchiving], [IDL.Opt(CurrentArchiving)], []),
         test_withdraw_all_tokens: IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Vec(IDL.Text)], []),
         token_balance: IDL.Func([IDL.Principal, IDL.Opt(IDL.Vec(IDL.Nat8))], [IDL.Nat], ['query']),
         token_balance_by: IDL.Func([IDL.Principal, Account], [IDL.Nat], ['query']),
@@ -623,6 +684,7 @@ export const idlFactory = ({ IDL }) => {
         tokens_balance_by: IDL.Func([Account], [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat))], ['query']),
         tokens_balance_of: IDL.Func([Account], [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat))], ['query']),
         tokens_query: IDL.Func([], [IDL.Vec(TokenInfo)], ['query']),
+        updated: IDL.Func([], [IDL.Nat64], ['query']),
         version: IDL.Func([], [IDL.Nat32], ['query']),
         wallet_balance: IDL.Func([], [IDL.Nat], ['query']),
         wallet_receive: IDL.Func([], [IDL.Nat], []),

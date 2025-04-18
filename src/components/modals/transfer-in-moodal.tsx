@@ -1,6 +1,6 @@
 import { InputNumber, Modal, Toast } from '@douyinfe/semi-ui';
 import BigNumber from 'bignumber.js';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import transferSvg from '@/assets/svg/transfer.svg';
@@ -19,7 +19,13 @@ import { SelectTokenModal } from './select-token-modal';
 export const TokenTransferInModal = () => {
     const { t } = useTranslation();
 
-    const { showTransferInModal, setShowTransferInModal, updateAllTokenBalance } = useTokenStore();
+    const {
+        showTransferInModal,
+        transferInDefaultToken,
+        setShowTransferInModal,
+        updateAllTokenBalance,
+        setTransferInDefaultToken,
+    } = useTokenStore();
     const { connectedIdentity } = useIdentityStore();
     const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
 
@@ -101,6 +107,15 @@ export const TokenTransferInModal = () => {
             setAmount(truncateDecimalToBN(amount, 4));
         }
     };
+
+    useEffect(() => {
+        if (showTransferInModal) {
+            console.log('🚀 ~ useEffect ~ transferInDefaultToken:', transferInDefaultToken);
+            setToken(transferInDefaultToken);
+        } else {
+            setTransferInDefaultToken('ICP');
+        }
+    }, [showTransferInModal, transferInDefaultToken, setTransferInDefaultToken]);
 
     return (
         <>
@@ -217,6 +232,7 @@ export const TokenTransferInModal = () => {
                     setToken(tokenInfo.symbol);
                     setShowSelectTokenModal(false);
                 }}
+                specifyWalletMode={'wallet'}
             />
         </>
     );
