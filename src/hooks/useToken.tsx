@@ -55,6 +55,8 @@ export const useTokenBalanceBySymbol = (symbol: string | undefined): TypeTokenBa
     }, [symbol, allTokenBalance, tokenList]);
 };
 
+let lastRefreshTime = 0;
+let isPolling = false;
 export const initBalance = async (
     connectedIdentity: ConnectedIdentity | undefined,
     tokenList: TokenInfo[] | undefined,
@@ -64,11 +66,14 @@ export const initBalance = async (
 
     if (!connectedIdentity) return;
     if (!tokenList) return;
+    if (isPolling) return;
 
     if (allTokenBalanceFetching) {
         console.log('🚀 ~ addAllTokenBalanceFetching ~ true');
         return;
     }
+
+    isPolling = true;
     setAllTokenBalanceFetching(true);
     const { principal } = connectedIdentity;
     const contractBalanceRes = await get_tokens_balance(connectedIdentity, {
@@ -87,13 +92,34 @@ export const initBalance = async (
             addAllTokenBalance(item.canister_id.toString(), res);
         }),
     ).finally(() => {
+        // setAllTokenBalanceFetching(false);
+        // computationTotalBalanceAmount();
+
+        // setTimeout(() => {
+        //     if (connectedIdentity && tokenList) {
+        //         console.log('🚀 ~ refreshBalance ~ refreshBalance');
+        //         initBalance(connectedIdentity, tokenList);
+        //     }
+        // }, 5000);
+
+        lastRefreshTime = Date.now();
+        isPolling = false;
         setAllTokenBalanceFetching(false);
         computationTotalBalanceAmount();
 
-        // setTimeout(() => {
-        //     console.log('🚀 ~ refreshBalance ~ refreshBalance');
-        //     initBalance(connectedIdentity, tokenList);
-        // }, 15000);
+        const poll = () => {
+            const now = Date.now();
+            const elapsed = now - lastRefreshTime;
+
+            if (elapsed >= 15000 && !document.hidden) {
+                console.log('🚀 ~ refreshBalance ~ refreshBalance');
+                initBalance(connectedIdentity, tokenList);
+            } else {
+                requestAnimationFrame(poll);
+            }
+        };
+
+        requestAnimationFrame(poll);
     });
 };
 

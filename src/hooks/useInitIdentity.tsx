@@ -1,5 +1,4 @@
 import { useConnect } from '@connect2ic/react';
-import { useInterval } from 'ahooks';
 import { useEffect } from 'react';
 
 import { checkConnected } from '@/components/connect/connect';
@@ -43,6 +42,7 @@ export const useInitIdentity = () => {
 
     useEffect(() => {
         if (isConnected && tokenList && connectedIdentity) {
+            console.log('🚀 ~ initBalance');
             initBalance(connectedIdentity, tokenList);
         }
     }, [isConnected, tokenList, connectedIdentity]);
